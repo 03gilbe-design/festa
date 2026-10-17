@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Festa di laurea di Gilberto</title>
+<meta property="og:title" content="🎓 Festa di laurea di Gilberto">
+<meta property="og:description" content="Tocca i giorni in cui ci sei. Ci vuole un minuto.">
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 440px; margin: 0 auto; padding: 16px; font-size: 18px; line-height: 1.4; color: #111; background: #fff; }
+  h1 { font-size: 24px; margin: 0; }
+  .sub { margin: 2px 0 8px; color: #444; font-size: 16px; }
+  h2 { font-size: 20px; margin: 24px 0 8px; }
+  .mese { font-size: 18px; margin: 16px 0 6px; text-transform: capitalize; }
+  .lab { display: block; font-weight: 700; margin: 16px 0 6px; }
+  input[type=text], textarea, select { width: 100%; box-sizing: border-box; padding: 12px; font: inherit; border: 2px solid #555; border-radius: 8px; background: #fff; color: #111; }
+  textarea { min-height: 80px; }
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  legend { font-weight: 700; padding: 0; margin: 16px 0 0; }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .wd { text-align: center; font-size: 13px; font-weight: 700; color: #444; }
+  .d, .x { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; min-height: 40px; border-radius: 8px; font-size: 17px; }
+  .x { color: #767676; }
+  .d { position: relative; border: 2px solid #555; cursor: pointer; font-weight: 600; }
+  .d input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .d.on { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+  .d:focus-within { outline: 3px solid #f59e0b; outline-offset: 2px; }
+  .d small { position: absolute; bottom: 1px; font-size: 10px; font-weight: 700; }
+  .chiuso { border-style: dashed; color: #767676; text-decoration: line-through; }
+  button { width: 100%; min-height: 52px; margin-top: 12px; font: inherit; font-size: 20px; font-weight: 700; border: 2px solid #1d4ed8; border-radius: 8px; background: #1d4ed8; color: #fff; cursor: pointer; }
+  button:disabled { background: #555; border-color: #555; }
+  .sec { background: #fff; color: #1d4ed8; }
+  .link { background: none; border: 0; color: #1d4ed8; text-decoration: underline; font-size: 17px; font-weight: 400; min-height: 44px; margin-top: 4px; }
+  :focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+  .err { margin-top: 12px; font-weight: 700; text-align: center; color: #b91c1c; }
+  .info { font-size: 16px; color: #1d4ed8; font-weight: 600; margin: 6px 0 0; }
+  .card { border: 2px solid #1d4ed8; border-radius: 12px; padding: 16px; margin-top: 16px; }
+  .card h2 { margin-top: 0; }
+  details { margin-top: 16px; }
+  summary { cursor: pointer; color: #1d4ed8; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+  .prec { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; align-items: center; margin: 8px 0; }
+  ol, ul { list-style: none; padding: 0; margin: 0; }
+  #ris li, #persone li { padding: 10px 0; border-bottom: 1px solid #ddd; }
+  .top { font-weight: 700; }
+  .chi { font-size: 15px; color: #444; }
+  #adminbar { position: sticky; top: 0; z-index: 2; background: #fde047; color: #111; font-weight: 700; padding: 10px 16px; margin: -16px -16px 12px; display: flex; justify-content: space-between; align-items: center; }
+  #adminbar .link { width: auto; margin: 0; color: #111; }
+  .riga { display: flex; gap: 8px; }
+  .riga button { min-height: 44px; font-size: 16px; margin-top: 6px; }
+  .nota { font-size: 15px; font-style: italic; color: #444; }
+</style>
+</head>
+<body>
+<div id="adminbar" hidden>Modalità admin <button id="esci" class="link" type="button">Esci</button></div>
+<main>
+<h1>🎓 Festa di laurea di Gilberto</h1>
+<p class="sub">San Bonifacio · ottobre/novembre</p>
+
+<section id="grazie" class="card" hidden>
+  <h2 id="grazie-t" tabindex="-1" role="status"></h2>
+  <p id="grazie-g"></p>
+  <button id="cambia" type="button" class="sec">Cambia i miei giorni</button>
+  <button id="nonsei" type="button" class="link"></button>
+</section>
+
+<form id="f" novalidate>
+  <p id="adm-edit" class="info" hidden></p>
+  <label class="lab" for="nome">Il tuo nome</label>
+  <input type="text" id="nome" name="nome" maxlength="60" autocomplete="name" placeholder="es. Anna Rossi" required>
+  <p id="avviso" class="info" hidden></p>
+  <fieldset>
+    <legend>Tocca i giorni in cui ci sei</legend>
+    <div id="mesi"></div>
+  </fieldset>
+  <details id="piu">
+    <summary>Vuoi essere più preciso? (facoltativo)</summary>
+    <div id="prec"></div>
+    <label class="lab" for="note">Vuoi aggiungere qualcosa?</label>
+    <textarea id="note" name="note" maxlength="300" placeholder="es. il 5 novembre ho un esame"></textarea>
+    <p class="chi">Lo legge solo Gilberto.</p>
+  </details>
+  <p id="bozza" class="info" hidden>Non hai ancora inviato. Premi il bottone qui sotto.</p>
+  <button id="b" type="submit">Invia</button>
+  <button id="annulla" type="button" class="link" hidden>Annulla</button>
+  <p id="msg" class="err" role="alert"></p>
+  <p id="lento" class="info" hidden>Ci vuole un attimo, non chiudere.</p>
+</form>
+
+<section id="ris" aria-labelledby="ris-t">
+  <h2 id="ris-t">Chi c'è finora</h2>
+  <div id="ris-c">Caricamento…</div>
+</section>
+
+<section id="adm" hidden>
+  <h2 id="pers-t">Persone</h2>
+  <p id="adm-msg" class="info" role="status"></p>
+  <ul id="persone"></ul>
+  <h2>Giorni votabili</h2>
+  <button id="apri" type="button" class="sec">Apri o chiudi giorni</button>
+  <div id="giorni-box" hidden>
+    <p class="info">Tocca un giorno per aprirlo o chiuderlo</p>
+    <div id="cal-adm"></div>
+    <button id="salva-g" type="button">Salva giorni</button>
+    <button id="annulla-g" type="button" class="link">Annulla</button>
+  </div>
+</section>
+</main>
+<script>
+  // Server che salva i voti (Apps Script, file Code.gs).
+  const SERVER = 'https://script.google.com/macros/s/AKfycbxwVlxv7fAEmWuuBAg8Ny8ciK-sZck3ALe0-MQzHhSuyWyUCDvq0AEA0CBYoS4-O9sS7A/exec';
+  // Valori iniziali, uguali a Code.gs: la pagina si disegna subito, poi il server conferma.
+  const DAL = '2026-10-19', AL = '2026-11-15', CHIUSI = ['2026-10-30', '2026-10-31', '2026-11-01'];
+  const TIPI = { '✔': 'Tutto il giorno', pomeriggio: 'Solo pomeriggio', sera: 'Solo sera', forse: 'Forse' };
+  const SIGLA = { pomeriggio: 'pom', sera: 'sera', forse: '?' };
+
+  const $ = id => document.getElementById(id);
+  // Compatibili anche con telefoni vecchi (iOS 12+, Android Chrome 70+).
+  const svuota = (el, ...figli) => { while (el.firstChild) el.removeChild(el.firstChild); el.append(...figli); };
+  const scadenza = ms => { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; };
+  const norm = s => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  const it = (iso, o) => new Date(iso + 'T00:00:00Z').toLocaleDateString('it-IT', Object.assign({ timeZone: 'UTC' }, o));
+  const breve = iso => it(iso, { weekday: 'short', day: 'numeric', month: 'short' });
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} },
+  };
+
+  let TUTTI = [];
+  for (let d = new Date(DAL + 'T00:00:00Z'); d <= new Date(AL + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + 1)) TUTTI.push(d.toISOString().slice(0, 10));
+  let aperti = TUTTI.filter(g => !CHIUSI.includes(g));
+  let voti = null;          // [{nome, giorni: {iso: tipo}}] dal server
+  let note = {};            // solo admin
+  let scelte = {};          // giorni scelti nel form: {iso: tipo}
+  let vecchio = '';         // nome con cui è salvata la riga che si sta modificando
+  let auto = false;         // giorni precompilati da un voto esistente (non toccati a mano)
+  let adminEdit = false;    // l'admin sta modificando il voto di un altro
+
+  // Segreto admin: letto dal link e tolto subito dalla barra degli indirizzi.
+  const qs = new URLSearchParams(location.search);
+  let admin = qs.get('admin') || '';
+  if (admin) history.replaceState(null, '', location.pathname);
+
+  const mio = () => store.get('nome') || '';
+  const votoDi = n => voti && voti.find(v => norm(v.nome) === norm(n));
+
+  // ---------- calendario ----------
+  function calendario(box, giorni, sel, modo) {
+    // modo 'voto': solo i giorni aperti si toccano; 'giorni': tutti, per aprire/chiudere (admin)
+    svuota(box);
+    const primo = giorni[0], ultimo = giorni[giorni.length - 1];
+    const fine = new Date(ultimo + 'T00:00:00Z');
+    for (let m = new Date(primo.slice(0, 8) + '01T00:00:00Z'); m <= fine; m.setUTCMonth(m.getUTCMonth() + 1)) {
+      const h = document.createElement('h3');
+      h.className = 'mese';
+      h.textContent = m.toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long', year: 'numeric' });
+      const cal = document.createElement('div');
+      cal.className = 'cal';
+      ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom'].forEach(w => {
+        const s = document.createElement('div');
+        s.className = 'wd'; s.setAttribute('aria-hidden', 'true'); s.textContent = w;
+        cal.append(s);
+      });
+      const celle = [];
+      for (let i = 0; i < (m.getUTCDay() + 6) % 7; i++) celle.push(document.createElement('div'));
+      const n = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 0)).getUTCDate();
+      for (let g = 1; g <= n; g++) {
+        const iso = m.toISOString().slice(0, 8) + String(g).padStart(2, '0');
+        const ok = modo === 'giorni' ? TUTTI.includes(iso) : aperti.includes(iso);
+        if (!ok) {
+          const x = document.createElement('div');
+          x.className = 'x'; x.setAttribute('aria-hidden', 'true'); x.textContent = g;
+          celle.push(x);
+          continue;
+        }
+        const l = document.createElement('label');
+        l.className = 'd' + (sel[iso] ? ' on' : (modo === 'giorni' ? ' chiuso' : ''));        const c = document.createElement('input');
+        c.type = 'checkbox'; c.value = iso; c.checked = !!sel[iso];
+        const nome = it(iso, { weekday: 'long', day: 'numeric', month: 'long' });
+        c.setAttribute('aria-label', modo === 'giorni' ? nome + (sel[iso] ? ', aperto' : ', chiuso') : nome);
+        const num = document.createElement('span');
+        num.setAttribute('aria-hidden', 'true'); num.textContent = g;
+        l.append(c, num);
+        if (modo === 'voto' && SIGLA[sel[iso]]) {
+          const s = document.createElement('small');
+          s.setAttribute('aria-hidden', 'true'); s.textContent = SIGLA[sel[iso]];
+          l.append(s);
+        }
+        celle.push(l);
+      }
+      // Solo le settimane con almeno un giorno toccabile.
+      for (let i = 0; i < celle.length; i += 7) {
+        const sett = celle.slice(i, i + 7);
+        if (sett.some(c => c.classList && c.classList.contains('d'))) cal.append(...sett);
+      }
+      box.append(h, cal);
+    }
+  }
+
+  function disegnaForm() {
+    calendario($('mesi'), TUTTI, scelte, 'voto');
+    // Precisazioni facoltative: una riga per ogni giorno scelto.
+    const prec = $('prec');
+    svuota(prec);
+    const giorni = Object.keys(scelte).filter(g => aperti.includes(g)).sort();
+    if (!giorni.length) {
+      const p = document.createElement('p');
+      p.className = 'chi'; p.textContent = 'Prima tocca qualche giorno nel calendario.';
+      prec.append(p);
+    }
+    giorni.forEach(g => {
+      const r = document.createElement('div');
+      r.className = 'prec';
+      const l = document.createElement('label');
+      l.htmlFor = 'p-' + g; l.textContent = breve(g);
+      const s = document.createElement('select');
+      s.id = 'p-' + g;
+      Object.entries(TIPI).forEach(([v, t]) => s.append(new Option(t, v, false, scelte[g] === v)));
+      s.addEventListener('change', () => { scelte[g] = s.value; auto = false; salvaBozza(); disegnaForm(); $('p-' + g).focus(); });
+      r.append(l, s);
+      prec.append(r);
+    });
+  }
+
+  $('mesi').addEventListener('change', e => {
+    const g = e.target.value;
+    if (e.target.checked) scelte[g] = '✔'; else delete scelte[g];
+    auto = false;
+    $('msg').textContent = '';
+    salvaBozza();
+    disegnaForm();
+    const c = $('mesi').querySelector('input[value="' + g + '"]');
+    if (c) c.focus();
+  });
+
+  // ---------- bozza: sopravvive a ricarica, tasto indietro, telefono spento ----------
+  function salvaBozza() {
+    if (adminEdit) return;
+    store.set('bozza', { nome: $('nome').value, note: $('note').value, scelte, vecchio });
+  }
+  $('note').addEventListener('input', salvaBozza);
+  $('nome').addEventListener('input', salvaBozza);
+
+  // ---------- stati della pagina ----------
+  function statoForm(opz) {
+    $('grazie').hidden = true;
+    $('f').hidden = false;
+    const v = votoDi(vecchio);
+    $('b').textContent = adminEdit ? 'Salva per ' + $('nome').value.trim() : (v ? 'Salva modifiche' : 'Invia');
+    $('annulla').hidden = !(adminEdit || v);
+    $('adm-edit').hidden = !adminEdit;
+    if (adminEdit) $('adm-edit').textContent = 'Stai modificando il voto di ' + vecchio + '.';
+    $('piu').open = !!(opz && opz.apri);
+    disegnaForm();
+  }
+
+  function statoGrazie() {
+    const v = votoDi(mio());
+    if (!v) return statoForm();
+    adminEdit = false;
+    $('f').hidden = true;
+    $('grazie').hidden = false;
+    $('grazie-t').textContent = 'Grazie, ' + v.nome + '! ✔';
+    const g = Object.keys(v.giorni).filter(d => aperti.includes(d)).sort();
+    $('grazie-g').textContent = 'I tuoi giorni: ' + (g.length ? g.map(d => breve(d) + (v.giorni[d] !== '✔' ? ' (' + TIPI[v.giorni[d]].toLowerCase() + ')' : '')).join(', ') : 'nessuno');
+    $('nonsei').textContent = 'Non sei ' + v.nome + '?';
+  }
+
+  function caricaVoto(v, n) {
+    scelte = Object.assign({}, v.giorni);
+    vecchio = v.nome;
+    $('nome').value = v.nome;
+    $('note').value = n || '';
+    return Object.values(scelte).some(t => t !== '✔') || !!n;
+  }
+
+  // Nome scritto a mano: se ha già un voto, lo si carica per modificarlo.
+  $('nome').addEventListener('change', () => {
+    if (adminEdit) return statoForm();
+    const v = votoDi($('nome').value);
+    const av = $('avviso');
+    if (v && norm(v.nome) !== norm(vecchio)) {
+      if (!Object.keys(scelte).length || auto) {
+        scelte = Object.assign({}, v.giorni);
+        auto = true;
+      }
+      if (!vecchio) vecchio = v.nome;
+      av.hidden = false;
+      av.textContent = norm(v.nome) === norm(mio())
+        ? 'Hai già votato: cambia i giorni e premi Salva modifiche.'
+        : 'C\'è già un voto a nome «' + v.nome + '». Se sei tu, cambia pure i giorni. Se sei un\'altra persona, aggiungi l\'iniziale del cognome (es. ' + v.nome.split(' ')[0] + ' B.).';
+    } else if (!v) {
+      if (auto) scelte = {};
+      auto = false;
+      if (vecchio && !votoDi(vecchio)) vecchio = '';
+      av.hidden = true;
+    }
+    salvaBozza();
+    statoForm({ apri: $('piu').open });
+  });
+
+  $('cambia').addEventListener('click', () => {
+    const v = votoDi(mio());
+    const apri = caricaVoto(v, '');
+    statoForm({ apri });
+    $('nome').focus();
+  });
+  $('nonsei').addEventListener('click', () => {
+    store.del('nome'); store.del('bozza');
+    scelte = {}; vecchio = ''; $('nome').value = ''; $('note').value = '';
+    $('avviso').hidden = true;
+    statoForm();
+    $('nome').focus();
+  });
+  $('annulla').addEventListener('click', () => {
+    adminEdit = false;
+    store.del('bozza');
+    scelte = {}; vecchio = ''; $('nome').value = ''; $('note').value = ''; $('avviso').hidden = true;
+    if (votoDi(mio())) { statoGrazie(); $('grazie-t').focus(); }
+    else statoForm();
+  });
+
+  // ---------- invio ----------
+  async function chiama(dati) {
+    const body = new URLSearchParams();
+    Object.entries(dati).forEach(([k, v]) => [].concat(v).forEach(x => body.append(k, x)));
+    if (admin) body.append('admin', admin);
+    // Corpo urlencoded = richiesta "semplice": niente preflight CORS, niente cookie Google.
+    const r = await fetch(SERVER, { method: 'POST', body, signal: scadenza(45000) });
+    return r.json();
+  }
+
+  $('f').addEventListener('submit', async e => {
+    e.preventDefault();
+    const nome = $('nome').value.trim().replace(/\s+/g, ' ');
+    const giorni = Object.keys(scelte).filter(g => aperti.includes(g)).sort();
+    if (!nome) { $('msg').textContent = 'Scrivi il tuo nome'; $('nome').focus(); return; }
+    if (!giorni.length) { $('msg').textContent = 'Tocca almeno un giorno'; $('mesi').querySelector('input').focus(); return; }
+    const testo = $('b').textContent;
+    const dati = { azione: 'vota', nome, vecchio, note: $('note').value, g: giorni.map(g => scelte[g] === '✔' ? g : g + ':' + scelte[g]) };
+    $('b').disabled = true; $('b').textContent = 'Invio…'; $('msg').textContent = '';
+    const t = setTimeout(() => { $('lento').hidden = false; }, 3000);
+    try {
+      const res = await chiama(dati);
+      if (!res.ok) throw new Error(res.msg);
+      const nuovo = { nome, giorni: Object.fromEntries(giorni.map(g => [g, scelte[g]])) };
+      if (voti) voti = voti.filter(v => norm(v.nome) !== norm(vecchio) && norm(v.nome) !== norm(nome)).concat(nuovo);
+      if (adminEdit) {
+        note[nome] = dati.note;
+        if (norm(vecchio) !== norm(nome)) delete note[vecchio];
+        if (norm(vecchio) === norm(mio())) store.set('nome', nome);
+        adminEdit = false;
+        scelte = {}; vecchio = ''; $('nome').value = ''; $('note').value = '';
+        $('adm-msg').textContent = 'Voto di ' + nome + ' aggiornato ✔';
+        if (votoDi(mio())) statoGrazie(); else statoForm();
+        $('adm-msg').scrollIntoView({ block: 'center' });
+      } else {
+        store.set('nome', nome);
+        store.del('bozza');
+        if (admin) note[nome] = dati.note;
+        $('avviso').hidden = true; $('bozza').hidden = true;
+        statoGrazie();
+        $('grazie-t').focus();
+      }
+      risultati();
+      persone();
+    } catch (err) {
+      $('msg').textContent = err.name === 'Error' && err.message ? err.message : 'Voto NON salvato: niente connessione. I giorni sono ancora qui, riprova.';
+      $('b').textContent = testo;
+    } finally {
+      clearTimeout(t);
+      $('lento').hidden = true;
+      $('b').disabled = false;
+      if ($('b').textContent === 'Invio…') $('b').textContent = testo;
+    }
+  });
+
+  // ---------- risultati ----------
+  function risultati() {
+    const box = $('ris-c');
+    if (!voti) return;
+    $('ris-t').textContent = 'Chi c\'è finora (' + voti.length + (voti.length === 1 ? ' persona)' : ' persone)');
+    const conta = aperti.map(g => {
+      const si = voti.filter(v => v.giorni[g] && v.giorni[g] !== 'forse');
+      const forse = voti.filter(v => v.giorni[g] === 'forse');
+      return { g, si, forse };
+    }).filter(x => x.si.length || x.forse.length)
+      .sort((a, b) => b.si.length - a.si.length || b.forse.length - a.forse.length || a.g.localeCompare(b.g));
+    if (!conta.length) { box.textContent = 'Ancora nessun voto: sei il primo!'; return; }
+    const max = conta[0].si.length;
+    const voce = x => {
+      const li = document.createElement('li');
+      const t = document.createElement('div');
+      const top = x.si.length === max && max > 0;
+      if (top) t.className = 'top';
+      t.textContent = (top ? '⭐ ' : '') + breve(x.g) + ' · ' + x.si.length + (x.si.length === 1 ? ' persona' : ' persone') + (x.forse.length ? ' + ' + x.forse.length + ' forse' : '');
+      const chi = document.createElement('div');
+      chi.className = 'chi';
+      chi.textContent = x.si.map(v => v.nome + (v.giorni[x.g] === '✔' ? '' : ' (' + v.giorni[x.g] + ')')).concat(x.forse.map(v => v.nome + ' (forse)')).join(', ');
+      li.append(t, chi);
+      return li;
+    };
+    const ol = document.createElement('ol');
+    conta.slice(0, 3).forEach(x => ol.append(voce(x)));
+    const parti = [ol];
+    if (conta.length > 3) {
+      const det = document.createElement('details');
+      const s = document.createElement('summary');
+      s.textContent = 'Vedi tutti i giorni';
+      const ol2 = document.createElement('ol');
+      conta.slice(3).forEach(x => ol2.append(voce(x)));
+      det.append(s, ol2);
+      parti.push(det);
+    }
+    svuota(box, ...parti);
+  }
+
+  // ---------- admin ----------
+  function persone() {
+    if (!admin || !voti) return;
+    $('adm').hidden = false;
+    $('pers-t').textContent = 'Persone (' + voti.length + ')';
+    const ul = $('persone');
+    svuota(ul);
+    voti.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'it')).forEach(v => {
+      const li = document.createElement('li');
+      const t = document.createElement('div');
+      t.className = 'top'; t.textContent = v.nome;
+      const g = Object.keys(v.giorni).filter(d => aperti.includes(d)).sort();
+      const c = document.createElement('div');
+      c.className = 'chi';
+      c.textContent = g.map(d => breve(d) + (v.giorni[d] !== '✔' ? ' (' + v.giorni[d] + ')' : '')).join(', ') || 'nessun giorno aperto';
+      li.append(t, c);
+      if (note[v.nome]) {
+        const n = document.createElement('div');
+        n.className = 'nota'; n.textContent = '“' + note[v.nome] + '”';
+        li.append(n);
+      }
+      const r = document.createElement('div');
+      r.className = 'riga';
+      const mod = document.createElement('button');
+      mod.type = 'button'; mod.className = 'sec'; mod.textContent = 'Modifica';
+      mod.setAttribute('aria-label', 'Modifica il voto di ' + v.nome);
+      mod.addEventListener('click', () => {
+        adminEdit = true;
+        const apri = caricaVoto(v, note[v.nome]);
+        $('avviso').hidden = true;
+        statoForm({ apri });
+        window.scrollTo(0, 0);
+        $('nome').focus();
+      });
+      const del = document.createElement('button');
+      del.type = 'button'; del.className = 'sec'; del.textContent = 'Elimina';
+      del.setAttribute('aria-label', 'Elimina il voto di ' + v.nome);
+      del.addEventListener('click', async () => {
+        const n = Object.keys(v.giorni).length;
+        if (!confirm('Eliminare il voto di ' + v.nome + ' (' + n + (n === 1 ? ' giorno' : ' giorni') + ')?')) return;
+        del.disabled = true;
+        try {
+          const res = await chiama({ azione: 'elimina', nome: v.nome });
+          if (!res.ok) throw new Error(res.msg);
+          voti = voti.filter(x => x !== v);
+          $('adm-msg').textContent = 'Voto di ' + v.nome + ' eliminato.';
+          if (norm(v.nome) === norm(mio())) { store.del('nome'); statoForm(); }
+          risultati(); persone();
+        } catch (err) {
+          del.disabled = false;
+          $('adm-msg').textContent = err.message && err.name === 'Error' ? err.message : 'Non eliminato: niente connessione, riprova.';
+        }
+      });
+      r.append(mod, del);
+      li.append(r);
+      ul.append(li);
+    });
+  }
+
+  let selGiorni = {};
+  $('apri').addEventListener('click', () => {
+    selGiorni = Object.fromEntries(aperti.map(g => [g, true]));
+    calendario($('cal-adm'), TUTTI, selGiorni, 'giorni');
+    $('giorni-box').hidden = false; $('apri').hidden = true; $('f').hidden = true; $('grazie').hidden = true;
+  });
+  $('cal-adm').addEventListener('change', e => {
+    const g = e.target.value;
+    if (!e.target.checked) {
+      const n = voti ? voti.filter(v => v.giorni[g]).length : 0;
+      if (n && !confirm(n + (n === 1 ? ' persona aveva' : ' persone avevano') + ' scelto ' + breve(g) + '. Chiuderlo? I loro voti restano salvati e ricompaiono se lo riapri.')) { e.target.checked = true; return; }
+      delete selGiorni[g];
+    } else selGiorni[g] = true;
+    calendario($('cal-adm'), TUTTI, selGiorni, 'giorni');
+    const c = $('cal-adm').querySelector('input[value="' + g + '"]');
+    if (c) c.focus();
+  });
+  function chiudiGiorni() {
+    $('giorni-box').hidden = true; $('apri').hidden = false;
+    if (votoDi(mio()) && !Object.keys(scelte).length) statoGrazie(); else statoForm();
+  }
+  $('annulla-g').addEventListener('click', chiudiGiorni);
+  $('salva-g').addEventListener('click', async () => {
+    const g = TUTTI.filter(d => selGiorni[d]);
+    if (!g.length) { $('adm-msg').textContent = 'Lascia aperto almeno un giorno.'; return; }
+    $('salva-g').disabled = true;
+    try {
+      const res = await chiama({ azione: 'giorni', g });
+      if (!res.ok) throw new Error(res.msg);
+      aperti = g;
+      $('adm-msg').textContent = 'Giorni salvati ✔';
+      chiudiGiorni(); risultati(); persone();
+    } catch (err) {
+      $('adm-msg').textContent = err.message && err.name === 'Error' ? err.message : 'Non salvato: niente connessione, riprova.';
+    } finally { $('salva-g').disabled = false; }
+  });
+  $('esci').addEventListener('click', () => { location.href = location.pathname; });
+
+  // ---------- avvio ----------
+  async function carica() {
+    $('ris-c').textContent = 'Caricamento…';
+    try {
+      const res = await (await fetch(SERVER, { signal: scadenza(30000) })).json();
+      voti = res.voti; aperti = res.aperti; TUTTI = res.tutti;
+    } catch (e) {
+      const p = document.createElement('p');
+      p.textContent = 'Non riesco a vedere i voti degli altri.';
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'sec'; b.textContent = 'Riprova';
+      b.addEventListener('click', carica);
+      svuota($('ris-c'), p, b);
+      disegnaForm();
+      return;
+    }
+    if (admin) {
+      try {
+        const res = await chiama({ azione: 'verifica' });
+        if (res.ok) { note = res.note || {}; $('adminbar').hidden = false; } else admin = '';
+      } catch (e) { admin = ''; }
+    }
+    risultati();
+    persone();
+    if (!$('f').hidden && (Object.keys(scelte).length || $('nome').value.trim())) { statoForm({ apri: $('piu').open }); return; }
+    if (votoDi(mio())) statoGrazie(); else statoForm();
+  }
+
+  // Bozza non inviata (ricarica, indietro, telefono spento): si riprende da dove si era.
+  const bz = store.get('bozza');
+  if (bz && (Object.keys(bz.scelte || {}).length || bz.nome)) {
+    scelte = bz.scelte || {}; vecchio = bz.vecchio || '';
+    $('nome').value = bz.nome || ''; $('note').value = bz.note || '';
+    $('bozza').hidden = !Object.keys(scelte).length;
+    statoForm({ apri: Object.values(scelte).some(t => t !== '✔') || !!bz.note });
+  } else {
+    disegnaForm();
+  }
+  carica();
+</script>
+</body>
+</html>
