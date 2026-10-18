@@ -219,13 +219,15 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 
 .sheet .xc{position:absolute;top:10px;right:12px;z-index:2;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--fill);color:var(--ink);font-size:26px;font-weight:600;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
 
-@-webkit-keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
-@keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
-.carico .g[data-g]{background-image:none;background-color:#e3e6ea;-webkit-animation:accendi 1.6s ease-in-out infinite;animation:accendi 1.6s ease-in-out infinite;color:transparent;pointer-events:none}
+@-webkit-keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
+@keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
+.carico .g[data-g]{background-image:none;background-color:#dfe3e8;color:transparent;pointer-events:none;opacity:.72}
+.carico .g.sk-onda{-webkit-animation:accendi 1.8s ease-in-out infinite;animation:accendi 1.8s ease-in-out infinite}
+.carico .g.sk-ferma{opacity:.72}
 .carico .g[data-g] .o{opacity:0}
 .caricamento{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 8px;color:var(--ink);font-weight:700}
 .caricamento .spin{flex:none;border-color:var(--line);border-top-color:var(--acc)}
-@media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}@keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}.carico .g[data-g]{background-color:#2b2f36}}
+@media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#20242a;opacity:.3}50%{background-color:#4b535f;opacity:1}}@keyframes accendi{0%,100%{background-color:#20242a;opacity:.3}50%{background-color:#4b535f;opacity:1}}.carico .g[data-g]{background-color:#343a43}}
 @media (prefers-reduced-motion:reduce){.carico .g[data-g]{-webkit-animation:none;animation:none}}
 
 .cbox{margin-top:8px;border:2px solid var(--fill);border-radius:12px;overflow:hidden;background:var(--bg)}
@@ -890,7 +892,8 @@ function renderCal() {
       var iso = mk + '-' + (d < 10 ? '0' : '') + d;
       if (giorni.indexOf(iso) < 0) { celle.push(el('div', 'g vuoto')); continue; }
       if (!avail(iso)) { var x = el('div', 'g x', String(d)); x.setAttribute('aria-hidden', 'true'); celle.push(x); continue; } // passato, chiuso o voti chiusi: stesso segno
-      var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d))); if (!VOTI) { b.disabled = true; b.style.webkitAnimationDelay = (-d * 90) + 'ms'; b.style.animationDelay = (-d * 90) + 'ms'; }
+      var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
+      if (!VOTI) { var onda = d % 5 !== 0 && d % 5 !== 3; b.disabled = true; b.className += onda ? ' sk-onda' : ' sk-ferma'; if (onda) { b.style.webkitAnimationDelay = (-d * 110) + 'ms'; b.style.animationDelay = (-d * 110) + 'ms'; } }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
