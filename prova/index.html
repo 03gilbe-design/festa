@@ -212,6 +212,23 @@ body.mano .squig, body.mano .av svg, body.mano h1 { -webkit-filter: url(#mano); 
 body.mano .squig { stroke-width: 4; }
 body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .cal > * { font-size: 17px !important; }
 
+.mcal{margin:2px 0 6px}
+.mm{font-size:13px;font-weight:700;color:var(--mut);text-transform:capitalize;margin:6px 0 2px}
+.mg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.mg .mv,.mg .mo,.mg .mc{height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:15px;box-sizing:border-box}
+.mg .mo{color:var(--t3,#b0b6c0)}
+.mg .mc{border:0;padding:0;background:var(--fill);color:var(--ink);font-weight:700;-webkit-tap-highlight-color:transparent}
+.mg .mc{position:relative}
+.cn{position:absolute;top:5px;left:5px;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.85;pointer-events:none}
+.mg .mc .cn{left:auto;right:5px}
+.chip.conn{display:flex;width:100%;box-sizing:border-box;align-items:flex-start;border-radius:16px;padding:6px 12px 6px 6px}
+.chip.conn .av{flex:none}
+.chip.conn .cb{display:flex;flex-direction:column;min-width:0;text-align:left}
+.chip .cn2{font-weight:700}
+.chip .ct{font-size:14px;color:var(--mut);white-space:normal;overflow-wrap:anywhere;word-wrap:break-word}
+.sheet .seg.vis{margin-top:8px}
+.mg .mc[aria-pressed="true"]{background:var(--acc);color:var(--onacc)}
+
 .slitta{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0}
 .slitta .pg{flex:none;width:100%;box-sizing:border-box;padding:0 16px;scroll-snap-align:center}
 
@@ -535,14 +552,16 @@ function deveOk(dati) {
 }
 
 // ---------- fogli ----------
-function sheet(titolo, build) {
+function sheet(titolo, build, senzaTesta) { // senzaTesta: niente titolo ne' x (si chiude col velo, Escape o indietro)
   var gia = !!$('over').firstChild;
   clear($('over'));
   var v = el('div', 'velo'), s = el('section', 'sheet'); s.setAttribute('role', 'dialog'); s.setAttribute('aria-modal', 'true'); s.setAttribute('aria-label', titolo);
   v.addEventListener('click', function () { closeSheet(); }); s.appendChild(el('div', 'mani'));
-  var t = el('div', 'sh-t'); t.appendChild(document.createTextNode(titolo));
-  var x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Chiudi'); x.addEventListener('click', function () { closeSheet(); }); t.appendChild(x); s.appendChild(t);
-  build(s); $('over').appendChild(v); $('over').appendChild(s); x.focus();
+  var x = null;
+  if (!senzaTesta) { var t = el('div', 'sh-t'); t.appendChild(document.createTextNode(titolo));
+    x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Chiudi'); x.addEventListener('click', function () { closeSheet(); }); t.appendChild(x); s.appendChild(t); }
+  build(s); $('over').appendChild(v); $('over').appendChild(s);
+  if (x) x.focus(); else { s.tabIndex = -1; try { s.focus({ preventScroll: true }); } catch (e) {} }
   if (!gia) passo('sheet');
 }
 function closeSheet(daIndietro, dopo) {
@@ -565,14 +584,21 @@ function scegliAvatar(s, senzaFatto) {
 function sheetAvatar() {
   sheet('Avatar', scegliAvatar);
 }
-function chipsChiViene(iso, tutti) { // chi ha detto di esserci quel giorno (avatar + nome)
+function notaDi(testo, iso) { var k = chiaveGiorno(iso), r = String(testo || '').split('\n'); for (var i = 0; i < r.length; i++) if (r[i].indexOf(k) === 0) return r[i].slice(k.length).trim(); return ''; }
+function chipsChiViene(iso, tutti) { // chi ha detto di esserci quel giorno: avatar + nome (+ commento di QUEL giorno, solo se pubblico: i privati non arrivano dal server)
   var ch = el('div', 'chips'); ch.className += ' chiviene';
-  (tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso)).slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) { var c = el('span', 'chip'); c.appendChild(av(v.nome, '')); c.appendChild(document.createTextNode(v.nome.split(' ')[0] + (/forse/.test(v.giorni[iso]) ? ' ?' : ''))); ch.appendChild(c); });
+  (tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso)).slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) {
+    var t = notaDi(v.commento, iso), c = el('span', 'chip' + (t ? ' conn' : '')), nm = v.nome.split(' ')[0] + (/forse/.test(v.giorni[iso]) ? ' ?' : '');
+    c.appendChild(av(v.nome, v.avatar || ''));
+    if (t) { var cb = el('span', 'cb'); cb.appendChild(el('span', 'cn2', nm)); cb.appendChild(el('span', 'ct', t)); c.appendChild(cb); } else c.appendChild(document.createTextNode(nm));
+    ch.appendChild(c);
+  });
   return ch;
 }
 function sheetChiViene(iso) {
   sheet(dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }), function (s) { var ch = chipsChiViene(iso, true); if (!ch.childNodes.length) s.appendChild(el('p', 'hint', 'Nessuno ancora')); else s.appendChild(ch); });
 }
+function segnaNota(iso, cella) { var m = cella || document.querySelector('.sheet .mc[data-gc="' + iso + '"]'); if (!m) return; var d = m.querySelector('.cn'); if (notaGiorno(iso)) { if (!d) { d = el('i', 'cn'); d.setAttribute('aria-hidden', 'true'); m.appendChild(d); } } else if (d) m.removeChild(d); }
 function sheetOpzioni() {
   store.set('dettagli_visti', 1);
   if (!(editable() && giorniScelti().length)) { closeSheet(); toast('Tocca prima un giorno'); return; }
@@ -599,32 +625,54 @@ function sheetOpzioni() {
       var cur = p0;
       seg(s1, [['tutto', 'Tutto il giorno', [], 't', 'Tutto il giorno'], ['pom', 'Pomeriggio', [], 't', 'Pomeriggio'], ['sera', 'Sera', [], 't', 'Sera']], p0.f, function (f) { cur = { f: f, si: cur.si }; agg(cur.f, cur.si); });
       [['si', 'Sì'], ['forse', 'Forse']].forEach(function (o) {
-        var b = el('button', '', o[0] === 'si' ? 'Sì' : '?'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', (p0.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
+        var b = el('button', '', o[0] === 'si' ? 'Sì' : 'Forse'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', (p0.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
         b.addEventListener('click', function () { cur = { f: cur.f, si: o[0] === 'si' }; agg(cur.f, cur.si); Array.prototype.forEach.call(s2.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); s2.appendChild(b);
       });
       ct.appendChild(s1); ct.appendChild(s2); box.appendChild(ct);
-      var dn = el('textarea', 'dnote'); dn.id = 'nota-giorno'; dn.rows = 2; dn.maxLength = 120; dn.value = notaGiorno(iso); dn.placeholder = 'Commento per questo giorno (es. ho un esame)'; dn.setAttribute('aria-label', 'Commento per questo giorno');
-      dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); renderBar(); }); box.appendChild(dn);
+      var dn = el('textarea', 'dnote'); dn.id = 'nota-giorno'; dn.rows = 2; dn.maxLength = 120; dn.value = notaGiorno(iso); dn.placeholder = 'Commento facoltativo (es. esame o impegno)'; dn.setAttribute('aria-label', 'Commento per questo giorno');
+      dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); segnaNota(iso); renderBar(); renderCal(); }); box.appendChild(dn);
+      var s3 = el('div', 'seg vis'); s3.setAttribute('role', 'group'); s3.setAttribute('aria-label', 'Chi vede il commento'); // un solo valore per tutti i commenti della persona, uguale in ogni pagina
+      [[true, 'Pubblico'], [false, 'Solo admin']].forEach(function (o) {
+        var b = el('button', '', o[1]); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('data-vis', o[0] ? '1' : '0'); b.setAttribute('aria-pressed', !!S.pubblico === o[0] ? 'true' : 'false');
+        b.addEventListener('click', function () { S.pubblico = o[0]; S.commToccato = true; S.dirty = true; salvaBozza(); Array.prototype.forEach.call(document.querySelectorAll('.sheet [data-vis]'), function (x) { x.setAttribute('aria-pressed', (x.getAttribute('data-vis') === '1') === o[0] ? 'true' : 'false'); }); }); s3.appendChild(b);
+      });
+      box.appendChild(s3);
       if (altri(iso).length) box.appendChild(chipsChiViene(iso));
       return box;
     }
     if (gs.length) {
-      var chips = el('div', 'gchips'); chips.setAttribute('role', 'group'); chips.setAttribute('aria-label', 'Giorni scelti');
+      var chips = el('div', 'mcal'); chips.setAttribute('role', 'group'); chips.setAttribute('aria-label', 'Giorni scelti');
       slide = el('div', 'slitta'); slide.setAttribute('role', 'group'); slide.setAttribute('aria-label', 'Dettagli del giorno');
       var cs = [];
       function vai(n, liscio) { try { slide.scrollTo ? slide.scrollTo({ left: n * slide.clientWidth, behavior: liscio ? 'smooth' : 'auto' }) : (slide.scrollLeft = n * slide.clientWidth); } catch (e) { slide.scrollLeft = n * slide.clientWidth; } }
-      function evidenzia(n) { cs.forEach(function (c, k) { c.setAttribute('aria-pressed', k === n ? 'true' : 'false'); if (k === n) { try { chips.scrollLeft = c.offsetLeft - 16; } catch (e) {} } }); }
-      gs.forEach(function (g, n) {
-        var pg = el('div', 'pg'); pg.setAttribute('data-gc', g); pg.appendChild(pannello(g)); slide.appendChild(pg);
-        var c = el('button', 'gc', dl(g, { weekday: 'short' }).replace('.', '') + ' ' + (+g.slice(8))); c.type = 'button'; c.setAttribute('aria-label', lungo(g)); c.setAttribute('data-gc', g);
-        c.addEventListener('click', function () { vai(n, true); }); chips.appendChild(c); cs.push(c);
+      function evidenzia(n) { cs.forEach(function (c, k) { c.setAttribute('aria-pressed', k === n ? 'true' : 'false'); }); }
+      gs.forEach(function (g) { var pg = el('div', 'pg'); pg.setAttribute('data-gc', g); pg.appendChild(pannello(g)); slide.appendChild(pg); });
+      // mini calendario: solo le settimane con giorni scelti; tocco su un giorno scelto = scorre a quel giorno
+      var mesi = {}; gs.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
+      Object.keys(mesi).sort().forEach(function (mk) {
+        var y = +mk.slice(0, 4), m = +mk.slice(5) - 1, nd = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), off = (new Date(Date.UTC(y, m, 1)).getUTCDay() + 6) % 7;
+        var lab = el('div', 'mm', new Date(Date.UTC(y, m, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); chips.appendChild(lab);
+        var gr = el('div', 'mg'), sett = {};
+        mesi[mk].forEach(function (g) { sett[Math.floor((+g.slice(8) - 1 + off) / 7)] = 1; });
+        Object.keys(sett).forEach(function (w) {
+          for (var c = 0; c < 7; c++) {
+            var d = +w * 7 + c - off + 1, cell;
+            if (d < 1 || d > nd) { cell = el('span', 'mv'); gr.appendChild(cell); continue; }
+            var iso = mk + '-' + (d < 10 ? '0' : '') + d, n = gs.indexOf(iso);
+            if (n < 0) { cell = el('span', 'mo', String(d)); cell.setAttribute('aria-hidden', 'true'); gr.appendChild(cell); continue; }
+            cell = el('button', 'mc', String(d)); cell.type = 'button'; cell.setAttribute('aria-label', lungo(iso)); cell.setAttribute('data-gc', iso);
+            (function (nn) { cell.addEventListener('click', function () { vai(nn, true); }); })(n); gr.appendChild(cell); cs[n] = cell; segnaNota(iso, cell);
+          }
+        });
+        chips.appendChild(gr);
       });
       s.appendChild(chips); s.appendChild(slide);
       var i0 = Math.max(0, gs.indexOf(S.focus)); evidenzia(i0);
       setTimeout(function () { vai(i0, false); }, 0);
       slide.addEventListener('scroll', function () { var n = Math.round(slide.scrollLeft / (slide.clientWidth || 1)); if (gs[n]) { evidenzia(n); if (gs[n] !== S.focus) { S.focus = gs[n]; renderCal(); } } });
     }
-  });
+  }, true);
+  var th = $('over').querySelector('.sheet > .sh-t'); if (th) th.parentNode.removeChild(th); // una sola croce: quella del giorno; si chiude anche toccando fuori o con indietro
 }
 // Punto a parte in alto a destra: ritrovare il proprio voto da un altro telefono / cambiare persona.
 function sheetPersona() {
@@ -807,6 +855,7 @@ function renderCal() {
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (!VOTI) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
+      if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
       if (mine && (p.f !== 'tutto' || !p.si)) { var fq = el('span', 'fq'); fq.setAttribute('aria-hidden', 'true'); if (p.f === 'pom') fq.appendChild(document.createTextNode('pom')); else if (p.f === 'sera') fq.appendChild(document.createTextNode('sera')); if (!p.si) fq.appendChild(document.createTextNode('?')); b.appendChild(fq); }
       if (iso === OGGI) b.className += ' oggi';
       if (iso === S.focus) b.className += ' foc';
@@ -880,7 +929,7 @@ function renderBar() {
     b.className += ' cambia'; b.type = 'button'; b.appendChild(ico('matita')); b.appendChild(document.createTextNode('Cambia'));
     b.addEventListener('click', cambia);
   } else {
-    var nb = el('button', 'ib'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('puntini')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); r.appendChild(nb);
+    var nb = el('button', 'ib'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); r.appendChild(nb);
     if (S.edit || S.adminEdit) { var cb = el('button', 'ib'); cb.type = 'button'; cb.id = 'annulla-mod'; cb.setAttribute('aria-label', 'Annulla le modifiche'); cb.appendChild(el('span', '', '×')); cb.firstChild.style.cssText = 'font-size:30px;line-height:1'; cb.addEventListener('click', function () { annullaModifica(); }); r.appendChild(cb); }
     if (S.invio) { b.className += ' lavora'; b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salvo…' : 'Invio…')); b.setAttribute('aria-busy', 'true'); }
     else {
