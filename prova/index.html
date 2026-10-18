@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#ffffff">
 <meta name="robots" content="noindex, nofollow">
-<title>PROVA - Festa di laurea</title>
+<title>Festa di laurea di Gilberto</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Festa di laurea di Gilberto">
 <meta property="og:description" content="Tocca i giorni in cui ci sei.">
@@ -294,7 +294,10 @@ body.invio .ib, body.invio .sugg { pointer-events: none; }
 .fl-ok { position: absolute; right: -5px; bottom: -4px; display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--acc); color: var(--onacc); border: 2px solid var(--bg); }
 .fl-ok .ico { width: 10px; height: 10px; stroke-width: 3.6; }
 .fl-piu { display: flex; align-items: center; justify-content: center; background: var(--fill); color: var(--mut); font-size: 12px; font-weight: 700; }
-.fila-n { margin-left: 10px; font-size: 16px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.fila-n { display: flex; align-items: center; gap: 4px; margin-left: 10px; font-size: 16px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.fila-n .ico { width: 16px; height: 16px; }
+.cambia-nome { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 64px); min-height: 44px; margin: 8px 0 0 64px; }
+.cambia-nome .ico { width: 18px; height: 18px; }
 .inv.manca .pers { opacity: .5; }
 .inv .pers .gia { color: var(--acc); margin-left: 8px; }
 header .wrap { position: relative; }
@@ -386,7 +389,7 @@ var TOCCO = 'tutto|si';
 var VALIDO = /^(tutto|pom|sera)\|(si|forse)$/;
 var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 6000, RICARICA_MS = 60000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
 var AVATARI = ['jeans', 'gpt', 'claude', 'razzo', 'medico', 'soldi', 'computer', 'gatto', 'cane', 'pizza', 'palla', 'chitarra', 'caffe', 'fiore', 'sole', 'gufo', 'cappello', 'brindisi', 'libro', 'fotocamera', 'ironman', 'drink', 'hennessy', 'jack', 'gemini', 'sigaretta', 'gattino'];   // elenco generato da assembla_v3.py dagli id a-... dello sprite (i nuovi in fondo)
-// Aspetto (admin): UGUALE a ASPETTO_OPZIONI in Code.gs, prima opzione = predefinita. Classe su <body> per l'opzione non predefinita.
+// Aspetto (admin): UGUALE a ASPETTO_OPZIONI in Code.gs, prima opzione = predefinita. Classe su <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div> per l'opzione non predefinita.
 var ASPETTO_OPZIONI = { stile: ['pulito', 'mano'], colore: ['blu', 'verde'], weekend: ['grande', 'uguale'] };
 var ASPETTO_CLASSE = { 'stile:mano': 'mano', 'colore:verde': 'verde', 'weekend:uguale': 'pesi' };
 var ASPETTO_NOMI = { stile: ['Stile', 'Pulito', 'A mano libera'], colore: ['Colore', 'Blu', 'Verde'], weekend: ['Weekend', 'Grandi', 'Uguali'] };
@@ -740,7 +743,7 @@ function renderFila() {
   });
   if (ord.length > mostra.length) { var piu = el('span', 'fl fl-piu', '+' + (ord.length - mostra.length)); cer.appendChild(piu); }
   bt.appendChild(cer);
-  var n = el('span', 'fila-n', voti.length + (tot ? '/' + tot : '')); n.setAttribute('aria-hidden', 'true'); bt.appendChild(n);
+  var n = el('span', 'fila-n'); n.setAttribute('aria-hidden', 'true'); n.appendChild(ico('persona')); n.appendChild(document.createTextNode(voti.length + (tot ? '/' + tot : ''))); bt.appendChild(n);
   bt.addEventListener('click', sheetInvitati);
   f.appendChild(bt);
 }
@@ -811,6 +814,10 @@ function renderName() {
   inp.addEventListener('focus', kbSeAperta); inp.addEventListener('blur', function () { document.body.classList.remove('kb'); });
   row.appendChild(inp);
   b.appendChild(row);
+  if (S.voted && !S.edit) {
+    var cambiaB = el('button', 'btn sec cambia-nome'); cambiaB.type = 'button'; cambiaB.id = 'b'; cambiaB.appendChild(ico('matita')); cambiaB.appendChild(document.createTextNode('Modifica il tuo voto'));
+    cambiaB.addEventListener('click', cambia); b.appendChild(cambiaB);
+  }
   var sl = el('div'); sl.id = 'sugg'; b.appendChild(sl); sugg();
 }
 // Nome scritto a mano: se ha gia' un voto lo si carica per modificarlo (pausa di 0,4 s: ridisegnare mentre il dito tocca un giorno lo farebbe perdere).
@@ -937,6 +944,7 @@ function renderBar() {
   if (document.activeElement && document.activeElement.id === 'serve' && !S.invio && !S.errore) return;
   var bar = $('bar'), tz = bar.querySelector('.toast');
   Array.prototype.slice.call(bar.children).forEach(function (c) { if (c !== tz) bar.removeChild(c); });
+  if (S.voted && !S.edit) return;
   var ex = esiste(), needKey = ex && ex.protetto && !S.adminEdit && !ricordo.get('chiavi', ex.nome);
   if (S.errore) { // messaggio umano + (se la rete e' giu') il bottone WhatsApp
     var er = el('div', 'errbox'); er.id = 'errore'; er.setAttribute('role', 'alert'); er.appendChild(document.createTextNode(S.errore)); bar.appendChild(er);
@@ -952,10 +960,7 @@ function renderBar() {
     cr.appendChild(ki); if (S.keyErr) { ki.setAttribute('aria-invalid', 'true'); var em = el('span', 'em', 'Chiave sbagliata'); em.id = 'serve-e'; em.setAttribute('role', 'alert'); cr.appendChild(em); } bar.appendChild(cr);
   }
   var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
-  if (S.voted && !S.edit) {
-    b.className += ' cambia'; b.type = 'button'; b.appendChild(ico('matita')); b.appendChild(document.createTextNode('Cambia'));
-    b.addEventListener('click', cambia);
-  } else {
+  {
     var nb = el('button', 'ib'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); r.appendChild(nb);
     if (S.edit || S.adminEdit) { var cb = el('button', 'ib'); cb.type = 'button'; cb.id = 'annulla-mod'; cb.setAttribute('aria-label', 'Annulla le modifiche'); cb.appendChild(el('span', '', '×')); cb.firstChild.style.cssText = 'font-size:30px;line-height:1'; cb.addEventListener('click', function () { annullaModifica(); }); r.appendChild(cb); }
     if (S.invio) { b.className += ' lavora'; b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salvo…' : 'Invio…')); b.setAttribute('aria-busy', 'true'); }
