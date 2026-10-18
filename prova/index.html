@@ -600,12 +600,20 @@ function sheetOpzioni() {
       return box;
     }
     if (gs.length) {
-      slide = el('div', 'slitta'); slide.setAttribute('role', 'group'); slide.setAttribute('aria-label', 'Giorni scelti');
-      gs.forEach(function (g) { var pg = el('div', 'pg'); pg.setAttribute('data-gc', g); pg.appendChild(pannello(g)); slide.appendChild(pg); });
-      s.appendChild(slide);
-      var i0 = Math.max(0, gs.indexOf(S.focus));
-      setTimeout(function () { try { slide.scrollLeft = i0 * slide.clientWidth; } catch (e) {} }, 0);
-      slide.addEventListener('scroll', function () { var n = Math.round(slide.scrollLeft / (slide.clientWidth || 1)); if (gs[n] && gs[n] !== S.focus) { S.focus = gs[n]; renderCal(); } });
+      var chips = el('div', 'gchips'); chips.setAttribute('role', 'group'); chips.setAttribute('aria-label', 'Giorni scelti');
+      slide = el('div', 'slitta'); slide.setAttribute('role', 'group'); slide.setAttribute('aria-label', 'Dettagli del giorno');
+      var cs = [];
+      function vai(n, liscio) { try { slide.scrollTo ? slide.scrollTo({ left: n * slide.clientWidth, behavior: liscio ? 'smooth' : 'auto' }) : (slide.scrollLeft = n * slide.clientWidth); } catch (e) { slide.scrollLeft = n * slide.clientWidth; } }
+      function evidenzia(n) { cs.forEach(function (c, k) { c.setAttribute('aria-pressed', k === n ? 'true' : 'false'); if (k === n) { try { chips.scrollLeft = c.offsetLeft - 16; } catch (e) {} } }); }
+      gs.forEach(function (g, n) {
+        var pg = el('div', 'pg'); pg.setAttribute('data-gc', g); pg.appendChild(pannello(g)); slide.appendChild(pg);
+        var c = el('button', 'gc', dl(g, { weekday: 'short' }).replace('.', '') + ' ' + (+g.slice(8))); c.type = 'button'; c.setAttribute('aria-label', lungo(g)); c.setAttribute('data-gc', g);
+        c.addEventListener('click', function () { vai(n, true); }); chips.appendChild(c); cs.push(c);
+      });
+      s.appendChild(chips); s.appendChild(slide);
+      var i0 = Math.max(0, gs.indexOf(S.focus)); evidenzia(i0);
+      setTimeout(function () { vai(i0, false); }, 0);
+      slide.addEventListener('scroll', function () { var n = Math.round(slide.scrollLeft / (slide.clientWidth || 1)); if (gs[n]) { evidenzia(n); if (gs[n] !== S.focus) { S.focus = gs[n]; renderCal(); } } });
     }
   });
 }
