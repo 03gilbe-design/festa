@@ -809,9 +809,9 @@ function renderName() {
   var b = clear($('nomeblk'));
   var row = el('div', 'nome' + (S.nomeErr ? ' err' : ''));
   var ab = el('button', 'avb'); ab.type = 'button'; ab.id = 'avatar'; ab.setAttribute('aria-label', blocca ? 'Avatar' : 'Modifica avatar'); ab.appendChild(avatarNome());
-  if (S.voted && !S.edit) { var ok = el('span', 'ok-b'); ok.appendChild(ico('spunta')); ab.appendChild(ok); ab.setAttribute('aria-label', 'Voto salvato'); }
-  if (!blocca) { ab.className += ' edit'; var eb = el('span', 'ed-b'); eb.appendChild(ico('matita')); ab.appendChild(eb); }
-  if (!blocca) ab.addEventListener('click', sheetAvatar); else if (S.voted && !S.edit) ab.disabled = true;
+  if (!S.adminEdit) { ab.className += ' edit'; var eb = el('span', 'ed-b'); eb.appendChild(ico('matita')); ab.appendChild(eb); ab.setAttribute('aria-label', 'Modifica avatar'); }
+  if (!blocca) ab.addEventListener('click', sheetAvatar);
+  else if (S.voted && !S.edit) ab.addEventListener('click', function () { cambia(); sheetAvatar(); });
   row.appendChild(ab);
   var inp = el('input'); inp.type = 'text'; inp.id = 'nome'; inp.value = S.nome; inp.placeholder = 'Il tuo nome'; inp.setAttribute('aria-label', 'Il tuo nome'); inp.autocomplete = 'name';
   inp.setAttribute('autocapitalize', 'words'); inp.setAttribute('autocorrect', 'off'); inp.setAttribute('spellcheck', 'false'); inp.maxLength = 60; inp.readOnly = blocca;
