@@ -324,6 +324,10 @@ header h1 { padding-right: 50px; }
 .carico .g.m{-webkit-animation:lieve 1.8s ease-in-out infinite;animation:lieve 1.8s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.carico .g.m{-webkit-animation:none;animation:none}}
 .carico .g.sk-r{-webkit-animation:accendi 2.6s ease-in-out infinite;animation:accendi 2.6s ease-in-out infinite}
+@-webkit-keyframes anello{0%{box-shadow:0 0 0 0 rgba(251,146,60,.7)}70%{box-shadow:0 0 0 12px rgba(251,146,60,0)}100%{box-shadow:0 0 0 0 rgba(251,146,60,0)}}
+@keyframes anello{0%{box-shadow:0 0 0 0 rgba(251,146,60,.7)}70%{box-shadow:0 0 0 12px rgba(251,146,60,0)}100%{box-shadow:0 0 0 0 rgba(251,146,60,0)}}
+.avb.hint,.bar .ib.hint{-webkit-animation:anello 1.7s ease-out infinite;animation:anello 1.7s ease-out infinite}
+@media (prefers-reduced-motion:reduce){.avb.hint,.bar .ib.hint{-webkit-animation:none;animation:none;box-shadow:0 0 0 3px rgba(251,146,60,.6)}}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -822,6 +826,7 @@ function renderName() {
   var row = el('div', 'nome' + (S.nomeErr ? ' err' : ''));
   var ab = el('button', 'avb'); ab.type = 'button'; ab.id = 'avatar'; ab.setAttribute('aria-label', blocca ? 'Avatar' : 'Modifica avatar'); ab.appendChild(avatarNome());
   if (!S.adminEdit) { ab.className += ' edit'; var eb = el('span', 'ed-b'); eb.appendChild(ico('matita')); ab.appendChild(eb); ab.setAttribute('aria-label', 'Modifica avatar'); }
+  if (!S.adminEdit && !store.get('avatar_visto')) { ab.className += ' hint'; ab.addEventListener('click', function () { store.set('avatar_visto', 1); ab.classList.remove('hint'); }); } // prima visita: anello che pulsa
   if (!blocca) ab.addEventListener('click', sheetAvatar);
   else if (S.voted && !S.edit) ab.addEventListener('click', function () { cambia(); sheetAvatar(); });
   row.appendChild(ab);
@@ -994,7 +999,7 @@ function renderBar() {
   }
   var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
   {
-    var nb = el('button', 'ib'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) r.appendChild(nb); // la matita compare solo dopo aver scelto un giorno
+    var nb = el('button', 'ib' + (store.get('dettagli_visti') ? '' : ' hint')); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) r.appendChild(nb); // la matita compare solo dopo aver scelto un giorno
     if (S.edit || S.adminEdit) { var cb = el('button', 'ib'); cb.type = 'button'; cb.id = 'annulla-mod'; cb.setAttribute('aria-label', 'Annulla le modifiche'); cb.appendChild(el('span', '', '×')); cb.firstChild.style.cssText = 'font-size:30px;line-height:1'; cb.addEventListener('click', function () { annullaModifica(); }); r.appendChild(cb); }
     if (S.invio) { b.className += ' lavora'; b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salvo…' : 'Invio…')); b.setAttribute('aria-busy', 'true'); }
     else {
