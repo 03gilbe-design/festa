@@ -222,8 +222,6 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 @-webkit-keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
 @keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
 .carico .g[data-g]:not(.m){background-image:none;background-color:#dfe3e8;color:transparent;pointer-events:none;opacity:.72}
-.carico .g.sk-onda{-webkit-animation:accendi 2.4s ease-in-out infinite;animation:accendi 2.4s ease-in-out infinite}
-.carico .g.sk-ferma{-webkit-animation:accendi 2.4s ease-in-out -1.2s infinite;animation:accendi 2.4s ease-in-out -1.2s infinite}
 .carico .g[data-g]:not(.m) .o{opacity:0}
 .caricamento{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 8px;color:var(--ink);font-weight:700}
 .caricamento .spin{flex:none;border-color:var(--line);border-top-color:var(--acc)}
@@ -321,6 +319,15 @@ header h1 { padding-right: 50px; }
 .bar .ib{background:#fdba74}
 .bar .ib .ico,.bar .ib:not([aria-disabled]) .ico{color:#7c2d12}
 .ed-b{background:#fdba74;color:#7c2d12}
+.carico .g.sk-f0{-webkit-animation:accendi 2.4s ease-in-out -0.00s infinite;animation:accendi 2.4s ease-in-out -0.00s infinite}
+.carico .g.sk-f1{-webkit-animation:accendi 2.4s ease-in-out -0.48s infinite;animation:accendi 2.4s ease-in-out -0.48s infinite}
+.carico .g.sk-f2{-webkit-animation:accendi 2.4s ease-in-out -0.96s infinite;animation:accendi 2.4s ease-in-out -0.96s infinite}
+.carico .g.sk-f3{-webkit-animation:accendi 2.4s ease-in-out -1.44s infinite;animation:accendi 2.4s ease-in-out -1.44s infinite}
+.carico .g.sk-f4{-webkit-animation:accendi 2.4s ease-in-out -1.92s infinite;animation:accendi 2.4s ease-in-out -1.92s infinite}
+@-webkit-keyframes lieve{50%{opacity:.8;-webkit-transform:scale(1.04);transform:scale(1.04)}}
+@keyframes lieve{50%{opacity:.8;-webkit-transform:scale(1.04);transform:scale(1.04)}}
+.carico .g.m{-webkit-animation:lieve 1.8s ease-in-out infinite;animation:lieve 1.8s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.carico .g.m{-webkit-animation:none;animation:none}}
 </style>
 </head>
 <body>
@@ -905,7 +912,7 @@ function renderCal() {
     var celle = [], i;
     function tessera(iso, d, y, mm) {
       var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
-      if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += (d + y + mm) % 2 ? ' sk-onda' : ' sk-ferma'; }
+      if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += ' sk-f' + (((new Date(Date.UTC(y, mm, d)).getUTCDay() + 6) % 7) * 3 + Math.floor((d - 1 + (new Date(Date.UTC(y, mm, 1)).getUTCDay() + 6) % 7) / 7) * 2) % 5; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
