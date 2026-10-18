@@ -565,6 +565,14 @@ function scegliAvatar(s, senzaFatto) {
 function sheetAvatar() {
   sheet('Avatar', scegliAvatar);
 }
+function chipsChiViene(iso, tutti) { // chi ha detto di esserci quel giorno (avatar + nome)
+  var ch = el('div', 'chips'); ch.className += ' chiviene';
+  (tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso)).slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) { var c = el('span', 'chip'); c.appendChild(av(v.nome, '')); c.appendChild(document.createTextNode(v.nome.split(' ')[0] + (/forse/.test(v.giorni[iso]) ? ' ?' : ''))); ch.appendChild(c); });
+  return ch;
+}
+function sheetChiViene(iso) {
+  sheet(dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }), function (s) { var ch = chipsChiViene(iso, true); if (!ch.childNodes.length) s.appendChild(el('p', 'hint', 'Nessuno ancora')); else s.appendChild(ch); });
+}
 function sheetOpzioni() {
   store.set('dettagli_visti', 1);
   if (!(editable() && giorniScelti().length)) { closeSheet(); toast('Tocca prima un giorno'); return; }
@@ -597,6 +605,7 @@ function sheetOpzioni() {
       ct.appendChild(s1); ct.appendChild(s2); box.appendChild(ct);
       var dn = el('textarea', 'dnote'); dn.id = 'nota-giorno'; dn.rows = 2; dn.maxLength = 120; dn.value = notaGiorno(iso); dn.placeholder = 'Commento per questo giorno (es. ho un esame)'; dn.setAttribute('aria-label', 'Commento per questo giorno');
       dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); renderBar(); }); box.appendChild(dn);
+      if (altri(iso).length) box.appendChild(chipsChiViene(iso));
       return box;
     }
     if (gs.length) {
@@ -827,7 +836,8 @@ function renderCal() {
 function onDay(e) {
   document.body.classList.remove('kb'); // si sta toccando il calendario: la barra torna fissa
   var iso = e.currentTarget.getAttribute('data-g');
-  if (S.invio || DECISA || !editable()) return;
+  if (S.invio || DECISA) return;
+  if (!editable()) { sheetChiViene(iso); return; }
   if (!S.scelte[iso]) { S.scelte[iso] = TOCCO; S.focus = iso; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
   else togliGiorno(iso); // secondo tocco = toglie (i dettagli stanno nel foglio del pulsante accanto a Invia)
   renderCal(); renderBar();
