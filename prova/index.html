@@ -453,6 +453,11 @@ var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
 var INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var cachePagina = store.get('cachePagina');
+if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.quando < 43200000 && Array.isArray(cachePagina.voti) && Array.isArray(cachePagina.aperti) && Array.isArray(cachePagina.tutti)) {
+  VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; OGGI = cachePagina.oggi || OGGI;
+  DECISA = cachePagina.chiuso ? cachePagina.dataScelta : ''; SCAD = cachePagina.scadenza || ''; aspettoSalvato = cachePagina.aspetto || {};
+}
 var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
 var CESTINO = [];                 // solo admin: [{nome, quando, come}]
 var qs = new URLSearchParams(location.search);
@@ -1326,6 +1331,7 @@ function carica() {
     firmaCalendario = nuovaFirmaCalendario;
     VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; OGGI = res.oggi || OGGI;
     DECISA = res.chiuso ? res.dataScelta : ''; SCAD = res.scadenza || ''; S.letturaKo = false;
+    store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
     aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
     var passo2 = ADMIN ? chiama({ azione: 'verifica' }).then(function (v) {
       if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; } else { ADMIN = ''; adminOk = false; }
