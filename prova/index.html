@@ -212,6 +212,14 @@ body.mano .squig, body.mano .av svg, body.mano h1 { -webkit-filter: url(#mano); 
 body.mano .squig { stroke-width: 4; }
 body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .cal > * { font-size: 17px !important; }
 
+.cbox{margin-top:8px;border:2px solid var(--fill);border-radius:12px;overflow:hidden;background:var(--bg)}
+.sheet .cbox .dnote{margin:0;border:0;border-radius:0;background:transparent}
+.sheet .cbox .seg.vis{margin:0;border-radius:0;background:var(--fill)}
+.sheet .cbox .seg.vis button{font-size:14px}
+.sheet .cbox .seg.vis button .ico{width:18px;height:18px;margin-right:6px}
+.sheet .seg button[data-sf="si"][aria-pressed="true"]{background:#15803d;color:#fff}
+.sheet .seg button[data-sf="forse"][aria-pressed="true"]{background:#c2410c;color:#fff}
+
 .mcal{margin:2px 0 6px}
 .mm{font-size:13px;font-weight:700;color:var(--mut);text-transform:capitalize;margin:6px 0 2px}
 .mg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
@@ -625,18 +633,18 @@ function sheetOpzioni() {
       var cur = p0;
       seg(s1, [['tutto', 'Tutto il giorno', [], 't', 'Tutto il giorno'], ['pom', 'Pomeriggio', [], 't', 'Pomeriggio'], ['sera', 'Sera', [], 't', 'Sera']], p0.f, function (f) { cur = { f: f, si: cur.si }; agg(cur.f, cur.si); });
       [['si', 'Sì'], ['forse', 'Forse']].forEach(function (o) {
-        var b = el('button', '', o[0] === 'si' ? 'Sì' : 'Forse'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', (p0.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
+        var b = el('button', '', o[0] === 'si' ? 'Sì' : 'Forse'); b.type = 'button'; b.setAttribute('data-sf', o[0]); b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', (p0.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
         b.addEventListener('click', function () { cur = { f: cur.f, si: o[0] === 'si' }; agg(cur.f, cur.si); Array.prototype.forEach.call(s2.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); s2.appendChild(b);
       });
       ct.appendChild(s1); ct.appendChild(s2); box.appendChild(ct);
       var dn = el('textarea', 'dnote'); dn.id = 'nota-giorno'; dn.rows = 2; dn.maxLength = 120; dn.value = notaGiorno(iso); dn.placeholder = 'Commento facoltativo (es. esame o impegno)'; dn.setAttribute('aria-label', 'Commento per questo giorno');
-      dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); segnaNota(iso); renderBar(); renderCal(); }); box.appendChild(dn);
+      dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); segnaNota(iso); renderBar(); renderCal(); }); var cbox = el('div', 'cbox'); cbox.appendChild(dn); box.appendChild(cbox);
       var s3 = el('div', 'seg vis'); s3.setAttribute('role', 'group'); s3.setAttribute('aria-label', 'Chi vede il commento'); // un solo valore per tutti i commenti della persona, uguale in ogni pagina
       [[true, 'Pubblico'], [false, 'Solo admin']].forEach(function (o) {
-        var b = el('button', '', o[1]); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('data-vis', o[0] ? '1' : '0'); b.setAttribute('aria-pressed', !!S.pubblico === o[0] ? 'true' : 'false');
+        var b = el('button', ''); b.appendChild(ico(o[0] ? 'gruppo' : 'lucchetto')); b.appendChild(document.createTextNode(o[1])); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('data-vis', o[0] ? '1' : '0'); b.setAttribute('aria-pressed', !!S.pubblico === o[0] ? 'true' : 'false');
         b.addEventListener('click', function () { S.pubblico = o[0]; S.commToccato = true; S.dirty = true; salvaBozza(); Array.prototype.forEach.call(document.querySelectorAll('.sheet [data-vis]'), function (x) { x.setAttribute('aria-pressed', (x.getAttribute('data-vis') === '1') === o[0] ? 'true' : 'false'); }); }); s3.appendChild(b);
       });
-      box.appendChild(s3);
+      cbox.appendChild(s3);
       if (altri(iso).length) box.appendChild(chipsChiViene(iso));
       return box;
     }
