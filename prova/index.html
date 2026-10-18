@@ -221,14 +221,14 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 
 @-webkit-keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
 @keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
-.carico .g[data-g]{background-image:none;background-color:#dfe3e8;color:transparent;pointer-events:none;opacity:.72}
+.carico .g[data-g]:not(.m){background-image:none;background-color:#dfe3e8;color:transparent;pointer-events:none;opacity:.72}
 .carico .g.sk-onda{-webkit-animation:accendi 2.4s ease-in-out infinite;animation:accendi 2.4s ease-in-out infinite}
 .carico .g.sk-ferma{-webkit-animation:accendi 2.4s ease-in-out -1.2s infinite;animation:accendi 2.4s ease-in-out -1.2s infinite}
-.carico .g[data-g] .o{opacity:0}
+.carico .g[data-g]:not(.m) .o{opacity:0}
 .caricamento{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 8px;color:var(--ink);font-weight:700}
 .caricamento .spin{flex:none;border-color:var(--line);border-top-color:var(--acc)}
-@media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#20242a;opacity:.3}50%{background-color:#4b535f;opacity:1}}@keyframes accendi{0%,100%{background-color:#20242a;opacity:.3}50%{background-color:#4b535f;opacity:1}}.carico .g[data-g]{background-color:#343a43}}
-@media (prefers-reduced-motion:reduce){.carico .g[data-g]{-webkit-animation:none;animation:none}}
+@media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#20242a;opacity:.3}50%{background-color:#4b535f;opacity:1}}@keyframes accendi{0%,100%{background-color:#20242a;opacity:.3}50%{background-color:#4b535f;opacity:1}}.carico .g[data-g]:not(.m){background-color:#343a43}}
+@media (prefers-reduced-motion:reduce){.carico .g[data-g]:not(.m){-webkit-animation:none;animation:none}}
 
 .cbox{margin-top:8px;border:2px solid var(--fill);border-radius:12px;overflow:hidden;background:var(--bg)}
 .sheet .cbox .dnote{margin:0;border:0;border-radius:0;background:transparent}
@@ -905,11 +905,11 @@ function renderCal() {
     var celle = [], i;
     function tessera(iso, d, y, mm) {
       var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
-      if (CARICO) { b.disabled = true; b.className += (d + y + mm) % 2 ? ' sk-onda' : ' sk-ferma'; }
+      if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += (d + y + mm) % 2 ? ' sk-onda' : ' sk-ferma'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
-      else if (CARICO) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
+      else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
       if (mine && (p.f !== 'tutto' || !p.si)) { var fq = el('span', 'fq'); fq.setAttribute('aria-hidden', 'true'); if (p.f === 'pom') fq.appendChild(document.createTextNode('pom')); else if (p.f === 'sera') fq.appendChild(document.createTextNode('sera')); if (!p.si) fq.appendChild(document.createTextNode('?')); b.appendChild(fq); }
       if (iso === OGGI) b.className += ' oggi';
@@ -1385,6 +1385,7 @@ document.addEventListener('focusin', function (e) { var id = e.target.id; if (id
     S.commToccato = !!bz.commToccato; S.vecchio = String(bz.vecchio || ''); S.keyNew = String(bz.keyNew || ''); S.dirty = true;
     Object.keys(bz.scelte).forEach(function (g) { if (/^\d{4}-\d\d-\d\d$/.test(g)) S.scelte[g] = VALIDO.test(bz.scelte[g]) ? bz.scelte[g] : TOCCO; });
   }
+  if (VOTI) applicaVotoMio(); // dati in cache: i giorni scelti l'ultima volta sono gia' al loro posto mentre parte l'animazione
   renderAll();
   carica();
 })();
