@@ -212,6 +212,8 @@ body.mano .squig, body.mano .av svg, body.mano h1 { -webkit-filter: url(#mano); 
 body.mano .squig { stroke-width: 4; }
 body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .cal > * { font-size: 17px !important; }
 
+.sheet .qs{margin:10px 0 6px;font-size:15px;font-weight:700;color:var(--mut)}
+
 .sheet.sx{padding-top:58px}
 .sheet.sx .mani{position:absolute;top:8px;left:50%;margin-left:-20px}
 
@@ -608,7 +610,7 @@ function sheetAvatar() {
   sheet('Avatar', scegliAvatar);
 }
 function notaDi(testo, iso) { var k = chiaveGiorno(iso), r = String(testo || '').split('\n'); for (var i = 0; i < r.length; i++) if (r[i].indexOf(k) === 0) return r[i].slice(k.length).trim(); return ''; }
-function chipsChiViene(iso, tutti) { // chi ha detto di esserci quel giorno: avatar + nome (+ commento di QUEL giorno, solo se pubblico: i privati non arrivano dal server)
+function chipsChiViene(iso, tutti, max) { // chi ha detto di esserci quel giorno: avatar + nome (+ commento di QUEL giorno, solo se pubblico: i privati non arrivano dal server)
   var ch = el('div', 'chips'); ch.className += ' chiviene';
   (tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso)).slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) {
     var t = notaDi(v.commento, iso), c = el('span', 'chip' + (t ? ' conn' : '')), nm = v.nome.split(' ')[0] + (/forse/.test(v.giorni[iso]) ? ' ?' : '');
@@ -616,6 +618,7 @@ function chipsChiViene(iso, tutti) { // chi ha detto di esserci quel giorno: ava
     if (t) { var cb = el('span', 'cb'); cb.appendChild(el('span', 'cn2', nm)); cb.appendChild(el('span', 'ct', t)); c.appendChild(cb); } else c.appendChild(document.createTextNode(nm));
     ch.appendChild(c);
   });
+  if (max && ch.childNodes.length > max) { var tot = ch.childNodes.length; while (ch.childNodes.length > max) ch.removeChild(ch.lastChild); var pi = el('span', 'chip'); pi.appendChild(document.createTextNode('+' + (tot - max))); ch.appendChild(pi); }
   return ch;
 }
 function sheetChiViene(iso) {
@@ -634,6 +637,7 @@ function sheetOpzioni() {
       if (!iso || !S.scelte[iso]) return box;
       var h = el('h3', 'sh-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })); h.style.cssText = 'margin-top:14px;font-size:17px';
       box.appendChild(h);
+      var qq = el('p', 'qs', 'Quando sei libero'); box.appendChild(qq);
       var ct = el('div', 'ctrl'), s1 = el('div', 'seg'), s2 = el('div', 'seg'); s1.setAttribute('role', 'group'); s1.setAttribute('aria-label', 'Orario'); s2.setAttribute('role', 'group'); s2.setAttribute('aria-label', 'Sicuro');
       var p0 = parti(S.scelte[iso]);
       function agg(f, si) { S.scelte[iso] = f + '|' + (si ? 'si' : 'forse'); S.auto = false; S.dirty = true; salvaBozza(); renderCal(); }
@@ -659,7 +663,7 @@ function sheetOpzioni() {
         b.addEventListener('click', function () { S.pubblico = o[0]; S.commToccato = true; S.dirty = true; salvaBozza(); Array.prototype.forEach.call(document.querySelectorAll('.sheet [data-vis]'), function (x) { x.setAttribute('aria-pressed', (x.getAttribute('data-vis') === '1') === o[0] ? 'true' : 'false'); }); }); s3.appendChild(b);
       });
       cbox.appendChild(s3);
-      if (altri(iso).length) box.appendChild(chipsChiViene(iso));
+      if (altri(iso).length) box.appendChild(chipsChiViene(iso, false, 6));
       return box;
     }
     if (gs.length) {
