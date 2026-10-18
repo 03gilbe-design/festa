@@ -41,7 +41,20 @@
   summary { cursor: pointer; color: #1d4ed8; font-weight: 600; padding: 10px 0; } /* niente flex: su Chrome <89 sparisce il triangolino */
   .prec { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; align-items: center; margin: 8px 0; }
   ol, ul { list-style: none; padding: 0; margin: 0; }
-  #ris li, #persone li { padding: 10px 0; border-bottom: 1px solid #ddd; }
+  #persone li { padding: 10px 0; border-bottom: 1px solid #ddd; }
+  /* Risultati a mappa di calore: più è scuro, più persone ci sono (numero sempre scritto, non solo colore). */
+  .cal button.d { width: auto; margin: 0; padding: 0; min-height: 36px; font-size: 17px; background: #fff; color: #111; border: 2px solid #ccc; }
+  .cal button.d.h1 { background: #dbeafe; border-color: #93c5fd; }
+  .cal button.d.h2 { background: #93c5fd; border-color: #60a5fa; }
+  .cal button.d.h3 { background: #2563eb; border-color: #2563eb; color: #fff; }
+  .cal button.d.h4 { background: #1e3a8a; border-color: #1e3a8a; color: #fff; }
+  .cal button.d.sel { box-shadow: 0 0 0 3px #111; }
+  #giorno-sel { margin-top: 12px; }
+  .chip { display: inline-block; padding: 4px 10px; margin: 6px 6px 0 0; border-radius: 999px; background: #eff6ff; border: 1px solid #93c5fd; font-size: 15px; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: anywhere; }
+  .chip.forse { background: #fff; border-style: dashed; color: #444; }
+  .chip.no { background: #f3f4f6; border-color: #d1d5db; color: #444; }
+  .fascia { padding: 8px 0; border-top: 1px solid #e5e7eb; }
+  .fascia-t { font-size: 15px; font-weight: 700; color: #444; }
   .top { font-weight: 700; }
   .chi { font-size: 15px; color: #444; }
   #adminbar { position: sticky; top: 0; z-index: 2; background: #fde047; color: #111; font-weight: 700; padding: 10px 16px; margin: -16px -16px 12px; display: flex; justify-content: space-between; align-items: center; }
@@ -110,7 +123,7 @@
   // Server che salva i voti (Apps Script, file Code.gs).
   const SERVER = 'https://script.google.com/macros/s/AKfycbxwVlxv7fAEmWuuBAg8Ny8ciK-sZck3ALe0-MQzHhSuyWyUCDvq0AEA0CBYoS4-O9sS7A/exec';
   // Valori iniziali, uguali a Code.gs: la pagina si disegna subito, poi il server conferma.
-  const DAL = '2026-10-19', AL = '2026-11-15', CHIUSI = ['2026-10-30', '2026-10-31', '2026-11-01'];
+  const DAL = '2026-10-19', AL = '2026-11-29', CHIUSI = ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-07'];
   const TIPI = { '✔': 'Tutto il giorno', pomeriggio: 'Solo pomeriggio', sera: 'Solo sera', forse: 'Forse' };
   const SIGLA = { pomeriggio: 'pom', sera: 'sera', forse: '?' };
 
@@ -141,6 +154,7 @@
   let auto = false;         // giorni precompilati da un voto esistente (non toccati a mano)
   let autoV = false;        // 'vecchio' trovato scrivendo il nome (non da 'Cambia' o dall'admin)
   let adminEdit = false;    // l'admin sta modificando il voto di un altro
+  let giornoSel = '';       // giorno toccato nei risultati (all'inizio il migliore)
 
   // Segreto admin: letto dal link e tolto subito dalla barra degli indirizzi.
   const qs = new URLSearchParams(location.search);
@@ -170,6 +184,8 @@
         cal.append(s);
       });
       const celle = [];
+      // modo 'ris': sel = {iso: {si, forse}}; ogni giorno è un bottone colorato per numero di persone.
+      const maxR = modo === 'ris' ? Math.max(1, ...Object.keys(sel).map(k => sel[k].si.length)) : 0;
       for (let i = 0; i < (m.getUTCDay() + 6) % 7; i++) celle.push(document.createElement('div'));
       const n = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 0)).getUTCDate();
       for (let g = 1; g <= n; g++) {
@@ -179,6 +195,31 @@
           const x = document.createElement('div');
           x.className = 'x'; x.setAttribute('aria-hidden', 'true'); x.textContent = g;
           celle.push(x);
+          continue;
+        }
+        if (modo === 'ris') {
+          const k = sel[iso], n = k.si.length, f = k.forse.length;
+          const bt = document.createElement('button');
+          bt.type = 'button';
+          bt.className = 'd h' + (n ? Math.max(1, Math.ceil(4 * n / maxR)) : 0) + (iso === giornoSel ? ' sel' : '');
+          bt.dataset.g = iso;
+          bt.setAttribute('aria-pressed', iso === giornoSel ? 'true' : 'false');
+          bt.setAttribute('aria-label', etichetta(iso) + ': ' + n + (n === 1 ? ' persona' : ' persone') + (f ? ', ' + f + ' forse' : ''));
+          const num = document.createElement('span');
+          num.setAttribute('aria-hidden', 'true'); num.textContent = g;
+          bt.append(num);
+          if (n || f) {
+            const s = document.createElement('small');
+            s.setAttribute('aria-hidden', 'true'); s.textContent = n ? n : '?';
+            bt.append(s);
+          }
+          bt.addEventListener('click', () => {
+            giornoSel = iso;
+            risultati();
+            const q = $('ris-c').querySelector('[data-g="' + iso + '"]');
+            if (q) q.focus();
+          });
+          celle.push(bt);
           continue;
         }
         const l = document.createElement('label');
@@ -422,38 +463,61 @@
     const box = $('ris-c');
     if (!voti) return;
     $('ris-t').textContent = 'Chi c\'è finora (' + voti.length + (voti.length === 1 ? ' persona)' : ' persone)');
-    const conta = aperti.map(g => {
-      const si = voti.filter(v => v.giorni[g] && v.giorni[g] !== 'forse');
-      const forse = voti.filter(v => v.giorni[g] === 'forse');
-      return { g, si, forse };
-    }).filter(x => x.si.length || x.forse.length)
-      .sort((a, b) => b.si.length - a.si.length || b.forse.length - a.forse.length || a.g.localeCompare(b.g));
-    if (!conta.length) { box.textContent = 'Ancora nessun voto: sei il primo!'; return; }
-    const max = conta[0].si.length;
-    const voce = x => {
-      const li = document.createElement('li');
-      const t = document.createElement('div');
-      const top = x.si.length === max && max > 0;
-      if (top) t.className = 'top';
-      t.textContent = (top ? '⭐ ' : '') + breve(x.g) + ' · ' + x.si.length + (x.si.length === 1 ? ' persona' : ' persone') + (x.forse.length ? ' + ' + x.forse.length + ' forse' : '');
-      const chi = document.createElement('div');
-      chi.className = 'chi';
-      chi.textContent = x.si.map(v => v.nome + (v.giorni[x.g] === '✔' ? '' : ' (' + v.giorni[x.g] + ')')).concat(x.forse.map(v => v.nome + ' (forse)')).join(', ');
-      li.append(t, chi);
-      return li;
-    };
-    const ol = document.createElement('ol');
-    conta.slice(0, 3).forEach(x => ol.append(voce(x)));
-    const parti = [ol];
-    if (conta.length > 3) {
-      const det = document.createElement('details');
-      const s = document.createElement('summary');
-      s.textContent = 'Vedi tutti i giorni';
-      const ol2 = document.createElement('ol');
-      conta.slice(3).forEach(x => ol2.append(voce(x)));
-      det.append(s, ol2);
-      parti.push(det);
+    const conta = {};
+    aperti.forEach(g => {
+      conta[g] = { si: voti.filter(v => v.giorni[g] && v.giorni[g] !== 'forse'), forse: voti.filter(v => v.giorni[g] === 'forse') };
+    });
+    const conVoti = aperti.filter(g => conta[g].si.length || conta[g].forse.length);
+    if (!conVoti.length) { box.textContent = 'Ancora nessun voto: sei il primo!'; return; }
+    const max = Math.max(...aperti.map(g => conta[g].si.length));
+    const migliori = max ? aperti.filter(g => conta[g].si.length === max) : [];
+    if (!conta[giornoSel]) giornoSel = migliori[0] || conVoti[0];
+
+    const parti = [];
+    if (max) {
+      const top = document.createElement('p');
+      top.className = 'top';
+      top.textContent = '⭐ ' + (migliori.length > 3 ? migliori.length + ' giorni a pari merito' : migliori.map(breve).join(', ')) + ' · ' + max + (max === 1 ? ' persona' : ' persone');
+      parti.push(top);
     }
+    const leg = document.createElement('p');
+    leg.className = 'chi';
+    leg.textContent = 'Più è scuro, più persone ci sono. Tocca un giorno per vedere chi c\'è.';
+    const cal = document.createElement('div');
+    calendario(cal, TUTTI, conta, 'ris');
+
+    // Chi c'è nel giorno toccato, diviso per fascia: Pomeriggio / Sera (sì), poi Forse e No. Solo nomi, niente frasi.
+    // "Tutto il giorno" conta in tutte e due le fasce.
+    const k = conta[giornoSel];
+    const det = document.createElement('div');
+    det.id = 'giorno-sel';
+    det.setAttribute('aria-live', 'polite');
+    const t = document.createElement('p');
+    t.className = 'top';
+    t.textContent = breve(giornoSel) + ' · ' + k.si.length + (k.si.length === 1 ? ' persona' : ' persone') + (k.forse.length ? ' + ' + k.forse.length + ' forse' : '');
+    det.append(t);
+    const gruppo = (titolo, chi, cls) => {
+      const r = document.createElement('div');
+      r.className = 'fascia';
+      const h = document.createElement('div');
+      h.className = 'fascia-t';
+      h.textContent = titolo + ' · ' + chi.length;
+      r.append(h);
+      chi.forEach(v => {
+        const c = document.createElement('span');
+        c.className = 'chip ' + cls;
+        c.textContent = v.nome;
+        r.append(c);
+      });
+      return r;
+    };
+    const tipo = v => v.giorni[giornoSel];
+    det.append(
+      gruppo('✔ Pomeriggio', k.si.filter(v => tipo(v) !== 'sera'), ''),
+      gruppo('✔ Sera', k.si.filter(v => tipo(v) !== 'pomeriggio'), ''),
+      gruppo('? Forse', k.forse, 'forse'),
+      gruppo('✗ No', voti.filter(v => !tipo(v)), 'no'));
+    parti.push(leg, cal, det);
     svuota(box, ...parti);
   }
 
