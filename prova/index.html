@@ -571,7 +571,9 @@ function sheetOpzioni() {
       clear(box);
       var iso = S.focus;
       if (!iso || !S.scelte[iso]) return;
-      var h = el('h3', 'sh-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })); h.style.cssText = 'margin-top:14px;font-size:17px'; box.appendChild(h);
+      var h = el('h3', 'sh-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })); h.style.cssText = 'margin-top:14px;font-size:17px';
+      var rm = el('button', 'x', '×'); rm.type = 'button'; rm.id = 'togli-giorno'; rm.setAttribute('aria-label', 'Togli questo giorno'); rm.style.cssText = 'color:var(--err);border-color:var(--err)';
+      rm.addEventListener('click', function () { togliGiorno(iso); renderCal(); renderBar(); sheetOpzioni(); }); h.appendChild(rm); box.appendChild(h);
       var ct = el('div', 'ctrl'), s1 = el('div', 'seg'), s2 = el('div', 'seg'); s1.setAttribute('role', 'group'); s1.setAttribute('aria-label', 'Orario'); s2.setAttribute('role', 'group'); s2.setAttribute('aria-label', 'Sicuro');
       var p0 = parti(S.scelte[iso]);
       function agg(f, si) { S.scelte[iso] = f + '|' + (si ? 'si' : 'forse'); S.auto = false; S.dirty = true; salvaBozza(); renderCal(); }
@@ -591,8 +593,6 @@ function sheetOpzioni() {
       ct.appendChild(s1); ct.appendChild(s2); box.appendChild(ct);
       var dn = el('textarea', 'dnote'); dn.id = 'nota-giorno'; dn.rows = 2; dn.maxLength = 120; dn.value = notaGiorno(iso); dn.placeholder = 'Commento per questo giorno (es. ho un esame)'; dn.setAttribute('aria-label', 'Commento per questo giorno');
       dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); renderBar(); }); box.appendChild(dn);
-      var rm = el('button', 'btn del', 'Togli questo giorno'); rm.type = 'button'; rm.id = 'togli-giorno'; rm.setAttribute('aria-label', 'Togli questo giorno'); rm.style.cssText = 'margin-top:10px;min-height:48px';
-      rm.addEventListener('click', function () { togliGiorno(iso); renderCal(); renderBar(); sheetOpzioni(); }); box.appendChild(rm);
     }
     if (gs.length) {
       chips = el('div', 'gchips'); chips.setAttribute('role', 'group'); chips.setAttribute('aria-label', 'Giorni scelti');
