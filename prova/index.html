@@ -212,10 +212,13 @@ body.mano .squig, body.mano .av svg, body.mano h1 { -webkit-filter: url(#mano); 
 body.mano .squig { stroke-width: 4; }
 body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .cal > * { font-size: 17px !important; }
 
-@-webkit-keyframes shim{0%{background-position:150% 0}100%{background-position:-50% 0}}
-@keyframes shim{0%{background-position:150% 0}100%{background-position:-50% 0}}
-.carico .g[data-g]{background-image:-webkit-linear-gradient(left,rgba(255,255,255,0) 20%,rgba(255,255,255,.85) 50%,rgba(255,255,255,0) 80%);background-image:linear-gradient(90deg,rgba(255,255,255,0) 20%,rgba(255,255,255,.85) 50%,rgba(255,255,255,0) 80%);background-size:60% 100%;background-repeat:no-repeat;background-color:var(--line);-webkit-animation:shim 1.1s linear infinite;animation:shim 1.1s linear infinite;color:var(--mut)}
-@media (prefers-color-scheme:dark){.carico .g[data-g]{background-image:-webkit-linear-gradient(left,rgba(255,255,255,0) 20%,rgba(255,255,255,.18) 50%,rgba(255,255,255,0) 80%);background-image:linear-gradient(90deg,rgba(255,255,255,0) 20%,rgba(255,255,255,.18) 50%,rgba(255,255,255,0) 80%)}}
+@-webkit-keyframes accendi{0%,100%{background-color:#d9dce1}50%{background-color:#f1f3f6}}
+@keyframes accendi{0%,100%{background-color:#d9dce1}50%{background-color:#f1f3f6}}
+.carico .g[data-g]{background-image:none;background-color:#d9dce1;-webkit-animation:accendi 1.3s ease-in-out infinite;animation:accendi 1.3s ease-in-out infinite;color:var(--mut)}
+.carico .g[data-g]:nth-child(2n){-webkit-animation-delay:-.65s;animation-delay:-.65s}
+.carico .g[data-g]:nth-child(3n){-webkit-animation-delay:-.3s;animation-delay:-.3s}
+.carico .g[data-g]:nth-child(5n){-webkit-animation-delay:-1s;animation-delay:-1s}
+@media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}@keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}.carico .g[data-g]{background-color:#2b2f36}}
 @media (prefers-reduced-motion:reduce){.carico .g[data-g]{-webkit-animation:none;animation:none}}
 
 .cbox{margin-top:8px;border:2px solid var(--fill);border-radius:12px;overflow:hidden;background:var(--bg)}
