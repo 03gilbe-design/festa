@@ -214,18 +214,20 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 
 /* aggiunte del codice (stati che il prototipo non mostra) */
 .errbox { margin-bottom: 8px; padding: 10px 12px; border-radius: 12px; background: var(--errbg); color: var(--err); font-weight: 700; font-size: 16px; }
-.pan { max-height: 300px; }
-.pan .seg button { font-size: 14px; padding: 0 2px; white-space: nowrap; }
+.fila-c { overflow: visible; padding: 4px 4px 4px 10px; }
+.fila-b { overflow: visible; }
+.sheet .seg button { font-size: 14px; padding: 0 2px; white-space: nowrap; }
 .ctrl { flex-wrap: wrap; } .ctrl .seg:first-child { -webkit-box-flex: 1; flex: 1 1 100%; margin-bottom: 8px; } .ctrl .seg + .seg { -webkit-box-flex: 1; flex: 1 1 0; margin-left: 0; }
 .seg button.t { font-size: 15px; }
 .g .fq { position: absolute; bottom: 3px; left: 0; right: 0; text-align: center; font-size: 11px; font-weight: 700; }
-.pan .dnote { display: block; width: 100%; box-sizing: border-box; min-height: 44px; margin-top: 8px; padding: 10px 12px; font: inherit; font-size: 16px; border: 2px solid var(--bg); border-radius: 12px; background: var(--bg); color: var(--ink); resize: none; }
-.g .pm { position: absolute; bottom: 2px; left: 0; right: 0; display: flex; justify-content: center; opacity: .8; pointer-events: none; }
-.g .pm .ico { width: 16px; height: 16px; }
-.g .pm.nuovo { -webkit-animation: pmp 1.1s ease-in-out 2; animation: pmp 1.1s ease-in-out 2; }
+.sheet .dnote { display: block; width: 100%; box-sizing: border-box; min-height: 44px; margin-top: 8px; padding: 10px 12px; font: inherit; font-size: 16px; border: 2px solid var(--fill); border-radius: 12px; background: var(--fill); color: var(--ink); resize: none; }
+.bar .ib .pt.nuovo { -webkit-animation: pmp 1.1s ease-in-out 2; animation: pmp 1.1s ease-in-out 2; }
 @-webkit-keyframes pmp { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 @keyframes pmp { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .g .pm.nuovo { -webkit-animation: none; animation: none; } }
+@media (prefers-reduced-motion: reduce) { .bar .ib .pt.nuovo { -webkit-animation: none; animation: none; } }
+.gchips { display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 4px -16px 0; padding: 0 16px 4px; }
+.gc { -webkit-tap-highlight-color: transparent; flex: none; min-height: 44px; margin-right: 8px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font-size: 16px; font-weight: 700; }
+.gc[aria-pressed="true"] { background: var(--acc); color: var(--onacc); }
 .grid .av { display: block; }
 .grid .av.ini { display: block; }
 .grid .av.ini .t { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: var(--mut); }
@@ -235,6 +237,9 @@ body.invio .ib, body.invio .sugg { pointer-events: none; }
 .locrow { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
 .locrow .loc { margin: 0; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #fila { flex: 1 1 auto; min-width: 0; display: flex; justify-content: flex-end; }
+.avb.edit { box-sizing: border-box; border: 2px solid var(--mut); }
+.ed-b { position: absolute; right: -6px; bottom: -6px; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--bg); border: 3px solid var(--bg); pointer-events: none; }
+.ed-b .ico { width: 12px; height: 12px; stroke-width: 2.6; }
 .nome input:focus { outline: none; border-color: var(--acc); }
 .av.vuoto .ico { width: 55%; height: 55%; color: var(--mut); }
 .fila-b { display: flex; align-items: center; max-width: 100%; min-height: 44px; margin-right: -4px; padding: 0; border: 0; background: none; color: var(--mut); }
@@ -475,7 +480,7 @@ function coda() { var c = store.get('coda'); return c && typeof c === 'object' &
 // Se dopo un invio fallito l'utente cambia qualcosa, la coda (vecchia) non deve piu' partire da sola sopra le modifiche.
 function toccaForm() { if (!S.invio && coda()) { store.del('coda'); renderBar(); } }
 document.addEventListener('input', toccaForm);
-document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#cal .g, #pan')) toccaForm(); });
+document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#cal .g')) toccaForm(); });
 
 // ---------- toast "Annulla" (6 s): sostituisce ogni conferma ----------
 var tt;
@@ -540,7 +545,7 @@ function closeSheet(daIndietro, dopo) {
   if (!daIndietro) { dopoPop = dopo || null; togliPasso('sheet'); }
 }
 // UN foglio per le opzioni del voto (accanto a Invia): commento (Solo Gilberto / Tutti), orario e sì/forse del giorno selezionato, avatar.
-function scegliAvatar(s) {
+function scegliAvatar(s, senzaFatto) {
   var g = el('div', 'grid'); g.id = 'avatar-griglia';
   [''].concat(AVATARI).forEach(function (a) {
     var b = el('button'); b.type = 'button'; b.setAttribute('aria-label', a || 'iniziale'); b.setAttribute('aria-pressed', (S.avatar || '') === a ? 'true' : 'false');
@@ -548,33 +553,31 @@ function scegliAvatar(s) {
     b.addEventListener('click', function () { S.avatar = a; S.dirty = true; salvaBozza(); Array.prototype.forEach.call(g.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); renderName(); }); g.appendChild(b);
   });
   s.appendChild(g);
+  if (senzaFatto) return;
   var ok = el('button', 'btn', 'Fatto'); ok.type = 'button'; ok.id = 'avatar-fatto'; ok.addEventListener('click', function () { closeSheet(); renderBar(); renderName(); }); s.appendChild(ok);
 }
 function sheetAvatar() {
   sheet('Avatar', scegliAvatar);
 }
 function sheetOpzioni() {
+  store.set('dettagli_visti', 1);
   sheet('Opzioni', function (s) {
-    var ta = el('textarea'); ta.id = 'commento'; ta.maxLength = MAX_COMMENTO; ta.value = S.commento; ta.setAttribute('aria-label', 'Commento'); ta.placeholder = 'es. il 5 ho un esame';
-    ta.addEventListener('input', function () { S.commento = ta.value; S.commToccato = true; S.dirty = true; salvaBozza(); }); s.appendChild(ta);
-    var vis = el('h3', 'sh-t', 'Chi vede il commento'); vis.style.cssText = 'margin-top:14px;font-size:17px'; s.appendChild(vis);
-    var sg = el('div', 'seg'); sg.setAttribute('role', 'group'); sg.setAttribute('aria-label', 'Chi vede il commento');
-    [[false, 'lucchetto', 'Solo Gilberto'], [true, 'gruppo', 'Tutti']].forEach(function (o) {
-      var b = el('button'); b.type = 'button'; b.setAttribute('aria-pressed', S.pubblico === o[0] ? 'true' : 'false'); b.appendChild(ico(o[1])); b.appendChild(document.createTextNode(o[2]));
-      b.addEventListener('click', function () { S.pubblico = o[0]; S.dirty = true; salvaBozza(); Array.prototype.forEach.call(sg.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); sg.appendChild(b);
-    });
-    s.appendChild(sg);
-    var iso = S.focus && S.scelte[S.focus] && editable() ? S.focus : '';
-    if (iso) { // orario e sì/forse del giorno selezionato (scorciatoia: secondo tocco sul giorno)
-      var h = el('h3', 'sh-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })); h.style.cssText = 'margin-top:14px;font-size:17px'; s.appendChild(h);
+    var gs = editable() ? giorniScelti() : [];
+    if (gs.length && gs.indexOf(S.focus) < 0) S.focus = gs[0];
+    var box = el('div', 'dbox'), chips = null;
+    function giornoAttivo() { // orario, sì/forse, commento e "togli" del giorno attivo
+      clear(box);
+      var iso = S.focus;
+      if (!iso || !S.scelte[iso]) return;
+      var h = el('h3', 'sh-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })); h.style.cssText = 'margin-top:14px;font-size:17px'; box.appendChild(h);
       var ct = el('div', 'ctrl'), s1 = el('div', 'seg'), s2 = el('div', 'seg'); s1.setAttribute('role', 'group'); s1.setAttribute('aria-label', 'Orario'); s2.setAttribute('role', 'group'); s2.setAttribute('aria-label', 'Sicuro');
       var p0 = parti(S.scelte[iso]);
       function agg(f, si) { S.scelte[iso] = f + '|' + (si ? 'si' : 'forse'); S.auto = false; S.dirty = true; salvaBozza(); renderCal(); }
-      function seg(box, voci, attuale, fn) {
+      function seg(box_, voci, attuale, fn) {
         voci.forEach(function (o) {
           var b = el('button', o[3] || ''); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', attuale === o[0] ? 'true' : 'false');
           (o[2] || []).forEach(function (n) { b.appendChild(ico(n)); }); if (o[3] === 't') b.appendChild(document.createTextNode(o[4]));
-          b.addEventListener('click', function () { fn(o[0]); Array.prototype.forEach.call(box.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); box.appendChild(b);
+          b.addEventListener('click', function () { fn(o[0]); Array.prototype.forEach.call(box_.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); box_.appendChild(b);
         });
       }
       var cur = p0;
@@ -583,8 +586,23 @@ function sheetOpzioni() {
         var b = el('button', '', o[0] === 'si' ? 'Sì' : '?'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', (p0.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
         b.addEventListener('click', function () { cur = { f: cur.f, si: o[0] === 'si' }; agg(cur.f, cur.si); Array.prototype.forEach.call(s2.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); s2.appendChild(b);
       });
-      ct.appendChild(s1); ct.appendChild(s2); s.appendChild(ct);
+      ct.appendChild(s1); ct.appendChild(s2); box.appendChild(ct);
+      var dn = el('textarea', 'dnote'); dn.id = 'nota-giorno'; dn.rows = 2; dn.maxLength = 120; dn.value = notaGiorno(iso); dn.placeholder = 'Commento per questo giorno (es. ho un esame)'; dn.setAttribute('aria-label', 'Commento per questo giorno');
+      dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); renderBar(); }); box.appendChild(dn);
+      var rm = el('button', 'btn del', 'Togli questo giorno'); rm.type = 'button'; rm.id = 'togli-giorno'; rm.setAttribute('aria-label', 'Togli questo giorno'); rm.style.cssText = 'margin-top:10px;min-height:48px';
+      rm.addEventListener('click', function () { togliGiorno(iso); renderCal(); renderBar(); sheetOpzioni(); }); box.appendChild(rm);
     }
+    if (gs.length) {
+      chips = el('div', 'gchips'); chips.setAttribute('role', 'group'); chips.setAttribute('aria-label', 'Giorni scelti');
+      gs.forEach(function (g) {
+        var c = el('button', 'gc', dl(g, { weekday: 'short' }).replace('.', '') + ' ' + (+g.slice(8))); c.type = 'button'; c.setAttribute('aria-label', lungo(g)); c.setAttribute('aria-pressed', g === S.focus ? 'true' : 'false'); c.setAttribute('data-gc', g);
+        c.addEventListener('click', function () { S.focus = g; Array.prototype.forEach.call(chips.children, function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); }); renderCal(); giornoAttivo(); });
+        chips.appendChild(c);
+      });
+      s.appendChild(chips); s.appendChild(box); giornoAttivo();
+    }
+    var ha = el('h3', 'sh-t', 'Avatar'); ha.style.cssText = 'margin-top:14px;font-size:17px'; s.appendChild(ha);
+    scegliAvatar(s, true);
     var ok = el('button', 'btn', 'Fatto'); ok.type = 'button'; ok.id = 'opzioni-fatto'; ok.addEventListener('click', function () { closeSheet(); renderBar(); renderName(); }); s.appendChild(ok);
   });
 }
@@ -677,13 +695,14 @@ function avatarNome() { return av(S.nome, S.avatar || (votoDi(S.nome) && !S.dirt
 function renderName() {
   var blocca = S.voted && !S.edit || !!S.adminEdit, f = $('nome');
   if (f && document.activeElement === f && f.readOnly === blocca ) {
-    var ab0 = $('avatar'); if (ab0) { var ok0 = ab0.querySelector('.ok-b'); clear(ab0); ab0.appendChild(avatarNome()); if (ok0) ab0.appendChild(ok0); }
+    var ab0 = $('avatar'); if (ab0) { var ok0 = ab0.querySelector('.ok-b, .ed-b'); clear(ab0); ab0.appendChild(avatarNome()); if (ok0) ab0.appendChild(ok0); }
     sugg(); return;
   }
   var b = clear($('nomeblk'));
   var row = el('div', 'nome' + (S.nomeErr ? ' err' : ''));
   var ab = el('button', 'avb'); ab.type = 'button'; ab.id = 'avatar'; ab.setAttribute('aria-label', 'Avatar'); ab.appendChild(avatarNome());
   if (S.voted && !S.edit) { var ok = el('span', 'ok-b'); ok.appendChild(ico('spunta')); ab.appendChild(ok); ab.setAttribute('aria-label', 'Voto salvato'); }
+  if (!blocca) { ab.className += ' edit'; var eb = el('span', 'ed-b'); eb.appendChild(ico('matita')); ab.appendChild(eb); }
   if (!blocca) ab.addEventListener('click', sheetAvatar); else if (S.voted && !S.edit) ab.disabled = true;
   row.appendChild(ab);
   var inp = el('input'); inp.type = 'text'; inp.id = 'nome'; inp.value = S.nome; inp.placeholder = 'Il tuo nome'; inp.setAttribute('aria-label', 'Il tuo nome'); inp.autocomplete = 'name';
@@ -769,13 +788,20 @@ function renderCal() {
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (!VOTI) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && (p.f !== 'tutto' || !p.si)) { var fq = el('span', 'fq'); fq.setAttribute('aria-hidden', 'true'); if (p.f === 'pom') fq.appendChild(document.createTextNode('pom')); else if (p.f === 'sera') fq.appendChild(document.createTextNode('sera')); if (!p.si) fq.appendChild(document.createTextNode('?')); b.appendChild(fq); }
-      if (mine && p.f === 'tutto' && p.si) { var pm = el('span', 'pm' + (store.get('dettagli_visti') ? '' : ' nuovo')); pm.setAttribute('aria-hidden', 'true'); pm.appendChild(ico('puntini', 's')); b.appendChild(pm); }
       if (iso === OGGI) b.className += ' oggi';
       if (iso === S.focus) b.className += ' foc';
       b.setAttribute('aria-label', lungo(iso) + (mine ? ', ci sei' + (p.f === 'pom' ? ', pomeriggio' : p.f === 'sera' ? ', sera' : '') + (p.si ? '' : ', forse') : '') + (iso === OGGI ? ', oggi' : '') + (nn ? ', ' + nn + (nn === 1 ? ' altro' : ' altri') : ''));
       b.setAttribute('aria-pressed', mine ? 'true' : 'false');
       b.addEventListener('click', onDay);
       celle.push(b);
+    }
+    // caselle vuote in fondo all'ultima riga: i giorni del mese dopo che esistono ma non si possono scegliere vanno li' (barrati), non in una riga a parte
+    var segue = new Date(Date.UTC(y, mm, n)), vuote = (7 - celle.length % 7) % 7;
+    while (vuote > 0) {
+      segue = new Date(segue.getTime() + 86400000);
+      var si_ = segue.toISOString().slice(0, 10);
+      if (TUTTI.indexOf(si_) >= 0 && !avail(si_)) { var xs = el('div', 'g x', String(segue.getUTCDate())); xs.setAttribute('aria-hidden', 'true'); celle.push(xs); vuote--; }
+      else { while (vuote-- > 0) celle.push(el('div', 'g vuoto')); }
     }
     var h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize';
     var cal = el('div', 'cal'), tot = 0;
@@ -786,18 +812,21 @@ function renderCal() {
     }
     if (tot) { c.appendChild(h); c.appendChild(cal); }
   });
-  renderPanel();
 }
 function onDay(e) {
   document.body.classList.remove('kb'); // si sta toccando il calendario: la barra torna fissa
   var iso = e.currentTarget.getAttribute('data-g');
-  if (S.invio || DECISA) return;
-  if (editable()) {
-    if (!S.scelte[iso]) { S.scelte[iso] = TOCCO; S.focus = ''; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
-    else { S.focus = S.focus === iso ? '' : iso; if (S.focus) store.set('dettagli_visti', 1); }
-  } else S.focus = S.focus === iso ? '' : iso;
+  if (S.invio || DECISA || !editable()) return;
+  if (!S.scelte[iso]) { S.scelte[iso] = TOCCO; S.focus = iso; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
+  else togliGiorno(iso); // secondo tocco = toglie (i dettagli stanno nel foglio del pulsante accanto a Invia)
   renderCal(); renderBar();
   var q = $('cal').querySelector('[data-g="' + iso + '"]'); if (q) q.focus({ preventScroll: true });
+}
+function togliGiorno(iso) {
+  if (notaGiorno(iso)) setNotaGiorno(iso, '');
+  delete S.scelte[iso]; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null;
+  if (S.focus === iso) S.focus = giorniScelti()[0] || '';
+  salvaBozza();
 }
 // Commento di un giorno: sta dentro il commento della persona, una riga per giorno ("24/10: ho un esame"). Il server non cambia.
 function chiaveGiorno(iso) { return (+iso.slice(8)) + '/' + (+iso.slice(5, 7)) + ': '; }
@@ -807,48 +836,10 @@ function setNotaGiorno(iso, testo) {
   testo = String(testo || '').replace(/\s*\n\s*/g, ' ').trim(); if (testo) r.push(k + testo);
   S.commento = r.join('\n').slice(0, MAX_COMMENTO); S.commToccato = true; S.dirty = true; salvaBozza();
 }
-function renderPanel() {
-  var bar = $('bar'), old = bar.querySelector('.pan'); if (old) bar.removeChild(old);
-  if (!S.focus || DECISA) return;
-  var iso = S.focus, p = parti(S.scelte[iso]), pan = el('div', 'pan'), t = el('div', 'pan-t'); pan.id = 'pan'; pan.setAttribute('role', 'group'); pan.setAttribute('aria-label', lungo(iso));
-  t.appendChild(document.createTextNode(dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })));
-  var x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Chiudi'); x.addEventListener('click', function () { S.focus = ''; renderCal(); renderBar(); }); t.appendChild(x); pan.appendChild(t);
-  if (editable() && S.scelte[iso]) {
-    var ct = el('div', 'ctrl'), s1 = el('div', 'seg'), s2 = el('div', 'seg'); s1.setAttribute('role', 'group'); s1.setAttribute('aria-label', 'Orario'); s2.setAttribute('role', 'group'); s2.setAttribute('aria-label', 'Sicuro');
-    [['tutto', 'Tutto il giorno', ['sole', 'luna']], ['pom', 'Pomeriggio', ['sole']], ['sera', 'Sera', ['luna']]].forEach(function (o) {
-      var b = el('button'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', p.f === o[0] ? 'true' : 'false'); b.appendChild(document.createTextNode(o[1]));
-      b.addEventListener('click', function () { S.scelte[iso] = o[0] + '|' + (p.si ? 'si' : 'forse'); S.auto = false; S.dirty = true; salvaBozza(); renderCal(); renderBar(); keep('Orario'); }); s1.appendChild(b);
-    });
-    [['si', 'Sì', 'Sì'], ['forse', '?', 'Forse']].forEach(function (o) {
-      var b = el('button', '', o[1]); b.type = 'button'; b.setAttribute('aria-label', o[2]); b.setAttribute('aria-pressed', (p.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
-      b.addEventListener('click', function () { S.scelte[iso] = p.f + '|' + o[0]; S.auto = false; S.dirty = true; salvaBozza(); renderCal(); renderBar(); keep('Sicuro'); }); s2.appendChild(b);
-    });
-    ct.appendChild(s1); ct.appendChild(s2);
-    var rm = el('button', 'x', '×'); rm.type = 'button'; rm.setAttribute('aria-label', 'Togli questo giorno'); rm.style.cssText = 'width:44px;height:44px;margin-left:4px;border:0;background:none;font-size:26px;color:var(--err)';
-    rm.addEventListener('click', function () { delete S.scelte[iso]; S.focus = ''; S.auto = false; S.dirty = true; salvaBozza(); renderCal(); renderBar(); }); ct.appendChild(rm);
-    pan.appendChild(ct);
-    var dn = el('textarea', 'dnote'); dn.id = 'nota-giorno'; dn.rows = 2; dn.maxLength = 120; dn.value = notaGiorno(iso); dn.placeholder = 'Commento per questo giorno (es. ho un esame)'; dn.setAttribute('aria-label', 'Commento per questo giorno');
-    dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); }); pan.appendChild(dn);
-  }
-  var gi = altri(iso);
-  if (gi.length) {
-    var ch = el('div', 'chips');
-    gi.forEach(function (v) {
-      var c = el('button', 'chip' + (parti(v.giorni[iso]).si ? '' : ' forse')); c.type = 'button'; c.appendChild(av(v.nome)); c.appendChild(document.createTextNode(v.nome));
-      c.setAttribute('aria-label', v.nome + (parti(v.giorni[iso]).si ? '' : ', forse'));
-      if (adminOk) c.addEventListener('click', function () { sheetPersone(v.nome); }); else { c.disabled = true; c.style.cursor = 'default'; }
-      ch.appendChild(c);
-    });
-    pan.appendChild(ch);
-  }
-  bar.insertBefore(pan, bar.querySelector('.toast') ? bar.querySelector('.toast').nextSibling : bar.firstChild);
-}
-function keep(grp) { var g = $('bar').querySelector('[aria-label="' + grp + '"] [aria-pressed="true"]'); if (g) g.focus({ preventScroll: true }); }
-
 function renderBar() {
   if (document.activeElement && document.activeElement.id === 'serve' && !S.invio && !S.errore) return;
-  var bar = $('bar'), tz = bar.querySelector('.toast'), pn = bar.querySelector('.pan');
-  Array.prototype.slice.call(bar.children).forEach(function (c) { if (c !== tz && c !== pn) bar.removeChild(c); });
+  var bar = $('bar'), tz = bar.querySelector('.toast');
+  Array.prototype.slice.call(bar.children).forEach(function (c) { if (c !== tz) bar.removeChild(c); });
   var ex = esiste(), needKey = ex && ex.protetto && !S.adminEdit && !ricordo.get('chiavi', ex.nome);
   if (S.errore) { // messaggio umano + (se la rete e' giu') il bottone WhatsApp
     var er = el('div', 'errbox'); er.id = 'errore'; er.setAttribute('role', 'alert'); er.appendChild(document.createTextNode(S.errore)); bar.appendChild(er);
@@ -868,7 +859,7 @@ function renderBar() {
     b.className += ' cambia'; b.type = 'button'; b.appendChild(ico('matita')); b.appendChild(document.createTextNode('Cambia'));
     b.addEventListener('click', cambia);
   } else {
-    var nb = el('button', 'ib'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('puntini')); if (S.commento) nb.appendChild(el('span', 'pt')); nb.addEventListener('click', sheetOpzioni); r.appendChild(nb);
+    var nb = el('button', 'ib'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('puntini')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); r.appendChild(nb);
     if (S.edit || S.adminEdit) { var cb = el('button', 'ib'); cb.type = 'button'; cb.id = 'annulla-mod'; cb.setAttribute('aria-label', 'Annulla le modifiche'); cb.appendChild(el('span', '', '×')); cb.firstChild.style.cssText = 'font-size:30px;line-height:1'; cb.addEventListener('click', function () { annullaModifica(); }); r.appendChild(cb); }
     if (S.invio) { b.className += ' lavora'; b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salvo…' : 'Invio…')); b.setAttribute('aria-busy', 'true'); }
     else {
