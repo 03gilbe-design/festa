@@ -7,7 +7,8 @@
 <meta property="og:title" content="🎓 Festa di laurea di Gilberto">
 <meta property="og:description" content="Tocca i giorni in cui ci sei. Ci vuole un minuto.">
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 440px; margin: 0 auto; padding: 16px; font-size: 18px; line-height: 1.4; color: #111; background: #fff; }
+  [hidden] { display: none !important; } /* senza questo, display:flex vince su hidden */
+  body { overflow-wrap: break-word; font-family: system-ui, sans-serif; max-width: 440px; margin: 0 auto; padding: 16px; font-size: 18px; line-height: 1.4; color: #111; background: #fff; }
   h1 { font-size: 24px; margin: 0; }
   .sub { margin: 2px 0 8px; color: #444; font-size: 16px; }
   h2 { font-size: 20px; margin: 24px 0 8px; }
@@ -17,9 +18,9 @@
   textarea { min-height: 80px; }
   fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   legend { font-weight: 700; padding: 0; margin: 16px 0 0; }
-  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
   .wd { text-align: center; font-size: 13px; font-weight: 700; color: #444; }
-  .d, .x { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; min-height: 40px; border-radius: 8px; font-size: 17px; }
+  .d, .x { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; min-height: 36px; /* 7 x 36 + gap ci sta in 320px */ border-radius: 8px; font-size: 17px; }
   .x { color: #767676; }
   .d { position: relative; border: 2px solid #555; cursor: pointer; font-weight: 600; }
   .d input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
@@ -37,7 +38,7 @@
   .card { border: 2px solid #1d4ed8; border-radius: 12px; padding: 16px; margin-top: 16px; }
   .card h2 { margin-top: 0; }
   details { margin-top: 16px; }
-  summary { cursor: pointer; color: #1d4ed8; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+  summary { cursor: pointer; color: #1d4ed8; font-weight: 600; padding: 10px 0; } /* niente flex: su Chrome <89 sparisce il triangolino */
   .prec { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; align-items: center; margin: 8px 0; }
   ol, ul { list-style: none; padding: 0; margin: 0; }
   #ris li, #persone li { padding: 10px 0; border-bottom: 1px solid #ddd; }
@@ -57,7 +58,7 @@
 <p class="sub">San Bonifacio · ottobre/novembre</p>
 
 <section id="grazie" class="card" hidden>
-  <h2 id="grazie-t" tabindex="-1" role="status"></h2>
+  <h2 id="grazie-t" tabindex="-1"></h2>
   <p id="grazie-g"></p>
   <button id="cambia" type="button" class="sec">Cambia i miei giorni</button>
   <button id="nonsei" type="button" class="link"></button>
@@ -116,14 +117,18 @@
   const $ = id => document.getElementById(id);
   // Compatibili anche con telefoni vecchi (iOS 12+, Android Chrome 70+).
   const svuota = (el, ...figli) => { while (el.firstChild) el.removeChild(el.firstChild); el.append(...figli); };
-  const scadenza = ms => { const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; };
+  // AbortController manca su iOS 12.0-12.1: lì si va senza scadenza invece di non funzionare.
+  const scadenza = ms => { if (!window.AbortController) return undefined; const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; };
+  const oggetto = coppie => { const o = {}; coppie.forEach(([k, v]) => { o[k] = v; }); return o; }; // Object.fromEntries: solo da Chrome 73
   const norm = s => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
   const it = (iso, o) => new Date(iso + 'T00:00:00Z').toLocaleDateString('it-IT', Object.assign({ timeZone: 'UTC' }, o));
   const breve = iso => it(iso, { weekday: 'short', day: 'numeric', month: 'short' });
+  // Memoria del telefono; se è bloccata (navigazione privata, in-app browser) si ricorda solo per questa visita.
+  const mem = {};
   const store = {
-    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
-    del(k) { try { localStorage.removeItem(k); } catch (e) {} },
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return k in mem ? mem[k] : null; } },
+    set(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+    del(k) { delete mem[k]; try { localStorage.removeItem(k); } catch (e) {} },
   };
 
   let TUTTI = [];
@@ -134,6 +139,7 @@
   let scelte = {};          // giorni scelti nel form: {iso: tipo}
   let vecchio = '';         // nome con cui è salvata la riga che si sta modificando
   let auto = false;         // giorni precompilati da un voto esistente (non toccati a mano)
+  let autoV = false;        // 'vecchio' trovato scrivendo il nome (non da 'Cambia' o dall'admin)
   let adminEdit = false;    // l'admin sta modificando il voto di un altro
 
   // Segreto admin: letto dal link e tolto subito dalla barra degli indirizzi.
@@ -143,6 +149,8 @@
 
   const mio = () => store.get('nome') || '';
   const votoDi = n => voti && voti.find(v => norm(v.nome) === norm(n));
+  const notaDi = n => Object.prototype.hasOwnProperty.call(note, n) ? note[n] : ''; // anche per un nome come 'constructor'
+  const etichetta = (iso, tipo) => it(iso, { weekday: 'long', day: 'numeric', month: 'long' }) + (tipo && tipo !== '✔' ? ', ' + TIPI[tipo] : '');
 
   // ---------- calendario ----------
   function calendario(box, giorni, sel, modo) {
@@ -174,10 +182,10 @@
           continue;
         }
         const l = document.createElement('label');
-        l.className = 'd' + (sel[iso] ? ' on' : (modo === 'giorni' ? ' chiuso' : ''));        const c = document.createElement('input');
+        l.className = 'd' + (sel[iso] ? ' on' : (modo === 'giorni' ? ' chiuso' : ''));
+        const c = document.createElement('input');
         c.type = 'checkbox'; c.value = iso; c.checked = !!sel[iso];
-        const nome = it(iso, { weekday: 'long', day: 'numeric', month: 'long' });
-        c.setAttribute('aria-label', modo === 'giorni' ? nome + (sel[iso] ? ', aperto' : ', chiuso') : nome);
+        c.setAttribute('aria-label', modo === 'giorni' ? etichetta(iso) + (sel[iso] ? ', aperto' : ', chiuso') : etichetta(iso, sel[iso]));
         const num = document.createElement('span');
         num.setAttribute('aria-hidden', 'true'); num.textContent = g;
         l.append(c, num);
@@ -197,9 +205,31 @@
     }
   }
 
+  // Il calendario si ricrea solo se cambiano i giorni aperti; altrimenti si aggiornano le caselle
+  // al loro posto: ricrearle mentre il dito tocca un giorno farebbe perdere il tocco.
   function disegnaForm() {
-    calendario($('mesi'), TUTTI, scelte, 'voto');
-    // Precisazioni facoltative: una riga per ogni giorno scelto.
+    const c = $('mesi').querySelectorAll('input');
+    if (Array.prototype.map.call(c, x => x.value).join() !== aperti.join()) calendario($('mesi'), TUTTI, scelte, 'voto');
+    else Array.prototype.forEach.call(c, segna);
+    disegnaPrec();
+  }
+
+  function segna(c) {
+    const l = c.parentNode, t = scelte[c.value];
+    c.checked = !!t;
+    l.classList.toggle('on', !!t);
+    const s = l.querySelector('small');
+    if (s) l.removeChild(s);
+    if (SIGLA[t]) {
+      const n = document.createElement('small');
+      n.setAttribute('aria-hidden', 'true'); n.textContent = SIGLA[t];
+      l.append(n);
+    }
+    c.setAttribute('aria-label', etichetta(c.value, t));
+  }
+
+  // Precisazioni facoltative: una riga per ogni giorno scelto.
+  function disegnaPrec() {
     const prec = $('prec');
     svuota(prec);
     const giorni = Object.keys(scelte).filter(g => aperti.includes(g)).sort();
@@ -216,27 +246,26 @@
       const s = document.createElement('select');
       s.id = 'p-' + g;
       Object.entries(TIPI).forEach(([v, t]) => s.append(new Option(t, v, false, scelte[g] === v)));
-      s.addEventListener('change', () => { scelte[g] = s.value; auto = false; salvaBozza(); disegnaForm(); $('p-' + g).focus(); });
+      s.addEventListener('change', () => { scelte[g] = s.value; auto = false; salvaBozza(); segna($('mesi').querySelector('input[value="' + g + '"]')); });
       r.append(l, s);
       prec.append(r);
     });
   }
 
   $('mesi').addEventListener('change', e => {
-    const g = e.target.value;
-    if (e.target.checked) scelte[g] = '✔'; else delete scelte[g];
+    const c = e.target;
+    if (c.checked) scelte[c.value] = '✔'; else delete scelte[c.value];
     auto = false;
     $('msg').textContent = '';
+    segna(c);
     salvaBozza();
-    disegnaForm();
-    const c = $('mesi').querySelector('input[value="' + g + '"]');
-    if (c) c.focus();
+    disegnaPrec();
   });
 
   // ---------- bozza: sopravvive a ricarica, tasto indietro, telefono spento ----------
   function salvaBozza() {
     if (adminEdit) return;
-    store.set('bozza', { nome: $('nome').value, note: $('note').value, scelte, vecchio });
+    store.set('bozza', { nome: $('nome').value, note: $('note').value, scelte, vecchio, auto, autoV });
   }
   $('note').addEventListener('input', salvaBozza);
   $('nome').addEventListener('input', salvaBozza);
@@ -268,36 +297,41 @@
 
   function caricaVoto(v, n) {
     scelte = Object.assign({}, v.giorni);
-    vecchio = v.nome;
+    vecchio = v.nome; auto = false; autoV = false;
     $('nome').value = v.nome;
     $('note').value = n || '';
     return Object.values(scelte).some(t => t !== '✔') || !!n;
   }
 
-  // Nome scritto a mano: se ha già un voto, lo si carica per modificarlo.
-  $('nome').addEventListener('change', () => {
-    if (adminEdit) return statoForm();
+  // Nome scritto a mano: se ha già un voto, lo si carica per modificarlo. Si controlla già mentre
+  // si scrive (pausa di 0,4 s): se l'avviso comparisse solo all'uscita dal campo, spingerebbe giù
+  // il calendario proprio mentre il dito tocca un giorno, e il tocco finirebbe nel vuoto.
+  let attesaNome;
+  $('nome').addEventListener('input', () => { clearTimeout(attesaNome); attesaNome = setTimeout(controllaNome, 400); });
+  $('nome').addEventListener('change', () => { clearTimeout(attesaNome); controllaNome(); });
+  function controllaNome() {
+    if (adminEdit) { $('b').textContent = 'Salva per ' + $('nome').value.trim(); return; }
     const v = votoDi($('nome').value);
-    const av = $('avviso');
-    if (v && norm(v.nome) !== norm(vecchio)) {
-      if (!Object.keys(scelte).length || auto) {
-        scelte = Object.assign({}, v.giorni);
-        auto = true;
-      }
-      if (!vecchio) vecchio = v.nome;
-      av.hidden = false;
-      av.textContent = norm(v.nome) === norm(mio())
-        ? 'Hai già votato: cambia i giorni e premi Salva modifiche.'
-        : 'C\'è già un voto a nome «' + v.nome + '». Se sei tu, cambia pure i giorni. Se sei un\'altra persona, aggiungi l\'iniziale del cognome (es. ' + v.nome.split(' ')[0] + ' B.).';
-    } else if (!v) {
-      if (auto) scelte = {};
-      auto = false;
-      if (vecchio && !votoDi(vecchio)) vecchio = '';
-      av.hidden = true;
+    const prima = JSON.stringify([scelte, vecchio]);
+    // Il voto trovato scrivendo il nome vale finché il nome resta quello. Chi poi aggiunge l'iniziale
+    // (Anna -> Anna B.) è un'altra persona: non deve rinominare la riga della prima Anna.
+    if (autoV && !(v && norm(v.nome) === norm(vecchio))) {
+      vecchio = ''; autoV = false;
+      if (auto) { scelte = {}; auto = false; }
     }
+    if (v && !vecchio) {
+      vecchio = v.nome; autoV = true;
+      if (!Object.keys(scelte).length) { scelte = Object.assign({}, v.giorni); auto = true; }
+    }
+    const av = $('avviso');
+    av.hidden = !(v && (autoV || norm(v.nome) !== norm(vecchio)));
+    av.textContent = !v ? '' : norm(v.nome) === norm(mio())
+      ? 'Hai già votato: cambia i giorni e premi Salva modifiche.'
+      : 'C\'è già un voto a nome «' + v.nome + '». Se sei tu, cambia pure i giorni. Se sei un\'altra persona, aggiungi l\'iniziale del cognome (es. ' + v.nome.split(' ')[0] + ' B.).';
     salvaBozza();
-    statoForm({ apri: $('piu').open });
-  });
+    // Si ridisegna solo se è cambiato qualcosa: ridisegnare mentre il dito tocca un giorno lo farebbe perdere.
+    if (JSON.stringify([scelte, vecchio]) !== prima) statoForm({ apri: $('piu').open });
+  }
 
   $('cambia').addEventListener('click', () => {
     const v = votoDi(mio());
@@ -305,17 +339,20 @@
     statoForm({ apri });
     $('nome').focus();
   });
-  $('nonsei').addEventListener('click', () => {
-    store.del('nome'); store.del('bozza');
+  function svuotaForm() {
+    adminEdit = false; auto = false; autoV = false;
+    store.del('bozza');
     scelte = {}; vecchio = ''; $('nome').value = ''; $('note').value = '';
-    $('avviso').hidden = true;
+    $('avviso').hidden = true; $('bozza').hidden = true; $('msg').textContent = '';
+  }
+  $('nonsei').addEventListener('click', () => {
+    store.del('nome');
+    svuotaForm();
     statoForm();
     $('nome').focus();
   });
   $('annulla').addEventListener('click', () => {
-    adminEdit = false;
-    store.del('bozza');
-    scelte = {}; vecchio = ''; $('nome').value = ''; $('note').value = ''; $('avviso').hidden = true;
+    svuotaForm();
     if (votoDi(mio())) { statoGrazie(); $('grazie-t').focus(); }
     else statoForm();
   });
@@ -326,8 +363,12 @@
     Object.entries(dati).forEach(([k, v]) => [].concat(v).forEach(x => body.append(k, x)));
     if (admin) body.append('admin', admin);
     // Corpo urlencoded = richiesta "semplice": niente preflight CORS, niente cookie Google.
-    const r = await fetch(SERVER, { method: 'POST', body, signal: scadenza(45000) });
-    return r.json();
+    // "occupato" = il server non ha scritto niente (troppi voti insieme): si riprova da soli.
+    for (let prova = 1; ; prova++) {
+      const res = await (await fetch(SERVER, { method: 'POST', body, signal: scadenza(60000) })).json();
+      if (!res.occupato || prova === 3) return res;
+      await new Promise(ok => setTimeout(ok, 2000 * prova));
+    }
   }
 
   $('f').addEventListener('submit', async e => {
@@ -338,19 +379,18 @@
     if (!giorni.length) { $('msg').textContent = 'Tocca almeno un giorno'; $('mesi').querySelector('input').focus(); return; }
     const testo = $('b').textContent;
     const dati = { azione: 'vota', nome, vecchio, note: $('note').value, g: giorni.map(g => scelte[g] === '✔' ? g : g + ':' + scelte[g]) };
+    const nuovo = { nome, giorni: oggetto(giorni.map(g => [g, scelte[g]])) }; // prima dell'attesa: i tocchi durante l'invio non contano
     $('b').disabled = true; $('b').textContent = 'Invio…'; $('msg').textContent = '';
     const t = setTimeout(() => { $('lento').hidden = false; }, 3000);
     try {
       const res = await chiama(dati);
       if (!res.ok) throw new Error(res.msg);
-      const nuovo = { nome, giorni: Object.fromEntries(giorni.map(g => [g, scelte[g]])) };
       if (voti) voti = voti.filter(v => norm(v.nome) !== norm(vecchio) && norm(v.nome) !== norm(nome)).concat(nuovo);
       if (adminEdit) {
         note[nome] = dati.note;
         if (norm(vecchio) !== norm(nome)) delete note[vecchio];
         if (norm(vecchio) === norm(mio())) store.set('nome', nome);
-        adminEdit = false;
-        scelte = {}; vecchio = ''; $('nome').value = ''; $('note').value = '';
+        svuotaForm();
         $('adm-msg').textContent = 'Voto di ' + nome + ' aggiornato ✔';
         if (votoDi(mio())) statoGrazie(); else statoForm();
         $('adm-msg').scrollIntoView({ block: 'center' });
@@ -358,14 +398,16 @@
         store.set('nome', nome);
         store.del('bozza');
         if (admin) note[nome] = dati.note;
-        $('avviso').hidden = true; $('bozza').hidden = true;
+        svuotaForm();
         statoGrazie();
         $('grazie-t').focus();
       }
       risultati();
       persone();
     } catch (err) {
-      $('msg').textContent = err.name === 'Error' && err.message ? err.message : 'Voto NON salvato: niente connessione. I giorni sono ancora qui, riprova.';
+      $('msg').textContent = err.name === 'Error' && err.message ? err.message
+        : err.name === 'SyntaxError' ? 'Voto NON salvato: il server di Google non risponde. I giorni sono ancora qui, riprova tra poco.'
+        : 'Voto NON salvato: niente connessione. I giorni sono ancora qui, riprova.';
       $('b').textContent = testo;
     } finally {
       clearTimeout(t);
@@ -431,9 +473,9 @@
       c.className = 'chi';
       c.textContent = g.map(d => breve(d) + (v.giorni[d] !== '✔' ? ' (' + v.giorni[d] + ')' : '')).join(', ') || 'nessun giorno aperto';
       li.append(t, c);
-      if (note[v.nome]) {
+      if (notaDi(v.nome)) {
         const n = document.createElement('div');
-        n.className = 'nota'; n.textContent = '“' + note[v.nome] + '”';
+        n.className = 'nota'; n.textContent = '“' + notaDi(v.nome) + '”';
         li.append(n);
       }
       const r = document.createElement('div');
@@ -443,7 +485,7 @@
       mod.setAttribute('aria-label', 'Modifica il voto di ' + v.nome);
       mod.addEventListener('click', () => {
         adminEdit = true;
-        const apri = caricaVoto(v, note[v.nome]);
+        const apri = caricaVoto(v, notaDi(v.nome));
         $('avviso').hidden = true;
         statoForm({ apri });
         window.scrollTo(0, 0);
@@ -476,7 +518,7 @@
 
   let selGiorni = {};
   $('apri').addEventListener('click', () => {
-    selGiorni = Object.fromEntries(aperti.map(g => [g, true]));
+    selGiorni = oggetto(aperti.map(g => [g, true]));
     calendario($('cal-adm'), TUTTI, selGiorni, 'giorni');
     $('giorni-box').hidden = false; $('apri').hidden = true; $('f').hidden = true; $('grazie').hidden = true;
   });
@@ -543,7 +585,7 @@
   // Bozza non inviata (ricarica, indietro, telefono spento): si riprende da dove si era.
   const bz = store.get('bozza');
   if (bz && (Object.keys(bz.scelte || {}).length || bz.nome)) {
-    scelte = bz.scelte || {}; vecchio = bz.vecchio || '';
+    scelte = bz.scelte || {}; vecchio = bz.vecchio || ''; auto = !!bz.auto; autoV = !!bz.autoV;
     $('nome').value = bz.nome || ''; $('note').value = bz.note || '';
     $('bozza').hidden = !Object.keys(scelte).length;
     statoForm({ apri: Object.values(scelte).some(t => t !== '✔') || !!bz.note });
