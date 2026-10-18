@@ -212,12 +212,9 @@ body.mano .squig, body.mano .av svg, body.mano h1 { -webkit-filter: url(#mano); 
 body.mano .squig { stroke-width: 4; }
 body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .cal > * { font-size: 17px !important; }
 
-@-webkit-keyframes accendi{0%,100%{background-color:#d9dce1}50%{background-color:#f1f3f6}}
-@keyframes accendi{0%,100%{background-color:#d9dce1}50%{background-color:#f1f3f6}}
-.carico .g[data-g]{background-image:none;background-color:#d9dce1;-webkit-animation:accendi 1.3s ease-in-out infinite;animation:accendi 1.3s ease-in-out infinite;color:var(--mut)}
-.carico .g[data-g]:nth-child(2n){-webkit-animation-delay:-.65s;animation-delay:-.65s}
-.carico .g[data-g]:nth-child(3n){-webkit-animation-delay:-.3s;animation-delay:-.3s}
-.carico .g[data-g]:nth-child(5n){-webkit-animation-delay:-1s;animation-delay:-1s}
+@-webkit-keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
+@keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
+.carico .g[data-g]{background-image:none;background-color:#e3e6ea;-webkit-animation:accendi 1.6s ease-in-out infinite;animation:accendi 1.6s ease-in-out infinite;color:var(--mut)}
 @media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}@keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}.carico .g[data-g]{background-color:#2b2f36}}
 @media (prefers-reduced-motion:reduce){.carico .g[data-g]{-webkit-animation:none;animation:none}}
 
