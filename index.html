@@ -314,6 +314,10 @@ header h1 { padding-right: 50px; }
 @media (prefers-reduced-motion: reduce) { .g .o.sk { -webkit-animation: none; animation: none; } }
 .invia .ico { width: 22px; height: 22px; }
 .bar .ib:not([aria-disabled]) .ico{color:var(--acc)}
+.g.x.nx{text-decoration:none;flex-direction:column;line-height:1.05;font-weight:600}
+.g.x.nx small{display:block;font-size:11px;font-weight:600;text-decoration:none}
+.bar .ib{background:var(--acc)}
+.bar .ib .ico,.bar .ib:not([aria-disabled]) .ico{color:var(--onacc)}
 </style>
 </head>
 <body>
@@ -918,7 +922,7 @@ function renderCal() {
     while (vuote > 0) {
       segue = new Date(segue.getTime() + 86400000);
       var si_ = segue.toISOString().slice(0, 10);
-      if (TUTTI.indexOf(si_) >= 0 && !avail(si_)) { var xs = el('div', 'g x', String(segue.getUTCDate())); xs.setAttribute('aria-hidden', 'true'); celle.push(xs); vuote--; }
+      if (TUTTI.indexOf(si_) >= 0 && !avail(si_)) { var xs = el('div', 'g x nx', String(segue.getUTCDate())); xs.appendChild(el('small', '', 'nov')); xs.setAttribute('aria-hidden', 'true'); celle.push(xs); vuote--; }
       else { while (vuote-- > 0) celle.push(el('div', 'g vuoto')); }
     }
     var h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize';
