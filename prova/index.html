@@ -222,7 +222,7 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 @-webkit-keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
 @keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
 .carico .g[data-g]{background-image:none;background-color:#dfe3e8;color:transparent;pointer-events:none;opacity:.72}
-.carico .g.sk-onda{-webkit-animation:accendi 1.8s ease-in-out infinite;animation:accendi 1.8s ease-in-out infinite}
+.carico .g.sk-onda{-webkit-animation:accendi 2.8s ease-in-out infinite;animation:accendi 2.8s ease-in-out infinite}
 .carico .g.sk-ferma{opacity:.72}
 .carico .g[data-g] .o{opacity:0}
 .caricamento{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 8px;color:var(--ink);font-weight:700}
@@ -287,8 +287,9 @@ body.invio .ib, body.invio .sugg { pointer-events: none; }
 .locrow .loc { margin: 0; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #fila { flex: 1 1 auto; min-width: 0; display: flex; justify-content: flex-end; }
 .avb.edit { box-sizing: border-box; border: 2px solid var(--mut); }
-.ed-b { position: absolute; right: -6px; bottom: -6px; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--bg); border: 3px solid var(--bg); pointer-events: none; }
-.ed-b .ico { width: 12px; height: 12px; stroke-width: 2.6; }
+.ed-b { position: absolute; right: -7px; bottom: -7px; display: flex; align-items: center; justify-content: center; width: 29px; height: 29px; border-radius: 50%; background: #f2b84b; color: #3b2a00; border: 3px solid var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,.22); pointer-events: none; }
+.ed-b .ico { width: 15px; height: 15px; stroke-width: 2.8; }
+#opzioni { background: #f2b84b; color: #3b2a00; border-color: #f2b84b; }
 .nome input:focus { outline: none; border-color: var(--acc); }
 .av.vuoto .ico { width: 55%; height: 55%; color: var(--mut); }
 .fila-b { display: flex; align-items: center; max-width: 100%; min-height: 44px; margin-right: -4px; padding: 0; border: 0; background: none; color: var(--mut); }
@@ -803,7 +804,7 @@ function renderName() {
   }
   var b = clear($('nomeblk'));
   var row = el('div', 'nome' + (S.nomeErr ? ' err' : ''));
-  var ab = el('button', 'avb'); ab.type = 'button'; ab.id = 'avatar'; ab.setAttribute('aria-label', 'Avatar'); ab.appendChild(avatarNome());
+  var ab = el('button', 'avb'); ab.type = 'button'; ab.id = 'avatar'; ab.setAttribute('aria-label', blocca ? 'Avatar' : 'Modifica avatar'); ab.appendChild(avatarNome());
   if (S.voted && !S.edit) { var ok = el('span', 'ok-b'); ok.appendChild(ico('spunta')); ab.appendChild(ok); ab.setAttribute('aria-label', 'Voto salvato'); }
   if (!blocca) { ab.className += ' edit'; var eb = el('span', 'ed-b'); eb.appendChild(ico('matita')); ab.appendChild(eb); }
   if (!blocca) ab.addEventListener('click', sheetAvatar); else if (S.voted && !S.edit) ab.disabled = true;
@@ -893,7 +894,7 @@ function renderCal() {
       if (giorni.indexOf(iso) < 0) { celle.push(el('div', 'g vuoto')); continue; }
       if (!avail(iso)) { var x = el('div', 'g x', String(d)); x.setAttribute('aria-hidden', 'true'); celle.push(x); continue; } // passato, chiuso o voti chiusi: stesso segno
       var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
-      if (!VOTI) { var onda = d % 5 !== 0 && d % 5 !== 3; b.disabled = true; b.className += onda ? ' sk-onda' : ' sk-ferma'; if (onda) { b.style.webkitAnimationDelay = (-d * 110) + 'ms'; b.style.animationDelay = (-d * 110) + 'ms'; } }
+      if (!VOTI) { var wd = new Date(Date.UTC(y, mm, d)).getUTCDay(), onda = wd !== 0 && wd !== 6 && d % 3 === 1; b.disabled = true; b.className += onda ? ' sk-onda' : ' sk-ferma'; if (onda) { b.style.webkitAnimationDelay = (-d * 170) + 'ms'; b.style.animationDelay = (-d * 170) + 'ms'; } }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
