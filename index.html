@@ -2,661 +2,1240 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
 <title>Festa di laurea di Gilberto</title>
-<meta property="og:title" content="🎓 Festa di laurea di Gilberto">
-<meta property="og:description" content="Tocca i giorni in cui ci sei. Ci vuole un minuto.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Festa di laurea di Gilberto">
+<meta property="og:description" content="Tocca i giorni in cui ci sei.">
+<meta property="og:image" content="https://03gilbe-design.github.io/festa/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://03gilbe-design.github.io/festa/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
-  [hidden] { display: none !important; } /* senza questo, display:flex vince su hidden */
-  body { overflow-wrap: break-word; font-family: system-ui, sans-serif; max-width: 440px; margin: 0 auto; padding: 16px; font-size: 18px; line-height: 1.4; color: #111; background: #fff; }
-  h1 { font-size: 24px; margin: 0; }
-  .sub { margin: 2px 0 8px; color: #444; font-size: 16px; }
-  h2 { font-size: 20px; margin: 24px 0 8px; }
-  .mese { font-size: 18px; margin: 16px 0 6px; text-transform: capitalize; }
-  .lab { display: block; font-weight: 700; margin: 16px 0 6px; }
-  input[type=text], textarea, select { width: 100%; box-sizing: border-box; padding: 12px; font: inherit; border: 2px solid #555; border-radius: 8px; background: #fff; color: #111; }
-  textarea { min-height: 80px; }
-  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
-  legend { font-weight: 700; padding: 0; margin: 16px 0 0; }
-  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
-  .wd { text-align: center; font-size: 13px; font-weight: 700; color: #444; }
-  .d, .x { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; min-height: 36px; /* 7 x 36 + gap ci sta in 320px */ border-radius: 8px; font-size: 17px; }
-  .x { color: #767676; }
-  .d { position: relative; border: 2px solid #555; cursor: pointer; font-weight: 600; }
-  .d input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
-  .d.on { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
-  .d:focus-within { outline: 3px solid #f59e0b; outline-offset: 2px; }
-  .d small { position: absolute; bottom: 1px; font-size: 10px; font-weight: 700; }
-  .chiuso { border-style: dashed; color: #767676; text-decoration: line-through; }
-  button { width: 100%; min-height: 52px; margin-top: 12px; font: inherit; font-size: 20px; font-weight: 700; border: 2px solid #1d4ed8; border-radius: 8px; background: #1d4ed8; color: #fff; cursor: pointer; }
-  button:disabled { background: #555; border-color: #555; }
-  .sec { background: #fff; color: #1d4ed8; }
-  .link { background: none; border: 0; color: #1d4ed8; text-decoration: underline; font-size: 17px; font-weight: 400; min-height: 44px; margin-top: 4px; }
-  :focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
-  .err { margin-top: 12px; font-weight: 700; text-align: center; color: #b91c1c; }
-  .info { font-size: 16px; color: #1d4ed8; font-weight: 600; margin: 6px 0 0; }
-  .card { border: 2px solid #1d4ed8; border-radius: 12px; padding: 16px; margin-top: 16px; }
-  .card h2 { margin-top: 0; }
-  details { margin-top: 16px; }
-  summary { cursor: pointer; color: #1d4ed8; font-weight: 600; padding: 10px 0; } /* niente flex: su Chrome <89 sparisce il triangolino */
-  .prec { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; align-items: center; margin: 8px 0; }
-  ol, ul { list-style: none; padding: 0; margin: 0; }
-  #persone li { padding: 10px 0; border-bottom: 1px solid #ddd; }
-  /* Risultati a mappa di calore: più è scuro, più persone ci sono (numero sempre scritto, non solo colore). */
-  .cal button.d { width: auto; margin: 0; padding: 0; min-height: 36px; font-size: 17px; background: #fff; color: #111; border: 2px solid #ccc; }
-  .cal button.d.h1 { background: #dbeafe; border-color: #93c5fd; }
-  .cal button.d.h2 { background: #93c5fd; border-color: #60a5fa; }
-  .cal button.d.h3 { background: #2563eb; border-color: #2563eb; color: #fff; }
-  .cal button.d.h4 { background: #1e3a8a; border-color: #1e3a8a; color: #fff; }
-  .cal button.d.sel { box-shadow: 0 0 0 3px #111; }
-  #giorno-sel { margin-top: 12px; }
-  .chip { display: inline-block; padding: 4px 10px; margin: 6px 6px 0 0; border-radius: 999px; background: #eff6ff; border: 1px solid #93c5fd; font-size: 15px; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: anywhere; }
-  .chip.forse { background: #fff; border-style: dashed; color: #444; }
-  .chip.no { background: #f3f4f6; border-color: #d1d5db; color: #444; }
-  .fascia { padding: 8px 0; border-top: 1px solid #e5e7eb; }
-  .fascia-t { font-size: 15px; font-weight: 700; color: #444; }
-  .top { font-weight: 700; }
-  .chi { font-size: 15px; color: #444; }
-  #adminbar { position: sticky; top: 0; z-index: 2; background: #fde047; color: #111; font-weight: 700; padding: 10px 16px; margin: -16px -16px 12px; display: flex; justify-content: space-between; align-items: center; }
-  #adminbar .link { width: auto; margin: 0; color: #111; }
-  .riga { display: flex; gap: 8px; }
-  .riga button { min-height: 44px; font-size: 16px; margin-top: 6px; }
-  .nota { font-size: 15px; font-style: italic; color: #444; }
+/* =============== TOKEN: 1 accento + grigi + 3 tinte + rosso errore =============== */
+:root {
+  --bg: #ffffff; --ink: #111827; --mut: #4b5563; --fill: #f1f3f6; --line: #e5e7eb; --off: #767676;
+  --acc: #1d4ed8; --onacc: #ffffff;
+  --t1: #e3ecfc; --t2: #c3d6f8; --t3: #9dbcf2; --tx: #1e3a8a; --t3x: #0f1f4d;
+  --err: #b91c1c; --errbg: #fef2f2; --sheet: #ffffff; --toast: #111827; --ontoast: #ffffff;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a; --ink: #f1f5f9; --mut: #cbd5e1; --fill: #1e293b; --line: #334155; --off: #8391a7;
+    --acc: #2563eb; --t1: #24334d; --t2: #34517f; --t3: #5b84c4; --tx: #dbeafe; --t3x: #0b1226;
+    --err: #fca5a5; --errbg: #450a0a; --sheet: #172033; --toast: #e2e8f0; --ontoast: #0f172a;
+  }
+}
+body.verde { --acc: #15803d; --t1: #e1f3e6; --t2: #bfe3c9; --t3: #8fcba2; --tx: #14532d; --t3x: #052e16; }
+@media (prefers-color-scheme: dark) { body.verde { --acc: #16a34a; --t1: #1f3a2b; --t2: #2f6342; --t3: #4f9a69; --tx: #dcfce7; --t3x: #052e16; } }
+
+/* =============== BASE =============== */
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 170px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.35 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; overflow-wrap: break-word; }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-appearance: none; }
+:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; white-space: nowrap; }
+.wrap { max-width: 480px; margin: 0 auto; padding-left: 16px; padding-left: calc(16px + env(safe-area-inset-left)); padding-right: 16px; padding-right: calc(16px + env(safe-area-inset-right)); }
+.ico { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; flex: none; }
+.ico.s { width: 18px; height: 18px; } .ico.pieno { fill: currentColor; }
+
+/* =============== TITOLO =============== */
+header { padding-top: 20px; padding-top: calc(20px + env(safe-area-inset-top)); }
+h1 { margin: 0; font-size: 22px; line-height: 1.15; letter-spacing: -.01em; }
+.squig { display: block; width: 116px; height: 10px; margin: 2px 0 0 -2px; fill: none; stroke: var(--acc); stroke-width: 3; stroke-linecap: round; }
+.loc { margin: 4px 0 0; color: var(--mut); font-size: 16px; }
+
+/* =============== NOME + AVATAR =============== */
+.nome { display: flex; align-items: center; margin-top: 18px; }
+.avb { position: relative; width: 52px; height: 52px; margin-right: 10px; padding: 0; border: 0; border-radius: 50%; background: none; flex: none; }
+.av { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; background: var(--fill); color: var(--mut); font-weight: 700; font-size: 20px; overflow: hidden; flex: none; }
+.av svg { width: 100%; height: 100%; display: block; }
+.av.vuoto { background: var(--fill); }
+.ok-b { position: absolute; right: -4px; bottom: -4px; display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--acc); color: var(--onacc); border: 3px solid var(--bg); }
+.ok-b .ico { width: 14px; height: 14px; stroke-width: 3.4; }
+.nome input { -webkit-box-flex: 1; flex: 1; min-width: 0; height: 52px; padding: 0 14px; border: 2px solid var(--ink); border-radius: 12px; background: var(--bg); color: var(--ink); font: inherit; font-size: 18px; -webkit-appearance: none; }
+.nome input:focus { outline: 3px solid var(--acc); outline-offset: 1px; }
+.nome input[readonly] { border-color: transparent; background: var(--fill); font-weight: 600; }
+.nome.err input { border-color: var(--err); }
+.ib { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; margin-left: 8px; border: 0; border-radius: 12px; background: var(--fill); color: var(--ink); flex: none; }
+.sugg { list-style: none; margin: 6px 0 0; padding: 0; border-radius: 12px; background: var(--fill); overflow: hidden; }
+.sugg button { display: flex; align-items: center; width: 100%; min-height: 48px; padding: 4px 12px; border: 0; border-top: 2px solid var(--bg); background: none; text-align: left; }
+.sugg li:first-child button { border-top: 0; }
+.sugg .av { width: 30px; height: 30px; margin-right: 10px; font-size: 14px; background: var(--bg); }
+.sugg .gia { margin-left: auto; color: var(--acc); }
+.sugg .lock { margin-left: auto; color: var(--mut); }
+.sugg .lock + .gia { margin-left: 8px; }
+
+/* =============== CALENDARIO UNICO =============== */
+.mese { margin: 20px 0 6px; font-size: 16px; font-weight: 600; color: var(--mut); }
+.cal { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) repeat(3, minmax(0, 1.45fr)); gap: 4px; }
+.wd { text-align: center; font-size: 13px; font-weight: 600; color: var(--mut); padding-bottom: 2px; }
+.g { position: relative; display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0; border: 0; border-radius: 12px; background: var(--fill); color: var(--ink); font-size: 17px; font-weight: 600; line-height: 1; -webkit-tap-highlight-color: transparent; }
+.cal > :nth-child(7n+5), .cal > :nth-child(7n+6), .cal > :nth-child(7n) { font-size: 20px; }
+.cal > .wd:nth-child(n) { font-size: 13px; }
+.squig { margin-top: 5px; }
+.g .o { position: absolute; top: 3px; right: 6px; font-size: 13px; font-style: normal; font-weight: 600; color: var(--tx); }
+.g.t1 { background: var(--t1); } .g.t2 { background: var(--t2); } .g.t3 { background: var(--t3); color: var(--t3x); } .g.t3 .o { color: var(--t3x); }
+.g.m { background: var(--acc); color: var(--onacc); font-weight: 800; } .g.m .o { color: var(--onacc); opacity: .85; }
+.g.f .fq { position: absolute; bottom: 3px; left: 0; right: 0; text-align: center; font-size: 13px; font-weight: 700; }
+.g.x { background: none; color: var(--off); font-weight: 400; text-decoration: line-through; pointer-events: none; }
+.g.oggi { box-shadow: inset 0 0 0 2px var(--ink); }
+.g.foc { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--ink); z-index: 1; }
+.g:active { -webkit-transform: scale(.95); transform: scale(.95); }
+.g.chiuso-adm { text-decoration: line-through; color: var(--off); background: none; }
+.g.aperto-adm { background: var(--acc); color: var(--onacc); }
+.g.vuoto { visibility: hidden; }
+
+/* =============== BARRA IN BASSO =============== */
+.bar { position: -webkit-sticky; position: sticky; bottom: 0; z-index: 3; margin: 16px -16px 0; padding: 10px 16px 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: var(--bg); box-shadow: 0 -1px 0 var(--line); }
+.riga { display: flex; align-items: stretch; }
+.invia { -webkit-box-flex: 1; flex: 1; display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 56px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--acc); color: var(--onacc); font-size: 20px; font-weight: 700; white-space: nowrap; }
+.invia .n { margin-left: 8px; font-weight: 600; opacity: .9; }
+.invia .n:before { content: "·"; margin-right: 8px; }
+.invia[aria-disabled="true"] { background: var(--fill); color: var(--mut); }
+.invia.cambia { background: var(--fill); color: var(--ink); }
+.invia .ico { margin-right: 8px; }
+.invia.lavora { background: var(--acc); color: var(--onacc); }
+.spin { width: 20px; height: 20px; margin-right: 10px; border: 3px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; -webkit-animation: gira .8s linear infinite; animation: gira .8s linear infinite; }
+@-webkit-keyframes gira { to { -webkit-transform: rotate(360deg); } } @keyframes gira { to { transform: rotate(360deg); } }
+.bar .ib { width: 56px; height: 56px; margin: 0 8px 0 0; border-radius: 14px; position: relative; }
+.bar .ib .pt { position: absolute; top: 9px; right: 9px; width: 10px; height: 10px; border-radius: 50%; background: var(--acc); }
+body.invio #nomeblk, body.invio #cal { opacity: .55; pointer-events: none; }
+.chiave-r { display: flex; align-items: center; margin-bottom: 8px; }
+.chiave-r .ico { margin-right: 10px; color: var(--mut); }
+.chiave-r input { -webkit-box-flex: 1; flex: 1; min-width: 0; height: 48px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--fill); color: var(--ink); font: inherit; }
+.chiave-r.err input { box-shadow: inset 0 0 0 2px var(--err); }
+.chiave-r .em { margin-left: 8px; color: var(--err); font-weight: 700; font-size: 15px; }
+
+/* pannello del giorno (2o tocco) */
+.pan { margin-bottom: 8px; padding: 10px 12px; border-radius: 16px; background: var(--fill); max-height: 220px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.pan-t { display: flex; align-items: center; font-weight: 700; }
+.pan-t .x { margin-left: auto; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -8px; border: 0; background: none; font-size: 26px; line-height: 1; color: var(--mut); }
+.ctrl { display: flex; align-items: center; margin-top: 4px; }
+.seg { display: flex; -webkit-box-flex: 1; flex: 1; padding: 3px; border-radius: 12px; background: var(--bg); }
+.seg + .seg { -webkit-box-flex: 0; flex: 0 0 38%; margin-left: 8px; }
+.seg button { -webkit-box-flex: 1; flex: 1; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0; border: 0; border-radius: 10px; background: none; color: var(--mut); font-weight: 700; font-size: 17px; }
+.seg button[aria-pressed="true"] { background: var(--acc); color: var(--onacc); }
+.seg button .ico { width: 22px; height: 22px; } .seg button .ico + .ico { margin-left: 2px; }
+.chips { display: flex; flex-wrap: wrap; margin: 6px -3px 0; }
+.chip { display: inline-flex; align-items: center; margin: 3px; padding: 3px 12px 3px 3px; border: 0; border-radius: 999px; background: var(--bg); color: var(--ink); font-size: 15px; }
+.chip .av { width: 26px; height: 26px; margin-right: 6px; font-size: 13px; }
+.chip.forse { box-shadow: inset 0 0 0 1.5px var(--mut); }
+.chip.forse:after { content: "?"; margin-left: 4px; font-weight: 700; }
+.chip.lo { box-shadow: inset 0 0 0 2px var(--acc); }
+
+/* toast "annulla" */
+.toast { display: flex; align-items: center; margin-bottom: 8px; padding: 4px 4px 4px 16px; border-radius: 14px; background: var(--toast); color: var(--ontoast); font-size: 17px; -webkit-animation: sale .2s ease-out; animation: sale .2s ease-out; }
+.toast span { -webkit-box-flex: 1; flex: 1; }
+.toast button { min-height: 44px; padding: 0 14px; border: 0; background: none; color: inherit; font-weight: 700; text-decoration: underline; }
+@-webkit-keyframes sale { from { opacity: 0; -webkit-transform: translateY(10px); } } @keyframes sale { from { opacity: 0; transform: translateY(10px); } }
+
+/* =============== FOGLI =============== */
+.velo { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 8; background: rgba(15,23,42,.45); }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9; max-width: 480px; max-height: 85%; margin: 0 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 16px 18px; padding-bottom: calc(18px + env(safe-area-inset-bottom)); border-radius: 20px 20px 0 0; background: var(--sheet); -webkit-animation: sale .2s ease-out; animation: sale .2s ease-out; }
+.mani { width: 40px; height: 5px; margin: 0 auto 8px; border-radius: 3px; background: var(--line); }
+.sh-t { display: flex; align-items: center; margin: 0 0 6px; font-size: 19px; font-weight: 700; }
+.sh-t .x { margin-left: auto; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -8px; border: 0; background: none; font-size: 28px; line-height: 1; color: var(--mut); }
+.sheet textarea { width: 100%; min-height: 84px; padding: 12px 14px; border: 0; border-radius: 12px; background: var(--fill); color: var(--ink); font: inherit; resize: none; }
+.sheet .seg { background: var(--fill); margin-top: 10px; -webkit-box-flex: 0; flex: none; width: 100%; }
+.sheet .seg button .ico { margin-right: 6px; }
+.grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-top: 8px; }
+.grid button { position: relative; padding: 0; border: 0; border-radius: 50%; background: none; }
+.grid .av { width: 100%; height: auto; padding-top: 100%; position: relative; } .grid .av > * { position: absolute; top: 0; left: 0; }
+.grid .av svg { width: 100%; height: 100%; } .grid .av.ini { display: flex; }
+.grid button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--sheet), 0 0 0 6px var(--acc); }
+.riga-a { display: flex; align-items: center; width: 100%; min-height: 54px; padding: 0 6px; border: 0; border-radius: 12px; background: none; font-size: 18px; text-align: left; }
+.riga-a .ico { margin-right: 14px; color: var(--mut); }
+.riga-a .n { margin-left: auto; color: var(--mut); }
+.riga-a.del { color: var(--err); } .riga-a.del .ico { color: var(--err); }
+.hint { margin: 6px 0 0; color: var(--mut); font-size: 15px; }
+.btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 54px; margin-top: 12px; border: 0; border-radius: 14px; background: var(--acc); color: var(--onacc); font-size: 19px; font-weight: 700; }
+.btn.sec { background: var(--fill); color: var(--ink); }
+.btn.del { background: var(--fill); color: var(--err); }
+.duo { display: flex; } .duo .btn + .btn { margin-left: 8px; } .duo .btn { -webkit-box-flex: 1; flex: 1; min-width: 0; }
+.sheet input[type=text], .sheet input[type=date] { width: 100%; height: 52px; margin-top: 8px; padding: 0 14px; border: 0; border-radius: 12px; background: var(--fill); color: var(--ink); font: inherit; }
+.lista { list-style: none; margin: 0; padding: 0; }
+.pers { display: flex; align-items: center; width: 100%; min-height: 56px; padding: 4px 4px; border: 0; border-radius: 12px; background: none; font-size: 18px; text-align: left; }
+.pers .av { width: 38px; height: 38px; margin-right: 12px; font-size: 16px; }
+.pers b { -webkit-box-flex: 1; flex: 1; min-width: 0; font-weight: 600; }
+.pers .q { color: var(--mut); font-size: 15px; margin-left: 8px; }
+.pers .ico { color: var(--mut); margin-left: 8px; }
+.pers[aria-expanded="true"] { background: var(--fill); }
+.dett { margin: 0 0 8px 50px; }
+.mini { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 44px; min-height: 48px; margin: 2px 4px 2px 0; border-radius: 10px; background: var(--acc); color: var(--onacc); font-size: 13px; line-height: 1.1; font-weight: 600; }
+.mini b { font-size: 17px; } .mini.f { background: var(--t2); color: var(--tx); }
+.mini .ico { width: 13px; height: 13px; }
+.cit { margin: 6px 0 0; padding: 8px 12px; border-radius: 12px; background: var(--fill); font-size: 16px; }
+.cit .ico { width: 16px; height: 16px; margin-right: 6px; color: var(--mut); }
+.uscita { opacity: .4; text-decoration: line-through; }
+.rad { display: flex; align-items: center; width: 100%; min-height: 56px; padding: 4px 6px; border: 0; border-radius: 12px; background: none; font-size: 18px; text-align: left; }
+.rad[aria-pressed="true"] { background: var(--fill); box-shadow: inset 0 0 0 2px var(--acc); }
+.rad .mini { margin-right: 12px; }
+
+/* =============== ADMIN: barra sottile =============== */
+.adm { position: -webkit-sticky; position: sticky; top: 0; z-index: 7; background: var(--ink); color: var(--bg); }
+.adm .in { display: flex; align-items: center; max-width: 480px; margin: 0 auto; padding-top: env(safe-area-inset-top); }
+.adm button { -webkit-box-flex: 1; flex: 1; display: flex; align-items: center; justify-content: center; min-height: 46px; border: 0; background: none; color: inherit; font-size: 16px; font-weight: 600; }
+.adm button .ico { margin-right: 6px; width: 20px; height: 20px; }
+.adm .ee { -webkit-box-flex: 0; flex: 0 0 64px; }
+
+/* =============== DATA SCELTA =============== */
+.decisa { margin: 28px 0 0; text-align: center; }
+.grande { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 112px; height: 120px; border-radius: 20px; background: var(--acc); color: var(--onacc); line-height: 1.05; font-weight: 700; }
+.grande span { font-size: 18px; } .grande b { font-size: 52px; }
+.decisa .lk { display: flex; align-items: center; justify-content: center; margin-top: 12px; color: var(--mut); }
+.decisa .lk .ico { margin-right: 6px; }
+
+/* =============== ADATTAMENTI =============== */
+body.kb .bar { position: relative; box-shadow: none; }
+@media (max-height: 500px) {
+  header { padding-top: 8px; padding-top: calc(8px + env(safe-area-inset-top)); } h1 { font-size: 19px; } .squig { display: none; } .loc { margin-top: 2px; }
+  .nome { margin-top: 8px; } .mese { margin-top: 10px; }
+  .bar { padding-top: 6px; padding-bottom: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom)); } .invia, .bar .ib { min-height: 48px; height: 48px; }
+  .pan { display: flex; flex-wrap: wrap; align-items: center; max-height: none; margin-bottom: 6px; padding: 4px 10px; }
+  .pan-t { margin-right: 12px; } .pan-t .x { margin-left: 8px; order: 5; }
+  .ctrl { -webkit-box-flex: 1; flex: 1; margin: 0; min-width: 0; } .seg button { min-height: 40px; }
+  .chips { -webkit-box-flex: 0; flex: 0 0 100%; flex-wrap: nowrap; overflow-x: auto; margin: 0 0 2px; -webkit-overflow-scrolling: touch; } .chip { flex: none; }
+}
+@media (max-width: 300px) { .wrap { padding-left: 8px; padding-right: 8px; } .bar { margin-left: -8px; margin-right: -8px; padding-left: 8px; padding-right: 8px; } .cal { gap: 2px; } .g, .cal > :nth-child(7n+5), .cal > :nth-child(7n+6), .cal > :nth-child(7n) { font-size: 15px; min-height: 44px; } .g .o { right: 2px; } .invia { font-size: 18px; padding: 0 8px; } }
+@media (prefers-reduced-motion: reduce) { .spin, .toast, .sheet, .g:active { -webkit-animation: none; animation: none; -webkit-transform: none; transform: none; } }
+/* aspetto (admin): mano libera = titolo, sottolineatura e avatar leggermente irregolari. Mai sui comandi. */
+body.mano .squig, body.mano .av svg, body.mano h1 { -webkit-filter: url(#mano); filter: url(#mano); }
+body.mano .squig { stroke-width: 4; }
+body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .cal > * { font-size: 17px !important; }
+
+/* aggiunte del codice (stati che il prototipo non mostra) */
+.errbox { margin-bottom: 8px; padding: 10px 12px; border-radius: 12px; background: var(--errbg); color: var(--err); font-weight: 700; font-size: 16px; }
+.toast.fisso { position: fixed; left: 12px; right: 12px; bottom: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 10; max-width: 456px; margin: 0 auto; }
+body.invio .ib, body.invio .sugg { pointer-events: none; }
+#stato { margin-top: 12px; }
+.locrow { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+.locrow .loc { margin: 0; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#fila { flex: 1 1 auto; min-width: 0; display: flex; justify-content: flex-end; }
+.nome input:focus { outline: none; border-color: var(--acc); }
+.av.vuoto .ico { width: 55%; height: 55%; color: var(--mut); }
+.fila-b { display: flex; align-items: center; max-width: 100%; min-height: 44px; margin-right: -4px; padding: 0; border: 0; background: none; color: var(--mut); }
+.fila-c { display: flex; align-items: center; min-width: 0; padding-left: 8px; overflow: hidden; }
+.fl { position: relative; flex: none; width: 30px; height: 30px; margin-left: -8px; border-radius: 50%; box-shadow: 0 0 0 2px var(--bg); background: var(--bg); }
+.fl .av { width: 100%; height: 100%; font-size: 14px; }
+.fl.io { z-index: 1; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--acc); }
+.fl-ok { position: absolute; right: -5px; bottom: -4px; display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--acc); color: var(--onacc); border: 2px solid var(--bg); }
+.fl-ok .ico { width: 10px; height: 10px; stroke-width: 3.6; }
+.fl-piu { display: flex; align-items: center; justify-content: center; background: var(--fill); color: var(--mut); font-size: 12px; font-weight: 700; }
+.fila-n { margin-left: 10px; font-size: 16px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.inv.manca .pers { opacity: .5; }
+.inv .pers .gia { color: var(--acc); margin-left: 8px; }
+header .wrap { position: relative; }
+header h1 { padding-right: 50px; }
+#persona { position: absolute; top: 0; right: 4px; top: calc(env(safe-area-inset-top)); width: 48px; height: 48px; margin: 8px 0 0; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--mut); display: flex; align-items: center; justify-content: center; }
+#persona .ico { width: 22px; height: 22px; }
+.g .o.sk { width: 14px; height: 8px; border-radius: 4px; background: var(--line); -webkit-animation: resp 1.2s ease-in-out infinite; animation: resp 1.2s ease-in-out infinite; }
+@-webkit-keyframes resp { 50% { opacity: .4; } } @keyframes resp { 50% { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .g .o.sk { -webkit-animation: none; animation: none; } }
+.invia .ico { width: 22px; height: 22px; }
 </style>
 </head>
 <body>
-<div id="adminbar" hidden>Modalità admin <button id="esci" class="link" type="button">Esci</button></div>
-<main>
-<h1>🎓 Festa di laurea di Gilberto</h1>
-<p class="sub">San Bonifacio · ottobre/novembre</p>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="mano" x="-5%" y="-20%" width="110%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <symbol id="i-sole" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></symbol>
+  <symbol id="i-luna" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 7 7 0 0 0 20 14.5z"/></symbol>
+  <symbol id="i-nuvola" viewBox="0 0 24 24"><path d="M4 5h16v11h-9l-5 4v-4H4z"/></symbol>
+  <symbol id="i-spunta" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></symbol>
+  <symbol id="i-matita" viewBox="0 0 24 24"><path d="M4 20l1-4.5L16 4.5l3.5 3.5-11 11z"/><path d="M13.5 7l3.5 3.5"/></symbol>
+  <symbol id="i-cestino" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4h5v3M6 7l1 13h10l1-13"/><path d="M10 11v5M14 11v5"/></symbol>
+  <symbol id="i-lucchetto" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-gruppo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.8 3.1-6 7-6s7 2.2 7 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.4.6 4 2.5 4 5.7"/></symbol>
+  <symbol id="i-persona" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  <symbol id="i-chiave" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5l3 3M14 9l2.5 2.5"/></symbol>
+  <symbol id="i-puntini" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="19" cy="12" r="1.7" fill="currentColor"/></symbol>
+  <symbol id="i-calendario" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-scambia" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.8 3.1-6 7-6 1.3 0 2.5.3 3.5.7"/><path d="M15 15h7M19 12l3 3-3 3"/></symbol>
+  <symbol id="i-orologio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<!-- 28 avatar mano libera (motore mano.js, seme 11): macchie pastello piene, senza contorno. GROSSA ~26 unita', PICCOLA ~7. Id a-<nome>. -->
+<symbol id="a-jeans" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fde0c8"/><path d="M14.6,10.8 C15.5,9.6 17.9,10.0 19.5,9.9 C21.1,9.9 22.6,10.3 24.3,10.4 C25.9,10.4 28.0,10.1 29.5,10.2 C31.1,10.4 32.7,10.1 33.6,11.4 C34.5,12.6 34.6,15.6 34.9,17.8 C35.2,19.9 35.3,22.3 35.3,24.4 C35.3,26.4 34.9,28.2 35.0,30.2 C35.0,32.2 36.7,35.1 35.5,36.4 C34.4,37.7 29.7,38.6 28.1,38.0 C26.6,37.4 26.8,34.7 26.2,33.0 C25.6,31.3 24.9,29.5 24.6,27.7 C24.3,26.0 24.8,22.6 24.5,22.6 C24.3,22.5 23.4,25.9 23.0,27.5 C22.6,29.2 22.4,30.7 22.0,32.5 C21.7,34.3 22.5,37.4 20.9,38.2 C19.3,39.0 13.8,38.7 12.5,37.4 C11.2,36.0 12.9,32.5 13.0,30.2 C13.0,27.9 12.6,25.7 12.8,23.5 C12.9,21.3 13.7,19.1 14.0,17.0 C14.3,14.9 13.6,12.0 14.6,10.8 Z" fill="#8fb0ee"/><path d="M27.3,16.1 C27.0,16.8 26.3,17.7 25.6,18.1 C24.8,18.5 23.6,18.5 22.8,18.3 C22.0,18.1 21.1,17.4 20.8,16.7 C20.4,16.0 20.4,14.9 20.7,14.1 C20.9,13.4 21.5,12.5 22.2,12.1 C23.0,11.7 24.4,11.5 25.2,11.8 C26.0,12.0 26.8,12.6 27.1,13.3 C27.5,14.0 27.5,15.3 27.3,16.1 Z" fill="#f5d36e"/></symbol>
+<symbol id="a-gpt" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#d5f3e3"/><path fill-rule="evenodd" d="M40.7,23.8 C40.8,24.4 40.5,24.6 40.1,25.3 C39.8,26.0 39.1,27.4 38.5,28.0 C37.8,28.6 37.4,28.5 36.4,28.9 C35.3,29.3 33.4,30.2 32.2,30.5 C31.1,30.7 30.5,30.5 29.5,30.4 C28.5,30.2 27.4,30.0 26.4,29.5 C25.3,29.0 24.0,28.1 23.3,27.4 C22.6,26.7 22.3,25.8 22.1,25.3 C21.9,24.8 22.0,24.9 22.0,24.4 C21.9,23.9 21.6,23.2 21.8,22.5 C21.9,21.9 22.1,21.1 22.8,20.5 C23.6,19.9 25.3,19.3 26.3,18.9 C27.4,18.5 28.1,18.1 29.2,17.9 C30.3,17.7 31.9,17.6 33.0,17.8 C34.2,18.1 35.5,19.0 36.3,19.4 C37.2,19.9 37.5,20.3 38.1,20.7 C38.7,21.1 39.2,21.2 39.7,21.8 C40.1,22.3 40.6,23.2 40.7,23.8 Z M36.1,23.5 C36.1,23.8 36.8,24.2 36.6,24.7 C36.4,25.2 35.4,25.9 34.9,26.2 C34.3,26.5 33.9,26.5 33.2,26.6 C32.6,26.7 31.8,26.6 31.1,26.6 C30.5,26.6 30.1,26.8 29.6,26.8 C29.1,26.9 28.9,27.2 28.3,27.2 C27.7,27.1 26.5,27.0 26.1,26.7 C25.7,26.4 26.1,26.0 26.0,25.5 C25.8,25.0 25.1,24.3 25.0,23.8 C25.0,23.4 25.5,23.4 25.8,23.0 C26.1,22.6 26.1,22.0 26.5,21.7 C27.0,21.3 27.6,21.1 28.3,21.1 C28.9,21.0 29.9,21.4 30.5,21.3 C31.2,21.3 31.7,20.7 32.1,20.8 C32.5,20.9 32.4,21.8 33.0,21.9 C33.5,22.0 34.7,21.5 35.3,21.6 C35.9,21.8 36.5,22.4 36.6,22.7 C36.8,23.0 36.1,23.1 36.1,23.5 Z" fill="#3aa47c"/><path fill-rule="evenodd" d="M32.9,35.0 C32.0,35.3 30.5,35.5 29.2,35.7 C27.9,35.9 26.2,36.5 25.1,36.4 C24.0,36.2 23.6,35.3 22.8,34.8 C22.0,34.3 21.0,33.9 20.3,33.4 C19.7,32.9 19.5,32.4 19.0,31.7 C18.5,31.0 17.6,29.9 17.5,29.3 C17.3,28.7 17.6,28.5 18.0,28.0 C18.4,27.6 19.1,27.1 19.8,26.6 C20.5,26.1 21.1,25.4 22.2,24.9 C23.2,24.4 24.9,24.0 26.2,23.8 C27.4,23.5 28.5,23.2 29.5,23.4 C30.6,23.5 31.8,24.3 32.6,24.7 C33.4,25.2 33.9,25.4 34.5,25.9 C35.1,26.5 35.9,27.5 36.2,28.1 C36.6,28.7 36.7,29.0 36.7,29.7 C36.7,30.3 36.6,31.1 36.2,31.8 C35.8,32.5 34.9,33.2 34.3,33.7 C33.8,34.3 33.7,34.7 32.9,35.0 Z M30.4,32.5 C29.8,32.7 28.9,32.3 28.3,32.3 C27.7,32.3 27.6,32.4 26.9,32.5 C26.3,32.5 25.0,32.8 24.3,32.6 C23.7,32.5 23.4,31.8 23.0,31.6 C22.6,31.5 22.2,31.9 22.0,31.6 C21.7,31.2 21.4,29.9 21.4,29.5 C21.5,29.1 22.0,29.5 22.4,29.1 C22.7,28.8 23.1,27.8 23.4,27.5 C23.8,27.1 24.1,26.9 24.6,26.9 C25.1,27.0 25.7,27.6 26.4,27.6 C27.0,27.7 27.9,27.3 28.5,27.2 C29.0,27.1 29.4,27.1 29.9,27.3 C30.4,27.4 31.2,27.8 31.6,28.1 C32.0,28.4 31.9,28.9 32.2,29.1 C32.6,29.3 33.4,29.0 33.6,29.3 C33.7,29.6 33.5,30.7 33.2,31.0 C32.9,31.4 32.3,31.2 31.8,31.4 C31.3,31.7 30.9,32.4 30.4,32.5 Z" fill="#3aa47c"/><path fill-rule="evenodd" d="M16.0,35.6 C15.1,35.1 14.5,33.9 13.7,33.3 C12.9,32.6 11.8,32.1 11.3,31.6 C10.9,31.2 11.1,31.1 11.2,30.5 C11.3,29.9 11.8,28.6 12.0,27.9 C12.3,27.2 12.2,26.7 12.8,26.3 C13.4,25.9 14.7,25.8 15.7,25.3 C16.7,24.8 17.4,23.4 18.6,23.3 C19.7,23.1 21.1,24.2 22.4,24.3 C23.6,24.5 25.1,23.9 26.0,24.2 C27.0,24.6 27.4,25.9 28.1,26.5 C28.7,27.1 29.6,27.5 29.9,28.0 C30.2,28.5 29.8,28.8 29.8,29.5 C29.8,30.2 30.3,31.3 29.9,32.0 C29.6,32.7 28.3,33.1 27.6,33.6 C26.8,34.2 26.2,34.9 25.4,35.2 C24.6,35.5 23.9,35.2 22.8,35.4 C21.7,35.6 20.0,36.4 18.9,36.4 C17.7,36.5 16.9,36.1 16.0,35.6 Z M18.4,32.9 C17.8,32.8 16.4,31.9 15.9,31.7 C15.4,31.4 15.7,31.6 15.5,31.4 C15.2,31.1 14.2,30.6 14.3,30.1 C14.3,29.7 15.3,29.0 15.6,28.6 C15.9,28.2 15.8,28.1 16.2,27.8 C16.5,27.5 17.0,26.8 17.7,26.7 C18.3,26.7 19.1,27.4 19.8,27.5 C20.5,27.6 21.3,27.1 22.0,27.2 C22.7,27.2 23.3,27.5 23.7,27.7 C24.2,27.9 24.3,28.1 24.7,28.3 C25.1,28.5 25.7,28.6 26.0,28.9 C26.3,29.3 26.8,29.9 26.7,30.3 C26.6,30.7 26.0,31.3 25.6,31.5 C25.2,31.8 24.6,31.6 24.3,31.8 C24.0,32.0 24.2,32.6 23.8,32.8 C23.4,33.0 22.7,33.1 21.9,33.0 C21.2,32.9 19.8,32.1 19.2,32.1 C18.6,32.0 18.9,32.9 18.4,32.9 Z" fill="#3aa47c"/><path fill-rule="evenodd" d="M7.9,23.4 C7.9,22.8 8.0,22.7 8.4,22.2 C8.7,21.7 9.2,20.9 9.8,20.3 C10.4,19.7 10.9,19.0 11.9,18.5 C12.9,18.0 14.6,17.5 15.7,17.4 C16.8,17.4 17.4,18.0 18.5,18.4 C19.5,18.7 21.1,19.1 22.1,19.4 C23.1,19.7 23.7,19.7 24.4,20.1 C25.1,20.6 26.2,21.2 26.5,21.8 C26.9,22.5 26.6,23.1 26.5,23.9 C26.4,24.7 26.1,25.9 25.8,26.5 C25.5,27.0 25.3,26.7 24.7,27.2 C24.1,27.7 23.2,28.9 22.3,29.3 C21.4,29.7 20.4,29.6 19.2,29.6 C18.0,29.7 16.2,29.7 14.9,29.7 C13.7,29.6 12.5,30.0 11.7,29.5 C10.9,29.1 10.6,27.7 10.0,27.1 C9.5,26.5 8.7,26.4 8.3,25.8 C8.0,25.1 7.9,24.0 7.9,23.4 Z M11.5,24.5 C11.5,24.2 11.0,23.5 11.3,23.1 C11.6,22.7 12.8,22.6 13.4,22.3 C14.0,21.9 14.2,21.0 14.7,20.9 C15.2,20.8 15.7,21.7 16.3,21.8 C16.9,21.9 17.6,21.7 18.2,21.5 C18.8,21.4 19.5,20.9 20.0,21.1 C20.5,21.2 20.8,22.1 21.3,22.4 C21.8,22.8 22.5,22.7 22.8,22.9 C23.1,23.2 23.0,23.7 23.0,24.0 C23.1,24.3 23.2,24.5 22.9,24.9 C22.6,25.3 21.9,26.2 21.3,26.5 C20.7,26.7 19.8,26.5 19.3,26.6 C18.8,26.7 18.6,27.0 18.2,27.0 C17.7,27.1 17.1,27.2 16.5,27.1 C15.8,27.0 14.9,26.8 14.4,26.6 C13.9,26.4 14.0,25.9 13.5,25.7 C13.0,25.4 11.7,25.3 11.3,25.1 C11.0,25.0 11.5,24.9 11.5,24.5 Z" fill="#3aa47c"/><path fill-rule="evenodd" d="M15.6,13.3 C16.4,12.9 17.5,12.1 18.7,12.0 C19.9,11.8 21.4,12.2 22.7,12.3 C23.9,12.4 25.2,12.0 26.0,12.4 C26.9,12.9 27.3,14.4 27.8,14.9 C28.3,15.5 28.9,15.3 29.1,15.9 C29.4,16.5 29.5,17.8 29.4,18.5 C29.4,19.3 29.2,19.8 28.9,20.4 C28.7,20.9 28.4,21.3 27.9,21.7 C27.3,22.1 26.6,22.3 25.8,22.7 C25.0,23.1 24.2,23.9 22.9,24.1 C21.7,24.3 19.5,24.3 18.3,24.0 C17.0,23.8 16.4,23.2 15.6,22.7 C14.8,22.3 14.1,21.9 13.4,21.5 C12.8,21.1 11.9,20.7 11.7,20.2 C11.4,19.7 11.7,18.9 11.7,18.3 C11.7,17.7 11.2,17.1 11.6,16.5 C11.9,15.9 13.1,15.3 13.8,14.7 C14.4,14.2 14.7,13.8 15.6,13.3 Z M17.6,15.1 C18.1,14.8 18.7,14.9 19.2,14.8 C19.7,14.8 20.1,14.7 20.8,14.9 C21.6,15.0 23.0,15.5 23.7,15.7 C24.4,15.8 24.7,15.6 25.1,15.7 C25.5,15.9 25.9,16.0 26.2,16.4 C26.5,16.7 27.0,17.3 27.0,17.8 C27.1,18.3 26.7,19.1 26.4,19.6 C26.0,20.1 25.7,20.4 25.2,20.6 C24.7,20.7 23.6,20.4 23.1,20.5 C22.5,20.6 22.5,21.0 21.9,21.0 C21.3,21.1 19.8,20.8 19.3,20.6 C18.7,20.5 19.0,20.2 18.5,20.2 C18.0,20.2 16.8,20.7 16.3,20.7 C15.8,20.6 15.8,20.3 15.5,19.8 C15.3,19.3 14.9,18.3 14.9,17.8 C14.9,17.2 15.3,16.7 15.5,16.4 C15.8,16.2 15.9,16.5 16.3,16.2 C16.6,16.0 17.1,15.3 17.6,15.1 Z" fill="#3aa47c"/><path fill-rule="evenodd" d="M32.7,13.5 C33.6,13.9 34.0,13.8 34.5,14.3 C35.1,14.8 35.6,16.0 35.9,16.7 C36.3,17.4 36.3,18.0 36.4,18.5 C36.6,18.9 36.9,19.0 36.8,19.5 C36.6,20.0 36.1,20.7 35.4,21.3 C34.6,21.9 33.6,22.7 32.5,23.2 C31.4,23.6 29.8,23.6 28.7,23.8 C27.6,24.0 26.9,24.3 25.9,24.3 C24.8,24.2 23.2,23.8 22.3,23.4 C21.4,23.0 20.9,22.7 20.3,22.1 C19.8,21.5 19.5,20.5 19.1,19.7 C18.7,19.0 18.3,18.4 18.1,17.8 C17.9,17.3 17.6,17.0 18.0,16.5 C18.4,15.9 19.8,15.3 20.5,14.6 C21.2,14.0 21.1,13.0 22.0,12.6 C22.8,12.1 24.6,11.9 25.8,11.8 C27.0,11.8 28.1,11.9 29.2,12.2 C30.4,12.5 31.8,13.2 32.7,13.5 Z M30.1,15.9 C30.7,15.9 31.8,15.3 32.2,15.4 C32.6,15.6 32.6,16.3 32.7,16.7 C32.8,17.2 32.8,17.6 32.8,18.0 C32.8,18.3 32.8,18.4 32.6,18.8 C32.4,19.3 32.1,20.4 31.6,20.7 C31.2,21.0 30.4,20.6 29.8,20.6 C29.3,20.5 28.9,20.3 28.5,20.4 C28.0,20.5 27.6,21.1 27.0,21.2 C26.4,21.2 25.8,20.8 25.0,20.6 C24.3,20.5 23.1,20.5 22.6,20.2 C22.2,19.9 22.6,19.2 22.5,18.9 C22.3,18.7 21.8,18.8 21.8,18.5 C21.8,18.2 22.0,17.5 22.3,17.1 C22.6,16.8 23.2,16.8 23.7,16.4 C24.1,16.1 24.5,15.4 25.1,15.3 C25.6,15.2 26.1,15.9 26.8,15.9 C27.4,15.9 28.1,15.1 28.7,15.1 C29.3,15.1 29.6,15.8 30.1,15.9 Z" fill="#3aa47c"/><path d="M27.8,25.1 C27.6,25.7 27.2,26.2 26.7,26.7 C26.1,27.3 25.2,28.2 24.6,28.4 C24.0,28.7 23.4,28.5 22.8,28.2 C22.3,27.9 21.8,27.5 21.2,26.9 C20.7,26.3 19.8,25.4 19.6,24.7 C19.4,24.0 19.6,23.5 19.9,22.9 C20.1,22.3 20.5,21.7 21.0,21.2 C21.5,20.7 22.3,20.0 23.0,19.9 C23.7,19.7 24.3,20.0 25.1,20.2 C25.8,20.4 26.9,20.7 27.4,21.1 C27.9,21.6 28.0,22.2 28.1,22.9 C28.2,23.5 28.1,24.5 27.8,25.1 Z" fill="#d5f3e3"/></symbol>
+<symbol id="a-claude" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#f1ebe2"/><path d="M28.0,26.3 C29.2,26.9 32.5,25.6 34.7,25.5 C36.8,25.4 40.1,26.0 41.2,25.5 C42.3,25.0 42.5,23.1 41.3,22.5 C40.2,22.0 36.3,22.5 34.1,22.4 C31.9,22.3 29.0,21.1 28.0,21.8 C27.0,22.4 26.9,25.6 28.0,26.3 Z" fill="#eb9a7e"/><path d="M25.3,28.5 C25.5,29.6 27.7,30.5 29.1,31.6 C30.4,32.6 32.3,34.5 33.4,34.8 C34.5,35.1 35.8,34.5 35.5,33.6 C35.2,32.7 32.9,30.8 31.6,29.4 C30.4,28.0 29.0,25.2 27.9,25.0 C26.9,24.9 25.1,27.5 25.3,28.5 Z" fill="#eb9a7e"/><path d="M21.9,27.7 C21.3,28.9 22.1,32.2 22.3,34.4 C22.5,36.6 22.4,39.8 23.0,40.9 C23.5,42.1 25.2,42.4 25.6,41.4 C26.1,40.3 25.7,36.9 25.8,34.6 C25.9,32.3 27.0,28.6 26.4,27.5 C25.8,26.3 22.6,26.6 21.9,27.7 Z" fill="#eb9a7e"/><path d="M19.3,24.6 C18.3,24.7 17.6,27.4 16.5,28.8 C15.4,30.3 13.0,32.3 12.7,33.4 C12.4,34.4 13.6,35.4 14.6,35.2 C15.5,34.9 17.2,32.8 18.6,31.7 C20.0,30.5 22.7,29.5 22.8,28.4 C23.0,27.2 20.4,24.5 19.3,24.6 Z" fill="#eb9a7e"/><path d="M20.3,21.9 C19.2,21.3 15.5,22.4 13.3,22.5 C11.2,22.7 8.4,22.5 7.4,22.9 C6.3,23.4 6.0,24.7 7.0,25.2 C8.1,25.7 11.7,25.8 13.9,26.0 C16.1,26.1 19.2,26.9 20.3,26.3 C21.4,25.6 21.5,22.5 20.3,21.9 Z" fill="#eb9a7e"/><path d="M23.1,19.5 C23.0,18.4 20.6,17.5 19.2,16.3 C17.9,15.2 16.1,12.8 15.0,12.6 C13.9,12.3 12.3,14.0 12.6,15.0 C12.8,16.0 15.2,17.4 16.4,18.7 C17.6,20.0 18.8,22.8 19.9,23.0 C21.1,23.1 23.2,20.6 23.1,19.5 Z" fill="#eb9a7e"/><path d="M26.7,20.3 C27.4,19.2 26.1,15.6 25.9,13.4 C25.6,11.3 25.5,8.3 25.0,7.2 C24.5,6.1 23.4,5.8 23.0,6.8 C22.5,7.9 22.5,11.3 22.3,13.5 C22.2,15.8 21.2,19.1 21.9,20.3 C22.6,21.4 26.0,21.4 26.7,20.3 Z" fill="#eb9a7e"/><path d="M27.9,22.7 C29.0,22.6 30.2,20.2 31.4,18.9 C32.6,17.6 34.7,15.9 35.0,14.9 C35.3,13.9 34.1,12.7 33.2,12.9 C32.3,13.2 30.8,15.2 29.5,16.3 C28.2,17.3 25.4,18.4 25.1,19.4 C24.9,20.5 26.9,22.8 27.9,22.7 Z" fill="#eb9a7e"/><path d="M28.9,25.5 C28.6,26.2 27.8,26.9 27.2,27.5 C26.6,28.1 25.9,28.8 25.1,29.0 C24.3,29.2 23.3,28.9 22.5,28.6 C21.7,28.4 20.9,28.0 20.3,27.4 C19.7,26.8 19.0,26.0 18.8,25.2 C18.7,24.4 19.2,23.4 19.5,22.5 C19.8,21.7 20.0,20.7 20.6,20.1 C21.3,19.5 22.3,19.2 23.1,19.0 C23.9,18.9 24.4,19.1 25.2,19.3 C25.9,19.5 27.0,19.7 27.6,20.4 C28.2,21.0 28.7,22.4 28.9,23.2 C29.1,24.1 29.2,24.8 28.9,25.5 Z" fill="#eb9a7e"/></symbol>
+<symbol id="a-razzo" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#e9e2fb"/><path d="M24.6,3.8 C26.2,3.7 28.4,6.7 29.5,8.4 C30.6,10.1 30.6,12.3 31.3,13.9 C31.9,15.4 33.4,15.9 33.5,17.7 C33.7,19.6 32.3,22.6 32.1,24.9 C31.9,27.1 33.3,29.5 32.5,31.3 C31.8,33.0 29.5,34.8 27.6,35.4 C25.7,35.9 22.8,35.5 20.9,34.7 C19.0,33.9 17.0,32.1 16.1,30.4 C15.3,28.8 16.3,26.9 16.0,24.9 C15.8,22.9 14.8,20.3 14.8,18.4 C14.9,16.6 15.6,15.3 16.4,13.7 C17.2,12.1 18.2,10.7 19.5,9.1 C20.9,7.4 22.9,3.9 24.6,3.8 Z" fill="#f29a97"/><path d="M16.1,26.0 C14.8,26.1 14.2,28.9 13.3,30.4 C12.3,32.0 9.5,34.7 10.3,35.4 C11.1,36.0 16.2,35.2 17.9,34.2 C19.7,33.3 21.3,31.2 21.0,29.8 C20.7,28.4 17.4,25.9 16.1,26.0 Z" fill="#6d90d6"/><path d="M31.7,25.7 C33.1,25.7 34.2,28.6 35.2,30.2 C36.3,31.8 38.8,34.4 37.9,35.0 C37.0,35.7 31.8,34.8 29.9,34.0 C28.0,33.1 26.4,31.3 26.7,29.9 C27.0,28.5 30.2,25.6 31.7,25.7 Z" fill="#6d90d6"/><path d="M27.2,20.1 C27.0,20.9 26.4,21.8 25.7,22.2 C24.9,22.7 23.6,22.8 22.8,22.5 C22.1,22.3 21.4,21.5 21.1,20.7 C20.7,20.0 20.4,18.7 20.7,17.9 C20.9,17.1 21.8,16.3 22.5,16.0 C23.2,15.6 24.3,15.4 25.0,15.6 C25.8,15.8 26.7,16.5 27.1,17.3 C27.5,18.0 27.5,19.2 27.2,20.1 Z" fill="#dbe8ff"/><path d="M20.4,34.1 C19.4,34.9 21.7,37.0 22.3,38.7 C22.9,40.4 23.1,44.3 23.7,44.4 C24.4,44.4 25.4,40.6 26.1,38.8 C26.9,37.1 29.2,34.7 28.2,33.9 C27.3,33.1 21.3,33.2 20.4,34.1 Z" fill="#f5d36e"/></symbol>
+<symbol id="a-medico" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#dbe8ff"/><path d="M15.7,7.2 C14.9,7.1 13.7,6.5 13.1,8.2 C12.5,10.0 12.0,14.8 12.3,17.5 C12.5,20.3 13.4,22.7 14.4,24.8 C15.4,27.0 16.6,29.3 18.3,30.4 C20.0,31.5 22.6,31.7 24.5,31.7 C26.5,31.7 28.3,31.5 29.9,30.4 C31.5,29.2 33.0,27.1 34.1,24.8 C35.1,22.5 35.8,19.2 36.1,16.6 C36.4,14.0 36.5,10.7 35.9,9.2 C35.4,7.8 33.7,7.8 32.7,7.8 C31.7,7.9 30.2,7.9 30.0,9.4 C29.8,10.9 31.7,14.6 31.7,16.9 C31.8,19.2 30.8,21.4 30.1,22.9 C29.3,24.4 28.1,25.2 27.2,25.9 C26.2,26.6 25.5,27.1 24.5,27.2 C23.5,27.3 22.2,27.1 21.2,26.3 C20.1,25.6 19.0,24.3 18.1,22.6 C17.3,20.9 16.3,18.6 16.3,16.3 C16.2,14.0 17.9,10.2 17.8,8.7 C17.7,7.2 16.5,7.3 15.7,7.2 Z" fill="#7d8fb0"/><path d="M23.7,28.3 C23.0,28.4 22.0,28.3 21.8,29.2 C21.5,30.1 21.2,32.0 22.0,33.7 C22.8,35.5 24.8,38.3 26.6,39.4 C28.3,40.5 31.5,40.4 32.5,40.2 C33.6,40.0 32.8,38.9 32.9,38.2 C33.0,37.5 33.8,36.3 33.1,35.8 C32.5,35.4 30.2,36.1 29.1,35.5 C28.0,34.9 27.2,33.4 26.7,32.3 C26.2,31.1 26.6,29.2 26.1,28.6 C25.6,27.9 24.5,28.2 23.7,28.3 Z" fill="#7d8fb0"/><path d="M38.9,38.4 C38.6,39.3 38.0,40.2 37.3,40.6 C36.6,41.0 35.4,40.9 34.6,40.7 C33.8,40.5 32.7,40.0 32.3,39.3 C31.9,38.6 31.9,37.2 32.2,36.4 C32.5,35.6 33.2,34.7 34.0,34.4 C34.7,34.0 35.9,33.9 36.7,34.2 C37.4,34.4 38.2,35.1 38.6,35.8 C39.0,36.5 39.1,37.6 38.9,38.4 Z" fill="#f29a97"/></symbol>
+<symbol id="a-soldi" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fdf0c4"/><path d="M10.2,18.7 C11.0,17.6 13.8,17.8 15.5,17.6 C17.2,17.5 18.8,18.0 20.6,17.8 C22.4,17.6 24.6,16.7 26.2,16.4 C27.9,16.2 28.9,16.5 30.6,16.3 C32.4,16.1 35.8,14.8 36.9,15.5 C38.1,16.2 37.6,18.9 37.7,20.5 C37.8,22.1 37.5,23.3 37.7,24.8 C37.9,26.3 39.3,28.4 38.6,29.5 C37.9,30.5 35.5,30.8 33.7,31.2 C31.8,31.6 29.6,31.8 27.6,32.0 C25.6,32.2 23.5,32.3 21.8,32.5 C20.2,32.7 19.3,32.9 17.6,33.1 C16.0,33.3 13.0,34.5 12.0,33.8 C10.9,33.1 11.7,30.3 11.5,28.8 C11.3,27.2 11.1,26.2 10.9,24.5 C10.7,22.8 9.4,19.9 10.2,18.7 Z" fill="#7ccaa0"/><path d="M25.3,24.7 C25.1,25.5 24.4,26.3 23.6,26.6 C22.9,26.9 21.6,27.0 20.8,26.8 C20.0,26.5 19.4,25.8 19.0,25.1 C18.7,24.4 18.4,23.4 18.6,22.6 C18.8,21.8 19.6,20.9 20.3,20.5 C21.0,20.1 22.1,20.0 22.9,20.2 C23.7,20.5 24.6,21.2 25.0,22.0 C25.4,22.7 25.5,24.0 25.3,24.7 Z" fill="#d3f1e1"/><path d="M40.9,35.7 C40.6,36.5 39.7,37.4 39.0,37.8 C38.3,38.1 37.4,38.2 36.6,37.9 C35.9,37.7 34.8,36.8 34.4,36.1 C34.0,35.3 34.0,34.3 34.3,33.5 C34.5,32.7 35.2,31.7 35.9,31.3 C36.6,30.9 37.7,30.8 38.5,31.1 C39.4,31.3 40.4,32.1 40.8,32.9 C41.1,33.7 41.2,34.9 40.9,35.7 Z" fill="#f5d36e"/></symbol>
+<symbol id="a-computer" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fde2ee"/><path fill-rule="evenodd" d="M11.6,11.8 C12.7,10.7 15.9,11.3 18.0,11.4 C20.1,11.5 22.1,12.3 24.3,12.4 C26.4,12.4 29.0,11.7 31.0,11.7 C33.1,11.7 35.5,11.3 36.6,12.4 C37.7,13.4 37.4,16.3 37.5,18.3 C37.7,20.3 37.7,22.5 37.6,24.4 C37.5,26.3 38.1,28.9 36.9,29.7 C35.8,30.6 32.7,29.3 30.6,29.4 C28.6,29.5 26.8,30.2 24.5,30.4 C22.3,30.6 19.7,30.5 17.3,30.4 C15.0,30.4 11.4,31.3 10.4,30.2 C9.4,29.1 11.4,26.1 11.5,24.1 C11.7,22.0 11.2,20.1 11.2,18.0 C11.2,16.0 10.4,12.9 11.6,11.8 Z M15.0,15.5 C16.2,14.7 19.4,16.1 21.4,16.2 C23.4,16.3 25.0,16.1 27.0,16.0 C29.0,15.8 32.4,14.5 33.4,15.3 C34.4,16.0 32.8,18.7 32.9,20.5 C32.9,22.2 34.8,24.9 33.8,25.9 C32.8,26.9 29.1,26.4 27.0,26.5 C24.8,26.5 22.9,26.4 20.7,26.4 C18.6,26.3 15.2,27.1 14.1,26.3 C13.0,25.4 14.1,22.9 14.2,21.1 C14.4,19.3 13.8,16.3 15.0,15.5 Z" fill="#7d8fb0"/><path d="M6.9,33.1 C7.2,32.4 10.1,33.2 12.1,33.2 C14.1,33.1 16.9,33.1 18.9,32.9 C20.9,32.8 22.2,32.5 24.1,32.4 C26.0,32.4 28.3,32.8 30.2,32.8 C32.1,32.8 33.6,32.4 35.5,32.4 C37.3,32.3 40.7,31.5 41.2,32.3 C41.8,33.2 40.3,36.7 39.0,37.5 C37.6,38.3 35.2,36.9 33.1,37.0 C31.1,37.1 28.4,37.9 26.5,38.0 C24.5,38.0 23.1,37.3 21.3,37.1 C19.6,37.0 17.6,37.2 15.8,37.2 C13.9,37.3 11.5,38.1 10.1,37.4 C8.6,36.7 6.5,33.8 6.9,33.1 Z" fill="#7d8fb0"/></symbol>
+<symbol id="a-gatto" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#e9e2fb"/><path d="M11.6,12.8 C12.4,10.9 14.0,6.2 15.5,5.9 C16.9,5.7 18.8,10.7 20.3,11.4 C21.8,12.0 23.3,9.7 24.5,9.7 C25.8,9.7 26.1,11.9 27.6,11.4 C29.1,10.9 31.9,6.4 33.5,6.8 C35.2,7.1 37.0,11.6 37.6,13.4 C38.2,15.1 37.3,15.9 37.4,17.2 C37.5,18.6 38.1,19.8 38.1,21.4 C38.2,23.0 37.9,25.2 37.5,26.9 C37.2,28.6 37.2,29.7 35.8,31.4 C34.5,33.2 31.3,36.0 29.4,37.2 C27.5,38.4 26.4,38.5 24.5,38.5 C22.7,38.4 20.2,38.3 18.2,37.0 C16.2,35.8 13.5,32.6 12.4,30.9 C11.3,29.3 11.9,28.5 11.5,27.1 C11.1,25.7 10.1,24.0 9.9,22.4 C9.7,20.7 10.2,18.8 10.5,17.2 C10.8,15.6 10.7,14.7 11.6,12.8 Z" fill="#f6ae76"/><path d="M21.6,24.4 C21.4,25.1 20.9,26.0 20.2,26.5 C19.4,26.9 18.1,27.1 17.3,26.9 C16.5,26.6 15.7,25.9 15.3,25.1 C14.9,24.4 14.7,23.2 14.9,22.4 C15.1,21.6 15.9,20.8 16.6,20.4 C17.4,20.1 18.7,20.0 19.5,20.3 C20.2,20.6 21.0,21.4 21.4,22.0 C21.7,22.7 21.8,23.6 21.6,24.4 Z" fill="#5a6a86"/><path d="M33.1,24.6 C32.9,25.4 32.0,26.2 31.3,26.5 C30.5,26.9 29.5,27.1 28.7,26.9 C27.9,26.6 26.9,25.8 26.5,25.1 C26.1,24.3 26.0,23.2 26.3,22.4 C26.5,21.6 27.4,20.8 28.1,20.4 C28.9,20.0 30.0,19.8 30.8,20.0 C31.5,20.3 32.2,21.3 32.6,22.0 C33.0,22.8 33.3,23.9 33.1,24.6 Z" fill="#5a6a86"/><path d="M21.5,28.5 C21.9,27.9 26.3,27.9 26.7,28.6 C27.2,29.2 25.0,32.4 24.1,32.4 C23.3,32.4 21.0,29.2 21.5,28.5 Z" fill="#e07a7e"/></symbol>
+<symbol id="a-cane" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fdf0c4"/><path d="M16.6,9.4 C18.8,9.1 21.9,7.7 24.5,7.8 C27.1,7.9 30.0,9.6 32.3,10.0 C34.5,10.3 36.7,8.5 38.1,9.9 C39.6,11.3 40.4,16.2 41.0,18.4 C41.6,20.5 41.8,21.5 42.0,23.1 C42.2,24.7 42.9,26.9 42.2,28.0 C41.5,29.0 38.9,29.9 37.9,29.3 C37.0,28.7 36.8,24.1 36.5,24.4 C36.3,24.8 37.3,29.3 36.5,31.4 C35.8,33.5 34.0,35.8 31.8,37.0 C29.6,38.3 25.9,38.9 23.4,38.8 C20.9,38.7 18.4,38.0 16.5,36.7 C14.7,35.4 13.0,33.0 12.2,31.0 C11.5,29.1 12.3,25.1 12.0,24.9 C11.7,24.8 11.5,29.7 10.5,30.2 C9.6,30.7 7.0,29.3 6.3,28.0 C5.6,26.7 6.6,24.2 6.5,22.5 C6.5,20.7 5.3,19.6 6.1,17.5 C6.8,15.3 9.0,11.1 10.8,9.7 C12.5,8.4 14.3,9.7 16.6,9.4 Z" fill="#d9a877"/><path d="M21.9,23.1 C21.6,23.8 20.9,24.7 20.2,25.1 C19.4,25.5 18.2,25.5 17.4,25.3 C16.6,25.1 15.7,24.4 15.4,23.7 C15.0,23.0 15.0,21.9 15.3,21.1 C15.5,20.4 16.1,19.5 16.8,19.1 C17.6,18.7 19.0,18.5 19.8,18.8 C20.6,19.0 21.4,19.6 21.7,20.3 C22.1,21.0 22.1,22.3 21.9,23.1 Z" fill="#5a6a86"/><path d="M32.9,23.1 C32.6,23.9 31.8,24.7 31.0,25.0 C30.3,25.4 29.1,25.5 28.4,25.3 C27.6,25.0 26.8,24.4 26.5,23.7 C26.1,22.9 26.0,21.6 26.2,20.8 C26.4,20.1 26.9,19.4 27.6,19.1 C28.4,18.7 29.7,18.4 30.5,18.6 C31.3,18.8 32.2,19.6 32.6,20.3 C33.0,21.1 33.1,22.3 32.9,23.1 Z" fill="#5a6a86"/><path d="M21.3,27.6 C21.8,27.0 26.4,26.9 26.8,27.5 C27.2,28.1 24.8,31.3 23.9,31.3 C22.9,31.3 20.8,28.2 21.3,27.6 Z" fill="#5a6a86"/></symbol>
+<symbol id="a-pizza" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fdd9d6"/><path d="M8.6,13.2 C9.4,11.6 13.9,10.1 16.5,9.4 C19.1,8.8 21.6,9.3 24.3,9.4 C26.9,9.4 30.0,9.0 32.5,9.7 C35.1,10.5 38.8,12.2 39.6,13.8 C40.4,15.3 38.3,17.2 37.5,19.0 C36.6,20.8 35.6,22.7 34.4,24.4 C33.3,26.1 31.8,27.4 30.7,29.1 C29.6,30.7 28.7,32.2 27.8,34.1 C26.9,36.0 26.3,40.2 25.1,40.4 C24.0,40.6 22.4,36.9 21.1,35.1 C19.8,33.3 18.3,31.4 17.4,29.6 C16.4,27.7 16.2,25.9 15.2,24.1 C14.2,22.3 12.6,20.6 11.5,18.7 C10.4,16.9 7.7,14.7 8.6,13.2 Z" fill="#f5d36e"/><path d="M22.5,20.2 C22.3,21.0 21.5,22.1 20.8,22.5 C20.0,22.9 18.8,22.9 17.9,22.7 C17.1,22.4 16.3,21.5 15.9,20.7 C15.5,20.0 15.2,18.8 15.5,18.0 C15.8,17.2 16.7,16.3 17.5,16.0 C18.2,15.6 19.2,15.6 20.0,15.9 C20.7,16.1 21.6,16.8 22.1,17.6 C22.5,18.3 22.7,19.4 22.5,20.2 Z" fill="#f29a97"/><path d="M32.8,19.2 C32.5,20.0 31.8,20.9 31.1,21.3 C30.4,21.7 29.4,21.9 28.6,21.7 C27.8,21.5 26.7,20.7 26.4,20.0 C26.0,19.3 26.2,18.1 26.4,17.3 C26.7,16.4 27.3,15.4 28.0,15.1 C28.7,14.7 30.0,14.7 30.8,14.9 C31.5,15.1 32.4,15.8 32.7,16.5 C33.0,17.2 33.1,18.4 32.8,19.2 Z" fill="#f29a97"/><path d="M27.8,29.5 C27.5,30.4 26.9,31.3 26.2,31.7 C25.5,32.1 24.3,32.0 23.5,31.8 C22.7,31.6 21.6,31.1 21.2,30.4 C20.8,29.7 20.8,28.3 21.1,27.5 C21.4,26.7 22.1,25.8 22.9,25.5 C23.6,25.1 24.8,25.0 25.6,25.3 C26.3,25.5 27.1,26.2 27.5,26.9 C27.9,27.6 28.0,28.7 27.8,29.5 Z" fill="#f29a97"/></symbol>
+<symbol id="a-palla" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#dbe8ff"/><path d="M37.5,25.1 C37.3,26.9 36.6,28.5 35.6,30.2 C34.5,31.9 32.9,34.2 31.3,35.3 C29.7,36.4 28.1,36.4 26.2,36.6 C24.2,36.9 21.2,37.2 19.5,36.7 C17.7,36.2 16.6,34.9 15.5,33.6 C14.3,32.3 13.1,30.7 12.4,28.8 C11.6,26.9 10.9,24.4 11.0,22.4 C11.1,20.4 12.0,18.1 13.0,16.6 C14.1,15.2 16.0,14.3 17.5,13.5 C19.0,12.6 20.5,11.8 22.2,11.5 C23.9,11.3 25.6,11.3 27.5,11.9 C29.4,12.4 32.1,13.5 33.6,14.8 C35.1,16.0 35.8,17.8 36.4,19.6 C37.1,21.3 37.6,23.3 37.5,25.1 Z" fill="#fffaf0"/><path d="M24.3,20.1 C25.6,20.2 27.6,21.9 27.9,23.1 C28.2,24.3 27.2,26.7 26.2,27.3 C25.1,28.0 22.6,27.8 21.6,27.0 C20.6,26.2 19.7,23.7 20.2,22.5 C20.6,21.4 23.0,20.0 24.3,20.1 Z" fill="#7e8fa8"/><path d="M24.1,17.8 C23.0,17.8 21.0,16.5 20.6,15.5 C20.2,14.5 21.0,12.2 21.9,11.6 C22.8,10.9 25.0,10.9 25.9,11.5 C26.8,12.2 27.5,14.5 27.2,15.5 C26.9,16.5 25.2,17.8 24.1,17.8 Z" fill="#7e8fa8"/><path d="M29.3,27.2 C29.8,26.3 31.8,25.3 32.9,25.5 C34.0,25.8 35.8,27.5 36.0,28.5 C36.1,29.6 34.8,31.5 33.8,32.0 C32.7,32.4 30.6,32.0 29.8,31.2 C29.1,30.4 28.8,28.1 29.3,27.2 Z" fill="#7e8fa8"/><path d="M18.7,27.0 C19.3,27.9 19.0,30.2 18.3,31.1 C17.6,31.9 15.4,32.5 14.4,32.0 C13.4,31.6 12.3,29.4 12.4,28.3 C12.4,27.2 13.8,25.8 14.8,25.5 C15.9,25.3 18.1,26.1 18.7,27.0 Z" fill="#7e8fa8"/></symbol>
+<symbol id="a-chitarra" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#dbe8ff"/><path d="M34.7,11.6 C36.2,10.7 37.5,11.5 36.9,13.1 C36.3,14.7 32.2,19.1 31.2,21.0 C30.3,22.8 31.6,22.8 31.1,24.1 C30.5,25.5 28.8,28.2 27.9,29.2 C27.0,30.1 25.8,29.1 25.7,30.0 C25.6,30.9 27.5,33.2 27.3,34.5 C27.2,35.8 26.1,37.1 24.8,37.8 C23.5,38.4 21.1,38.6 19.6,38.5 C18.0,38.5 16.8,38.1 15.6,37.3 C14.3,36.4 12.6,35.0 11.9,33.4 C11.2,31.8 10.8,29.0 11.5,27.6 C12.3,26.2 14.7,25.3 16.2,25.0 C17.7,24.6 19.7,26.1 20.5,25.7 C21.3,25.2 20.3,23.3 21.1,22.3 C21.9,21.4 24.0,20.7 25.1,20.1 C26.3,19.5 26.6,20.1 28.2,18.7 C29.8,17.3 33.3,12.5 34.7,11.6 Z" fill="#f6ae76"/><path d="M23.7,31.5 C23.4,32.2 22.6,33.1 21.8,33.4 C21.1,33.8 20.2,33.9 19.5,33.7 C18.7,33.5 17.6,32.9 17.2,32.2 C16.8,31.5 16.8,30.3 17.0,29.5 C17.2,28.7 17.9,27.8 18.6,27.4 C19.3,27.0 20.5,26.9 21.3,27.2 C22.1,27.5 23.1,28.3 23.5,29.0 C23.9,29.7 24.0,30.7 23.7,31.5 Z" fill="#b98253"/></symbol>
+<symbol id="a-caffe" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fde0c8"/><path d="M11.6,22.8 C12.0,21.5 14.9,21.5 16.5,21.4 C18.1,21.4 19.6,22.3 21.3,22.4 C22.9,22.4 25.0,21.7 26.5,21.7 C28.1,21.7 29.3,22.1 30.6,22.4 C31.9,22.6 34.0,22.1 34.5,23.3 C35.1,24.4 34.2,27.5 33.9,29.4 C33.6,31.3 33.3,33.0 32.5,34.7 C31.7,36.4 30.5,38.2 29.1,39.4 C27.8,40.6 26.3,41.6 24.5,41.8 C22.8,42.0 20.4,41.5 18.8,40.4 C17.2,39.3 15.6,37.1 14.8,35.2 C14.0,33.3 14.3,31.1 13.7,29.1 C13.2,27.0 11.1,24.1 11.6,22.8 Z" fill="#ffffff"/><path d="M32.1,26.5 C32.2,27.1 32.2,27.8 33.2,28.3 C34.1,28.8 37.0,28.9 37.8,29.4 C38.6,30.0 38.7,31.0 38.1,31.6 C37.4,32.3 34.8,32.6 34.1,33.1 C33.3,33.7 33.1,34.6 33.5,35.1 C33.9,35.5 35.1,36.4 36.3,36.1 C37.6,35.7 40.8,34.5 41.3,32.8 C41.8,31.1 40.8,27.3 39.4,26.0 C38.0,24.6 34.0,24.6 32.8,24.7 C31.6,24.8 32.1,25.8 32.1,26.5 Z" fill="#ffffff"/><path d="M19.2,19.2 C19.6,19.1 20.3,18.7 20.3,18.2 C20.2,17.6 18.6,16.9 18.8,16.0 C19.1,15.2 21.5,14.2 21.8,13.0 C22.0,11.8 20.6,9.5 20.1,8.8 C19.6,8.1 19.1,8.6 18.7,8.8 C18.2,9.0 17.5,9.3 17.5,9.9 C17.5,10.5 19.0,11.3 18.8,12.2 C18.6,13.2 16.6,14.2 16.4,15.4 C16.2,16.5 17.4,18.4 17.9,19.1 C18.3,19.7 18.8,19.4 19.2,19.2 Z" fill="#a9b8cc"/><path d="M27.2,19.4 C27.6,19.2 28.3,18.5 28.3,17.9 C28.3,17.3 26.9,16.7 27.1,15.8 C27.3,15.0 29.5,14.0 29.7,12.9 C29.9,11.7 28.6,9.4 28.1,8.7 C27.5,8.1 26.8,8.7 26.4,8.9 C26.0,9.1 25.6,9.3 25.7,9.9 C25.7,10.4 27.1,11.4 26.9,12.3 C26.7,13.2 24.6,14.2 24.4,15.3 C24.1,16.4 25.1,18.3 25.6,19.0 C26.0,19.7 26.7,19.5 27.2,19.4 Z" fill="#a9b8cc"/></symbol>
+<symbol id="a-fiore" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#d5f3e3"/><path d="M24.6,14.4 C25.0,13.6 25.3,12.6 25.7,12.2 C26.1,11.8 26.4,12.1 26.9,12.0 C27.4,11.8 28.3,11.1 28.6,11.2 C28.9,11.3 28.5,12.2 28.8,12.8 C29.0,13.3 30.0,13.8 30.2,14.5 C30.4,15.2 30.3,16.1 30.1,16.8 C29.9,17.4 29.2,17.7 28.9,18.1 C28.7,18.6 28.7,18.8 28.7,19.3 C28.7,19.8 29.0,20.8 29.1,21.1 C29.1,21.4 28.9,21.4 29.1,21.4 C29.3,21.4 29.5,21.2 30.3,21.1 C31.0,21.1 32.6,21.1 33.5,21.2 C34.3,21.2 34.7,21.4 35.3,21.7 C35.9,21.9 36.6,22.1 37.0,22.6 C37.5,23.1 37.8,24.1 37.7,24.6 C37.6,25.1 37.0,25.5 36.5,25.7 C36.1,25.9 35.8,25.9 35.1,26.0 C34.4,26.1 33.0,26.3 32.4,26.4 C31.8,26.5 31.8,26.5 31.2,26.6 C30.7,26.7 29.6,27.0 29.1,27.1 C28.6,27.2 28.6,27.1 28.4,27.3 C28.2,27.4 28.0,27.5 28.1,27.9 C28.1,28.3 28.4,29.0 28.6,29.7 C28.9,30.4 29.5,31.3 29.6,32.1 C29.7,32.9 29.1,33.7 29.2,34.4 C29.2,35.0 29.9,35.6 29.8,35.9 C29.6,36.3 28.6,36.3 28.2,36.4 C27.7,36.5 27.6,36.8 27.1,36.6 C26.6,36.4 25.7,35.6 25.2,35.0 C24.7,34.4 24.3,33.7 24.0,33.1 C23.8,32.5 23.9,32.1 23.8,31.5 C23.6,30.9 23.5,29.8 23.2,29.6 C22.9,29.3 22.1,29.9 21.9,29.9 C21.6,29.8 21.9,29.3 21.7,29.3 C21.5,29.4 21.1,30.0 20.6,30.3 C20.2,30.7 19.6,31.3 18.9,31.6 C18.2,31.9 17.3,31.9 16.4,32.1 C15.6,32.3 14.5,32.9 14.1,32.8 C13.6,32.7 13.9,31.9 13.8,31.5 C13.6,31.0 13.3,30.6 13.3,30.2 C13.4,29.7 13.9,29.2 14.1,28.5 C14.3,27.9 14.1,26.8 14.5,26.3 C14.8,25.8 15.6,25.8 16.1,25.6 C16.6,25.4 17.3,25.3 17.7,25.0 C18.0,24.8 18.0,24.4 18.2,24.2 C18.3,23.9 18.7,23.7 18.5,23.4 C18.3,23.0 17.5,22.4 17.0,22.0 C16.4,21.7 15.8,21.6 15.2,21.1 C14.6,20.6 13.7,19.7 13.4,19.1 C13.0,18.6 13.0,18.3 13.0,17.8 C13.0,17.3 13.0,16.4 13.3,16.0 C13.5,15.6 14.1,15.6 14.6,15.5 C15.0,15.5 15.3,15.6 16.0,15.8 C16.7,15.9 18.1,16.2 18.9,16.4 C19.6,16.6 19.8,16.8 20.3,17.2 C20.8,17.5 21.6,18.0 21.8,18.3 C22.1,18.5 21.7,18.9 21.8,18.8 C21.9,18.7 22.4,17.9 22.6,17.7 C22.8,17.4 22.9,17.6 23.2,17.0 C23.6,16.5 24.1,15.2 24.6,14.4 Z" fill="#f4a9c6"/><path d="M27.3,24.9 C27.1,25.7 26.5,26.8 25.8,27.2 C25.0,27.6 23.9,27.5 23.0,27.3 C22.2,27.0 21.2,26.2 20.8,25.5 C20.4,24.8 20.3,23.9 20.6,23.1 C20.9,22.3 21.7,21.3 22.4,20.9 C23.2,20.5 24.2,20.4 25.0,20.7 C25.8,20.9 26.7,21.7 27.1,22.5 C27.5,23.2 27.5,24.1 27.3,24.9 Z" fill="#f5d36e"/></symbol>
+<symbol id="a-sole" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#dbe8ff"/><path d="M24.6,9.6 C25.4,9.5 25.9,12.6 26.9,12.9 C27.9,13.2 29.7,11.2 30.4,11.6 C31.2,12.0 30.6,14.6 31.3,15.3 C32.0,16.0 34.2,14.8 34.7,15.5 C35.2,16.2 33.6,18.6 34.3,19.6 C34.9,20.5 38.4,20.5 38.4,21.2 C38.5,21.9 34.8,22.8 34.7,23.7 C34.6,24.6 38.1,25.7 38.0,26.6 C37.9,27.5 34.8,28.0 34.3,29.1 C33.8,30.2 35.6,32.7 34.9,33.3 C34.2,33.9 30.8,32.1 30.1,32.6 C29.4,33.2 31.3,36.5 30.7,36.9 C30.1,37.2 27.7,34.3 26.6,34.5 C25.6,34.8 25.2,38.0 24.4,38.1 C23.7,38.2 23.2,35.3 22.1,35.1 C21.0,35.0 18.6,37.7 17.7,37.2 C16.9,36.7 18.2,32.9 17.3,32.1 C16.4,31.3 12.8,33.0 12.4,32.3 C11.9,31.7 15.1,29.1 14.7,28.2 C14.3,27.4 10.2,27.9 10.0,27.2 C9.7,26.5 13.1,25.1 13.1,24.0 C13.0,22.9 9.5,21.5 9.7,20.7 C9.8,19.9 13.3,20.2 13.9,19.4 C14.4,18.6 12.5,16.2 13.0,15.7 C13.4,15.1 15.9,16.8 16.8,16.1 C17.7,15.4 17.6,12.0 18.4,11.5 C19.2,11.1 20.7,13.6 21.7,13.3 C22.7,13.0 23.7,9.7 24.6,9.6 Z" fill="#f5d36e"/></symbol>
+<symbol id="a-gufo" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fdf0c4"/><path d="M12.6,13.2 C13.6,11.8 15.7,12.4 16.9,12.8 C18.1,13.3 17.9,15.5 19.9,16.0 C21.9,16.4 27.0,15.7 28.9,15.3 C30.8,15.0 29.9,14.0 31.2,13.8 C32.5,13.5 35.4,12.4 36.5,13.7 C37.7,14.9 38.1,19.4 38.2,21.4 C38.3,23.4 37.4,24.2 37.2,25.7 C37.0,27.2 37.9,28.4 37.1,30.4 C36.4,32.4 34.8,36.3 32.5,37.8 C30.3,39.3 26.7,39.7 23.8,39.6 C21.0,39.6 17.4,39.0 15.4,37.6 C13.4,36.2 12.3,33.0 11.5,31.1 C10.8,29.1 11.0,27.7 10.9,26.0 C10.8,24.3 10.6,23.1 10.8,20.9 C11.1,18.8 11.5,14.5 12.6,13.2 Z" fill="#b3a2ec"/><path d="M21.7,24.2 C21.5,25.0 20.6,25.9 19.8,26.2 C19.1,26.5 18.0,26.5 17.2,26.2 C16.4,26.0 15.3,25.2 14.9,24.5 C14.6,23.7 14.7,22.6 15.0,21.8 C15.2,21.1 15.8,20.3 16.5,19.9 C17.2,19.6 18.4,19.4 19.2,19.6 C20.0,19.9 20.7,20.6 21.2,21.3 C21.6,22.1 21.9,23.4 21.7,24.2 Z" fill="#fffaf0"/><path d="M33.0,24.1 C32.8,24.9 32.2,25.8 31.5,26.2 C30.7,26.7 29.4,26.8 28.6,26.5 C27.9,26.3 27.2,25.5 26.9,24.7 C26.5,24.0 26.2,22.7 26.5,21.9 C26.7,21.1 27.6,20.3 28.3,20.0 C29.0,19.6 30.1,19.4 30.8,19.6 C31.6,19.8 32.5,20.5 32.9,21.3 C33.3,22.0 33.3,23.2 33.0,24.1 Z" fill="#fffaf0"/><path d="M21.6,27.0 C22.0,26.2 26.4,26.1 26.7,26.9 C27.1,27.7 24.7,31.7 23.9,31.8 C23.0,31.8 21.1,27.8 21.6,27.0 Z" fill="#f6ae76"/></symbol>
+<symbol id="a-cappello" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#f1ebe2"/><path d="M17.2,21.8 C16.0,22.5 17.2,24.3 17.2,25.9 C17.2,27.5 15.8,30.0 17.1,31.4 C18.3,32.7 22.2,33.9 24.5,33.9 C26.8,33.9 29.6,32.6 30.8,31.4 C32.0,30.2 31.6,28.3 31.8,26.8 C32.0,25.3 33.3,23.2 32.0,22.4 C30.7,21.5 26.4,21.8 23.9,21.7 C21.4,21.6 18.3,21.1 17.2,21.8 Z" fill="#7d8fb0"/><path d="M10.7,20.0 C10.7,18.9 15.7,18.7 17.8,17.8 C20.0,16.9 21.8,14.7 23.8,14.6 C25.9,14.6 27.7,16.6 30.1,17.6 C32.5,18.6 37.8,19.6 37.9,20.7 C38.1,21.7 33.2,22.8 30.9,23.8 C28.7,24.9 26.6,26.8 24.4,26.9 C22.2,27.0 20.1,25.5 17.8,24.4 C15.5,23.2 10.7,21.1 10.7,20.0 Z" fill="#7d8fb0"/><path d="M40.9,29.5 C40.7,30.3 40.0,31.1 39.2,31.4 C38.5,31.7 37.2,31.8 36.4,31.6 C35.6,31.3 35.0,30.6 34.6,29.9 C34.3,29.2 34.0,28.2 34.2,27.4 C34.4,26.6 35.2,25.7 35.9,25.3 C36.6,24.9 37.7,24.8 38.5,25.0 C39.3,25.3 40.2,26.0 40.6,26.8 C41.0,27.5 41.1,28.8 40.9,29.5 Z" fill="#f5d36e"/></symbol>
+<symbol id="a-brindisi" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fde2ee"/><path d="M14.9,16.2 C15.9,15.3 17.8,16.4 19.3,16.8 C20.7,17.2 22.9,17.5 23.4,18.6 C24.0,19.8 23.0,21.6 22.4,23.4 C21.9,25.2 20.6,27.5 20.2,29.3 C19.8,31.2 20.1,32.8 19.8,34.6 C19.6,36.4 20.2,39.5 18.6,40.0 C17.0,40.6 11.5,39.1 10.3,37.8 C9.1,36.4 11.1,33.8 11.5,32.1 C12.0,30.4 12.6,29.3 12.9,27.6 C13.2,26.0 12.9,24.2 13.2,22.3 C13.5,20.4 13.9,17.1 14.9,16.2 Z" fill="#f5d36e"/><path d="M12.9,21.9 C12.9,21.3 13.7,20.3 13.0,20.3 C12.3,20.3 9.6,20.2 8.5,21.6 C7.5,23.0 6.5,26.6 6.8,28.5 C7.0,30.3 9.3,32.1 10.1,32.7 C10.8,33.3 10.8,32.4 11.1,31.9 C11.4,31.3 12.1,30.2 11.8,29.5 C11.4,28.8 9.1,28.7 9.0,27.6 C8.9,26.5 10.6,23.7 11.3,23.0 C11.9,22.3 12.7,23.6 13.0,23.4 C13.3,23.2 12.9,22.4 12.9,21.9 Z" fill="#f5d36e"/><path d="M24.7,18.2 C25.0,17.2 27.3,17.5 28.8,17.2 C30.2,16.9 32.2,15.6 33.2,16.5 C34.2,17.4 34.4,20.4 34.7,22.3 C35.0,24.2 34.7,26.0 35.1,27.8 C35.6,29.6 36.8,31.3 37.2,33.0 C37.6,34.7 38.8,36.7 37.7,37.9 C36.6,39.0 31.9,40.5 30.4,39.8 C28.9,39.2 29.2,36.0 28.7,34.1 C28.2,32.2 27.8,30.4 27.4,28.7 C27.1,27.0 27.1,25.5 26.7,23.7 C26.2,22.0 24.3,19.3 24.7,18.2 Z" fill="#f5d36e"/><path d="M35.0,21.2 C34.8,21.9 34.0,23.6 34.4,23.9 C34.8,24.3 36.6,22.6 37.4,23.3 C38.1,23.9 39.0,26.9 38.9,28.0 C38.7,29.1 37.0,29.3 36.7,29.8 C36.3,30.3 36.6,30.7 36.8,31.2 C37.0,31.6 37.1,32.9 38.0,32.5 C38.8,32.0 41.7,30.1 42.1,28.3 C42.4,26.4 41.0,22.7 40.0,21.4 C39.0,20.1 36.8,20.2 36.0,20.2 C35.1,20.1 35.3,20.6 35.0,21.2 Z" fill="#f5d36e"/><path d="M21.2,13.3 C20.9,14.1 20.2,15.1 19.5,15.5 C18.8,15.9 17.7,16.1 16.9,15.9 C16.1,15.6 15.2,14.8 14.8,14.1 C14.5,13.3 14.6,12.2 14.8,11.4 C15.1,10.5 15.8,9.6 16.5,9.2 C17.2,8.8 18.3,8.8 19.1,9.1 C19.8,9.3 20.7,10.0 21.0,10.7 C21.3,11.4 21.4,12.5 21.2,13.3 Z" fill="#fffaf0"/><path d="M33.3,13.5 C33.1,14.3 32.3,15.0 31.6,15.4 C30.9,15.8 29.8,16.0 29.0,15.7 C28.2,15.5 27.1,14.8 26.8,14.1 C26.4,13.3 26.5,12.2 26.8,11.4 C27.0,10.6 27.7,9.6 28.4,9.2 C29.1,8.8 30.4,8.7 31.1,9.0 C31.9,9.3 32.6,10.0 33.0,10.8 C33.3,11.5 33.6,12.7 33.3,13.5 Z" fill="#fffaf0"/></symbol>
+<symbol id="a-libro" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fdd9d6"/><path d="M11.0,16.8 C12.1,15.5 15.3,14.5 17.3,14.4 C19.2,14.4 21.5,16.0 22.7,16.6 C23.9,17.1 24.1,17.5 24.5,17.5 C25.0,17.5 24.0,16.9 25.2,16.6 C26.4,16.2 29.6,15.1 31.7,15.3 C33.9,15.4 37.2,16.2 38.2,17.4 C39.2,18.5 37.6,20.4 37.5,22.0 C37.4,23.7 37.6,25.2 37.7,27.1 C37.8,29.0 39.3,32.6 38.1,33.4 C37.0,34.2 33.2,31.8 31.0,31.8 C28.8,31.9 26.1,33.0 25.0,33.6 C23.9,34.2 24.9,35.5 24.5,35.5 C24.1,35.4 23.8,34.1 22.6,33.4 C21.4,32.7 19.2,31.3 17.2,31.3 C15.3,31.4 12.1,34.1 10.9,33.6 C9.8,33.1 10.4,30.0 10.3,28.0 C10.2,26.1 10.3,23.9 10.4,22.0 C10.5,20.1 9.8,18.0 11.0,16.8 Z" fill="#fffaf0"/><path d="M30.4,12.6 C31.3,10.8 34.7,10.8 35.5,12.7 C36.3,14.5 35.8,22.2 35.3,23.6 C34.9,25.1 33.8,21.4 33.0,21.4 C32.1,21.4 30.9,25.0 30.5,23.6 C30.0,22.1 29.6,14.5 30.4,12.6 Z" fill="#f29a97"/></symbol>
+<symbol id="a-fotocamera" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#e9e2fb"/><path d="M17.4,15.0 C18.2,14.2 18.7,13.2 20.5,13.0 C22.3,12.9 26.5,13.6 28.3,14.0 C30.0,14.3 30.4,14.2 30.9,14.9 C31.4,15.7 30.1,17.8 31.2,18.4 C32.3,18.9 36.1,18.0 37.3,18.3 C38.6,18.5 38.5,18.7 38.6,20.0 C38.7,21.2 38.0,23.9 37.9,25.9 C37.8,28.0 38.2,30.7 38.1,32.2 C38.0,33.7 38.7,34.4 37.3,34.8 C36.0,35.2 32.5,34.9 30.2,34.8 C27.9,34.8 25.4,34.7 23.4,34.6 C21.4,34.5 20.1,34.5 18.1,34.5 C16.1,34.4 12.7,34.7 11.4,34.4 C10.1,34.1 10.6,34.0 10.4,32.7 C10.3,31.5 10.6,28.9 10.5,26.8 C10.4,24.7 9.8,21.5 9.9,20.0 C10.0,18.5 10.3,18.1 11.2,17.7 C12.1,17.3 14.4,17.9 15.5,17.5 C16.5,17.0 16.5,15.7 17.4,15.0 Z" fill="#a9b8cc"/><path d="M27.5,26.9 C27.2,27.7 26.3,28.7 25.6,29.1 C24.8,29.5 23.7,29.6 22.9,29.3 C22.1,29.1 21.2,28.3 20.8,27.6 C20.4,26.9 20.3,25.7 20.5,25.0 C20.8,24.2 21.7,23.4 22.4,23.1 C23.1,22.7 24.1,22.6 24.9,22.8 C25.7,23.1 26.8,23.8 27.3,24.5 C27.7,25.1 27.7,26.1 27.5,26.9 Z" fill="#8fb0ee"/><path d="M11.4,19.6 C12.1,19.1 14.9,19.2 15.5,19.7 C16.2,20.1 16.1,21.7 15.4,22.1 C14.7,22.5 12.1,22.5 11.4,22.1 C10.7,21.7 10.7,20.0 11.4,19.6 Z" fill="#f5d36e"/></symbol>
+<symbol id="a-ironman" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#f1ebe2"/><path d="M11.1,17.8 C11.3,15.2 12.1,11.3 13.5,9.4 C14.9,7.5 17.4,7.0 19.3,6.4 C21.1,5.8 23.0,5.7 24.5,5.7 C26.1,5.7 26.8,5.6 28.6,6.4 C30.4,7.1 34.0,8.3 35.5,10.3 C37.1,12.3 37.9,16.0 38.1,18.4 C38.3,20.7 37.0,22.2 36.7,24.2 C36.3,26.2 36.7,28.5 36.1,30.4 C35.6,32.4 34.6,34.2 33.5,35.9 C32.5,37.6 31.5,39.2 29.8,40.4 C28.1,41.7 25.3,43.3 23.4,43.2 C21.5,43.1 19.9,41.3 18.5,40.1 C17.2,38.8 16.2,37.0 15.2,35.5 C14.2,34.0 13.0,32.7 12.4,30.9 C11.8,29.2 12.0,27.3 11.8,25.1 C11.5,22.9 10.8,20.4 11.1,17.8 Z" fill="#d95f62"/><path d="M14.9,15.2 C15.8,13.3 17.9,10.7 20.0,9.8 C22.1,8.9 25.4,8.8 27.7,9.7 C29.9,10.5 32.3,12.8 33.2,14.7 C34.2,16.6 33.3,19.0 33.4,21.0 C33.5,23.1 34.3,25.3 33.9,27.0 C33.5,28.6 32.1,29.6 31.2,30.9 C30.3,32.3 29.9,33.8 28.8,35.1 C27.6,36.3 25.7,38.3 24.0,38.3 C22.4,38.4 19.9,36.6 18.7,35.4 C17.5,34.2 17.6,32.6 16.9,31.2 C16.1,29.8 14.4,28.6 14.0,26.9 C13.7,25.2 14.6,23.1 14.8,21.1 C14.9,19.2 14.1,17.1 14.9,15.2 Z" fill="#f5d36e"/><path d="M15.8,20.9 C16.8,20.5 21.5,21.2 22.5,21.9 C23.5,22.7 22.9,25.0 22.0,25.4 C21.0,25.8 17.7,25.0 16.6,24.3 C15.6,23.5 14.8,21.3 15.8,20.9 Z" fill="#dff7ff"/><path d="M32.1,21.2 C31.1,20.8 26.5,21.2 25.6,21.9 C24.6,22.6 25.3,24.9 26.3,25.4 C27.3,25.8 30.7,25.1 31.6,24.4 C32.6,23.7 33.1,21.6 32.1,21.2 Z" fill="#dff7ff"/><path d="M18.4,31.8 C18.6,31.2 19.2,35.1 20.7,35.7 C22.2,36.3 25.8,36.0 27.3,35.3 C28.8,34.7 29.6,31.3 29.8,31.9 C30.0,32.5 29.3,37.3 28.3,39.0 C27.2,40.6 25.1,41.6 23.6,41.6 C22.2,41.7 20.5,40.7 19.6,39.0 C18.8,37.4 18.2,32.3 18.4,31.8 Z" fill="#d95f62"/></symbol>
+<symbol id="a-drink" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fdf0c4"/><path d="M11.8,14.5 C12.3,13.7 16.0,13.9 18.1,13.9 C20.2,13.9 22.1,14.6 24.3,14.6 C26.4,14.7 28.9,14.1 30.9,14.2 C33.0,14.3 36.0,14.2 36.4,15.1 C36.8,16.0 34.6,18.0 33.6,19.5 C32.5,21.0 31.2,22.7 29.8,24.1 C28.5,25.6 26.1,26.4 25.4,28.0 C24.6,29.7 24.6,32.8 25.4,34.1 C26.2,35.5 29.4,35.8 30.1,36.4 C30.8,37.0 30.7,37.7 29.6,37.9 C28.5,38.1 25.2,37.7 23.4,37.6 C21.6,37.6 19.6,37.8 18.8,37.5 C18.0,37.2 17.9,36.5 18.6,36.0 C19.3,35.5 22.4,35.8 23.1,34.6 C23.9,33.5 23.8,30.7 23.1,28.9 C22.3,27.2 20.0,25.8 18.7,24.2 C17.3,22.5 16.2,20.5 15.0,18.9 C13.8,17.3 11.2,15.3 11.8,14.5 Z" fill="#f4a9c6"/><path d="M37.6,13.5 C37.4,14.2 36.9,15.1 36.2,15.6 C35.4,16.0 34.1,16.2 33.3,16.0 C32.5,15.7 31.7,15.0 31.3,14.2 C30.9,13.5 30.7,12.3 30.9,11.5 C31.1,10.7 31.9,9.9 32.6,9.5 C33.4,9.2 34.7,9.1 35.5,9.4 C36.2,9.7 37.0,10.5 37.4,11.1 C37.7,11.8 37.8,12.7 37.6,13.5 Z" fill="#7ccaa0"/></symbol>
+<symbol id="a-hennessy" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fde0c8"/><path d="M20.6,3.8 C22.1,2.3 27.0,2.0 28.5,3.4 C29.9,4.9 28.3,10.0 29.3,12.4 C30.3,14.8 33.8,15.9 34.5,17.7 C35.3,19.6 33.8,21.8 33.9,23.6 C33.9,25.4 34.8,27.0 35.0,28.8 C35.3,30.5 35.4,32.5 35.3,34.1 C35.3,35.8 35.6,37.2 34.9,38.7 C34.2,40.3 32.9,42.5 31.1,43.4 C29.4,44.4 26.9,44.2 24.5,44.4 C22.2,44.6 18.8,45.3 16.8,44.4 C14.8,43.6 12.9,41.0 12.4,39.2 C11.9,37.4 13.6,35.6 13.8,33.8 C14.0,32.0 13.7,30.3 13.7,28.5 C13.8,26.7 14.0,24.8 14.2,23.2 C14.3,21.5 13.7,20.4 14.5,18.6 C15.3,16.8 17.9,14.8 18.9,12.4 C19.9,9.9 19.0,5.3 20.6,3.8 Z" fill="#b98253"/><path d="M16.0,19.8 C16.8,18.8 19.2,19.7 21.0,19.7 C22.8,19.6 25.1,19.6 26.9,19.7 C28.7,19.8 31.1,19.1 31.9,20.0 C32.7,21.0 31.9,23.6 31.9,25.3 C31.9,27.1 31.7,28.8 31.7,30.6 C31.7,32.4 32.6,35.1 31.8,36.1 C30.9,37.0 28.5,36.3 26.7,36.3 C24.9,36.4 22.7,36.4 21.0,36.4 C19.3,36.3 17.2,37.2 16.4,36.2 C15.5,35.2 16.1,32.4 16.0,30.6 C16.0,28.8 16.3,27.2 16.3,25.4 C16.3,23.6 15.2,20.8 16.0,19.8 Z" fill="#fffaf0"/><path d="M19.0,22.9 C19.7,22.0 22.3,21.9 23.0,22.8 C23.7,23.7 22.6,27.2 23.4,28.1 C24.1,28.9 26.7,28.5 27.3,27.7 C27.9,26.9 26.1,24.2 26.7,23.4 C27.4,22.5 30.4,22.0 31.1,22.8 C31.9,23.7 31.2,26.5 31.2,28.4 C31.3,30.3 32.0,33.1 31.3,34.0 C30.6,34.9 27.8,34.3 27.0,33.8 C26.2,33.3 27.3,31.3 26.7,30.7 C26.1,30.1 23.9,29.8 23.3,30.3 C22.7,30.8 23.9,33.3 23.2,33.9 C22.5,34.5 20.0,34.9 19.3,34.0 C18.5,33.0 18.7,30.0 18.6,28.1 C18.6,26.3 18.3,23.7 19.0,22.9 Z" fill="#b98253"/><path d="M18.8,4.0 C20.5,3.0 27.2,3.1 28.9,4.1 C30.6,5.1 30.6,9.1 28.9,10.1 C27.3,11.0 20.9,11.0 19.2,10.0 C17.5,9.0 17.2,5.0 18.8,4.0 Z" fill="#f5d36e"/></symbol>
+<symbol id="a-jack" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#f1ebe2"/><path d="M19.6,3.8 C20.5,2.4 22.9,3.3 24.5,3.4 C26.1,3.5 28.4,3.0 29.3,4.4 C30.1,5.8 29.0,9.7 29.5,11.7 C30.1,13.7 31.9,14.6 32.6,16.4 C33.3,18.2 33.7,20.4 34.0,22.5 C34.4,24.6 34.5,26.9 34.6,28.9 C34.7,30.8 34.3,32.5 34.4,34.5 C34.5,36.4 35.6,38.8 35.1,40.4 C34.7,42.1 33.4,43.7 31.5,44.4 C29.7,45.1 26.3,44.5 23.8,44.4 C21.3,44.4 18.1,44.8 16.4,44.2 C14.7,43.6 14.0,42.6 13.5,41.1 C13.1,39.5 13.6,36.9 13.7,34.8 C13.9,32.7 14.2,30.4 14.4,28.4 C14.6,26.4 14.9,24.9 15.0,22.8 C15.1,20.8 14.2,18.2 14.9,16.4 C15.6,14.5 18.2,13.8 19.0,11.7 C19.8,9.6 18.6,5.2 19.6,3.8 Z" fill="#6f4a32"/><path d="M15.7,17.7 C16.6,16.6 19.8,17.6 21.6,17.7 C23.4,17.8 24.8,18.0 26.6,18.0 C28.3,18.1 31.0,16.9 31.9,18.0 C32.8,19.0 31.7,22.1 31.7,24.2 C31.7,26.4 31.7,28.5 31.8,30.7 C31.8,32.9 32.9,36.2 32.0,37.3 C31.1,38.4 28.1,37.4 26.4,37.4 C24.6,37.3 23.4,37.3 21.7,37.2 C20.0,37.1 17.0,38.0 16.0,36.9 C15.1,35.8 16.3,32.9 16.3,30.8 C16.3,28.7 16.1,26.4 16.0,24.2 C15.9,22.0 14.7,18.7 15.7,17.7 Z" fill="#292a2f"/><path d="M18.5,21.8 C19.4,21.3 22.6,21.3 23.4,22.1 C24.1,22.8 23.4,24.7 23.3,26.2 C23.2,27.8 23.1,29.9 22.7,31.4 C22.4,32.8 21.9,34.6 21.1,34.8 C20.4,35.1 18.4,33.7 18.2,32.9 C18.1,32.1 20.0,31.3 20.3,30.0 C20.6,28.6 20.4,25.6 20.0,24.8 C19.7,24.0 18.4,25.7 18.2,25.2 C17.9,24.7 17.7,22.3 18.5,21.8 Z" fill="#fffaf0"/><path d="M25.3,21.8 C26.0,20.7 28.2,21.2 29.2,21.9 C30.2,22.6 31.0,24.5 31.3,26.0 C31.5,27.4 31.1,29.1 30.6,30.6 C30.2,32.2 29.6,34.3 28.6,35.0 C27.7,35.8 25.5,36.3 24.8,35.2 C24.2,34.2 24.8,30.8 24.9,28.6 C24.9,26.4 24.6,22.9 25.3,21.8 Z" fill="#fffaf0"/><path d="M19.2,5.0 C20.9,4.2 27.4,4.0 29.1,4.9 C30.7,5.7 30.8,9.2 29.1,10.0 C27.4,10.8 20.6,10.7 18.9,9.9 C17.3,9.1 17.5,5.8 19.2,5.0 Z" fill="#33343a"/></symbol>
+<symbol id="a-grok" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#e9e2fb"/><path d="M9.3,12.9 C9.7,11.4 13.7,8.5 15.3,8.6 C16.9,8.8 17.7,12.1 19.0,13.6 C20.3,15.0 21.8,16.1 23.0,17.5 C24.2,18.9 25.0,20.7 26.2,22.2 C27.5,23.7 29.3,25.1 30.7,26.5 C32.1,28.0 33.3,29.5 34.5,30.9 C35.8,32.3 38.0,33.4 37.9,34.8 C37.9,36.3 35.4,39.5 34.1,39.6 C32.8,39.8 31.6,37.1 30.2,35.8 C28.8,34.4 27.1,32.8 25.6,31.3 C24.0,29.8 22.4,28.2 21.1,26.6 C19.8,25.1 19.0,23.6 17.7,22.0 C16.4,20.5 14.7,19.0 13.3,17.5 C11.9,16.0 9.0,14.3 9.3,12.9 Z" fill="#30343b"/><path d="M34.3,8.9 C35.9,8.9 39.4,11.7 39.3,13.4 C39.3,15.0 35.7,17.0 33.9,18.7 C32.2,20.5 30.7,23.8 29.0,23.8 C27.3,23.8 23.6,20.3 23.7,18.7 C23.7,17.0 27.5,15.3 29.2,13.7 C31.0,12.1 32.6,9.0 34.3,8.9 Z" fill="#30343b"/><path d="M19.9,25.0 C21.3,25.2 24.9,28.3 24.9,30.0 C24.9,31.6 21.4,33.2 19.7,34.9 C18.0,36.6 16.5,39.8 14.8,40.1 C13.0,40.3 9.4,37.5 9.0,36.3 C8.6,35.1 11.1,33.9 12.4,32.7 C13.6,31.5 15.5,30.2 16.7,28.9 C18.0,27.6 18.5,24.9 19.9,25.0 Z" fill="#30343b"/><path d="M38.4,14.0 C38.2,14.7 37.8,15.4 37.2,15.9 C36.7,16.3 35.8,16.4 35.1,16.4 C34.3,16.4 33.5,16.2 33.0,15.8 C32.5,15.4 32.1,14.8 31.9,14.2 C31.7,13.5 31.6,12.5 31.8,11.8 C32.0,11.2 32.2,10.8 32.8,10.4 C33.3,10.0 34.3,9.5 35.0,9.4 C35.7,9.4 36.6,9.7 37.1,10.1 C37.7,10.5 38.2,11.2 38.4,11.9 C38.7,12.5 38.6,13.3 38.4,14.0 Z" fill="#8fb0ee"/></symbol>
+<symbol id="a-gemini" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#dbe8ff"/><path d="M24.6,4.8 C25.4,4.6 25.9,8.7 26.5,10.9 C27.1,13.2 27.1,16.9 28.3,18.4 C29.4,19.8 31.8,19.1 33.2,19.7 C34.7,20.4 35.4,21.6 36.9,22.4 C38.5,23.1 42.8,23.5 42.5,24.3 C42.3,25.0 38.0,26.1 35.6,26.9 C33.2,27.6 29.5,27.3 27.9,28.7 C26.3,30.1 26.7,33.0 26.1,35.4 C25.6,37.9 25.3,43.2 24.5,43.4 C23.7,43.6 22.3,38.8 21.3,36.4 C20.3,34.1 19.8,30.8 18.4,29.2 C17.0,27.6 15.1,27.4 13.0,26.6 C11.0,25.7 6.2,25.0 6.2,24.0 C6.2,23.1 10.7,21.8 12.9,20.9 C15.1,20.0 18.1,20.1 19.5,18.6 C20.9,17.1 20.6,14.2 21.4,11.9 C22.3,9.6 23.7,4.9 24.6,4.8 Z" fill="#8fb0ee"/><path d="M24.0,9.8 C24.5,9.8 24.6,13.0 25.2,14.7 C25.7,16.3 26.1,18.5 27.2,19.7 C28.4,20.9 30.3,21.3 31.9,22.0 C33.5,22.8 36.9,23.3 36.9,24.0 C36.9,24.6 33.4,25.2 31.7,25.9 C30.0,26.6 27.8,26.8 26.8,28.1 C25.7,29.3 26.0,31.6 25.5,33.3 C25.0,35.0 24.2,38.4 23.7,38.4 C23.2,38.3 23.0,35.0 22.4,33.2 C21.8,31.5 21.1,29.1 20.0,27.9 C18.9,26.7 17.3,26.8 15.8,26.1 C14.3,25.4 11.0,24.6 11.0,23.9 C11.0,23.1 14.0,22.4 15.5,21.8 C17.1,21.2 19.2,21.2 20.4,20.1 C21.5,18.9 21.7,16.4 22.3,14.7 C22.9,13.0 23.5,9.8 24.0,9.8 Z" fill="#b3a2ec"/><path d="M36.9,7.2 C37.5,7.2 37.9,10.8 39.1,11.9 C40.3,13.1 44.1,13.3 44.1,14.0 C44.1,14.6 40.3,14.8 39.1,16.0 C38.0,17.2 37.7,20.9 37.0,20.9 C36.3,20.9 36.0,17.3 34.9,16.1 C33.7,14.9 30.1,14.6 30.1,13.9 C30.2,13.2 34.0,13.1 35.1,11.9 C36.2,10.8 36.2,7.2 36.9,7.2 Z" fill="#f4a9c6"/></symbol>
+<symbol id="a-sigaretta" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#fde2ee"/><path d="M17.8,32.2 C18.5,30.6 21.8,30.1 23.8,29.4 C25.8,28.7 27.6,28.6 29.6,27.9 C31.7,27.1 34.6,24.1 36.0,24.8 C37.3,25.5 38.2,30.3 37.7,31.9 C37.1,33.5 34.4,33.5 32.5,34.3 C30.7,35.1 28.7,36.1 26.5,36.8 C24.4,37.5 21.2,39.4 19.8,38.6 C18.3,37.8 17.1,33.7 17.8,32.2 Z" fill="#ffffff"/><path d="M10.8,34.9 C11.5,33.3 15.9,31.8 17.4,32.5 C18.9,33.2 20.5,37.5 19.8,39.0 C19.1,40.5 14.7,42.3 13.2,41.6 C11.7,40.9 10.1,36.4 10.8,34.9 Z" fill="#f6ae76"/><path d="M35.6,25.1 C35.8,23.7 38.3,22.7 39.4,23.5 C40.5,24.3 42.3,28.6 42.1,30.0 C41.9,31.3 39.3,32.5 38.2,31.7 C37.1,30.9 35.4,26.4 35.6,25.1 Z" fill="#f29a97"/><path d="M32.9,25.4 C33.3,25.1 34.0,24.6 33.9,23.9 C33.8,23.3 32.3,22.3 32.4,21.4 C32.6,20.5 34.8,19.7 34.9,18.6 C35.0,17.5 33.8,15.5 33.2,14.9 C32.7,14.2 32.1,14.6 31.7,14.8 C31.2,14.9 30.5,15.3 30.6,15.9 C30.6,16.5 32.0,17.5 31.9,18.4 C31.8,19.3 30.0,20.2 29.8,21.4 C29.7,22.5 30.7,24.7 31.2,25.3 C31.7,26.0 32.4,25.6 32.9,25.4 Z" fill="#a9b8cc"/></symbol>
+<symbol id="a-gattino" viewBox="0 0 48 48"><path d="M46.6,28.6 C46.1,31.2 45.2,33.6 43.9,35.9 C42.7,38.2 41.1,40.6 39.1,42.4 C37.0,44.1 34.1,45.5 31.5,46.3 C28.9,47.2 26.1,47.4 23.4,47.4 C20.6,47.3 17.6,47.1 15.1,46.2 C12.5,45.2 10.0,43.3 8.0,41.6 C6.1,39.8 4.6,38.0 3.4,35.6 C2.1,33.2 1.0,29.8 0.5,27.1 C0.1,24.4 0.0,22.1 0.6,19.5 C1.2,17.0 2.5,14.1 4.0,11.7 C5.4,9.4 7.2,6.9 9.3,5.3 C11.3,3.6 13.8,2.8 16.3,1.9 C18.8,1.1 21.4,0.0 24.1,0.1 C26.8,0.2 30.2,1.2 32.7,2.2 C35.2,3.3 37.1,4.4 39.1,6.2 C41.2,7.9 43.8,10.3 45.1,12.7 C46.4,15.1 46.7,18.0 46.9,20.6 C47.2,23.3 47.1,26.1 46.6,28.6 Z" fill="#dbe8ff"/><path d="M11.6,15.8 C11.8,13.1 10.5,9.0 11.5,8.4 C12.4,7.9 15.1,12.0 17.3,12.4 C19.4,12.8 22.3,10.7 24.5,10.7 C26.8,10.7 28.4,12.6 30.6,12.4 C32.8,12.1 36.4,8.6 37.5,9.3 C38.7,9.9 37.5,14.0 37.6,16.4 C37.7,18.8 38.6,21.8 38.4,23.7 C38.3,25.6 37.2,26.3 36.6,27.9 C36.1,29.5 36.3,32.1 35.0,33.4 C33.8,34.7 31.0,35.0 29.1,35.7 C27.1,36.4 25.0,37.8 23.4,37.7 C21.8,37.6 20.9,36.1 19.3,35.3 C17.7,34.5 14.9,34.2 13.7,33.0 C12.5,31.9 12.5,29.8 11.9,28.4 C11.3,27.0 10.1,26.7 10.0,24.6 C10.0,22.5 11.3,18.5 11.6,15.8 Z" fill="#fffaf0"/><path d="M21.3,25.3 C21.1,26.2 20.4,27.0 19.6,27.4 C18.9,27.8 17.6,27.9 16.8,27.7 C16.0,27.4 15.4,26.5 15.0,25.7 C14.7,24.9 14.4,23.7 14.6,22.8 C14.8,22.0 15.6,20.9 16.3,20.5 C17.0,20.0 18.1,19.9 18.9,20.1 C19.7,20.4 20.6,21.3 21.0,22.2 C21.4,23.0 21.5,24.4 21.3,25.3 Z" fill="#5a6a86"/><path d="M33.4,25.3 C33.1,26.3 32.2,27.3 31.5,27.7 C30.8,28.1 29.9,28.2 29.1,27.9 C28.4,27.6 27.3,26.7 26.9,25.8 C26.5,25.0 26.5,23.8 26.8,22.9 C27.0,22.0 27.7,20.9 28.4,20.4 C29.1,19.9 30.2,19.8 31.0,20.1 C31.9,20.4 32.9,21.3 33.3,22.2 C33.6,23.0 33.7,24.4 33.4,25.3 Z" fill="#5a6a86"/><path d="M21.7,29.3 C22.1,28.8 25.9,29.1 26.3,29.6 C26.7,30.0 24.8,32.2 24.1,32.1 C23.3,32.1 21.4,29.7 21.7,29.3 Z" fill="#f4a9c6"/></symbol>
+</svg>
 
-<section id="grazie" class="card" hidden>
-  <h2 id="grazie-t" tabindex="-1"></h2>
-  <p id="grazie-g"></p>
-  <button id="cambia" type="button" class="sec">Cambia i miei giorni</button>
-  <button id="nonsei" type="button" class="link"></button>
-</section>
 
-<form id="f" novalidate>
-  <p id="adm-edit" class="info" hidden></p>
-  <label class="lab" for="nome">Il tuo nome</label>
-  <input type="text" id="nome" name="nome" maxlength="60" autocomplete="name" placeholder="es. Anna Rossi" required>
-  <p id="avviso" class="info" hidden></p>
-  <fieldset>
-    <legend>Tocca i giorni in cui ci sei</legend>
-    <div id="mesi"></div>
-  </fieldset>
-  <details id="piu">
-    <summary>Vuoi essere più preciso? (facoltativo)</summary>
-    <div id="prec"></div>
-    <label class="lab" for="note">Vuoi aggiungere qualcosa?</label>
-    <textarea id="note" name="note" maxlength="300" placeholder="es. il 5 novembre ho un esame"></textarea>
-    <p class="chi">Lo legge solo Gilberto.</p>
-  </details>
-  <p id="bozza" class="info" hidden>Non hai ancora inviato. Premi il bottone qui sotto.</p>
-  <button id="b" type="submit">Invia</button>
-  <button id="annulla" type="button" class="link" hidden>Annulla</button>
-  <p id="msg" class="err" role="alert"></p>
-  <p id="lento" class="info" hidden>Ci vuole un attimo, non chiudere.</p>
-</form>
-
-<section id="ris" aria-labelledby="ris-t">
-  <h2 id="ris-t">Chi c'è finora</h2>
-  <div id="ris-c">Caricamento…</div>
-</section>
-
-<section id="adm" hidden>
-  <h2 id="pers-t">Persone</h2>
-  <p id="adm-msg" class="info" role="status"></p>
-  <ul id="persone"></ul>
-  <h2>Giorni votabili</h2>
-  <button id="apri" type="button" class="sec">Apri o chiudi giorni</button>
-  <div id="giorni-box" hidden>
-    <p class="info">Tocca un giorno per aprirlo o chiuderlo</p>
-    <div id="cal-adm"></div>
-    <button id="salva-g" type="button">Salva giorni</button>
-    <button id="annulla-g" type="button" class="link">Annulla</button>
-  </div>
-</section>
+<div class="adm" id="adm" hidden><div class="in" id="admin-in"></div></div>
+<header><div class="wrap">
+  <button id="persona" type="button" aria-label="Il mio voto"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-persona" xlink:href="#i-persona"></use></svg></button>
+  <h1>Festa di laurea di Gilberto</h1>
+  <svg class="squig" viewBox="0 0 116 10" aria-hidden="true"><path d="M3 6c12-5 22 4 36 0s24-5 36-1 28 3 38-1"/></svg>
+  <div class="locrow"><p class="loc" id="loc">San Bonifacio</p><div id="fila" hidden></div></div>
+</div></header>
+<main class="wrap" id="main">
+  <div id="decisa"></div>
+  <div id="nomeblk"></div>
+  <div id="cal"></div>
+  <div id="stato"></div>
+  <div class="bar" id="bar"></div>
 </main>
+<div id="over"></div>
+
 <script>
-  // Server che salva i voti (Apps Script, file Code.gs).
-  const SERVER = 'https://script.google.com/macros/s/AKfycbxwVlxv7fAEmWuuBAg8Ny8ciK-sZck3ALe0-MQzHhSuyWyUCDvq0AEA0CBYoS4-O9sS7A/exec';
-  // Valori iniziali, uguali a Code.gs: la pagina si disegna subito, poi il server conferma.
-  const DAL = '2026-10-19', AL = '2026-11-29', CHIUSI = ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-07'];
-  const TIPI = { '✔': 'Tutto il giorno', pomeriggio: 'Solo pomeriggio', sera: 'Solo sera', forse: 'Forse' };
-  const SIGLA = { pomeriggio: 'pom', sera: 'sera', forse: '?' };
+// ======================================================================================
+// Sondaggio festa di laurea (v3): pagina su GitHub Pages + server Apps Script (Code.gs).
+// Struttura e disegno: design/v3/prototipo_v3.html. Qui la logica vera al posto delle simulazioni.
+// Compatibile iOS 12+ / Chrome 70+: niente ?. ?? replaceChildren Object.fromEntries :has gap-su-flex.
+// ======================================================================================
+var SERVER = 'https://script.google.com/macros/s/AKfycbxwVlxv7fAEmWuuBAg8Ny8ciK-sZck3ALe0-MQzHhSuyWyUCDvq0AEA0CBYoS4-O9sS7A/exec';
+var VERSIONE = 2;                 // se il server dice paginaMinima > VERSIONE la pagina si ricarica da sola
+var DAL = '2026-10-19', AL = '2026-11-29', CHIUSI0 = ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-07']; // come Code.gs: si disegna subito, poi il server conferma
+var TOCCO = 'tutto|si';
+var VALIDO = /^(tutto|pom|sera)\|(si|forse)$/;
+var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 6000, RICARICA_MS = 60000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
+var AVATARI = ['jeans', 'gpt', 'claude', 'razzo', 'medico', 'soldi', 'computer', 'gatto', 'cane', 'pizza', 'palla', 'chitarra', 'caffe', 'fiore', 'sole', 'gufo', 'cappello', 'brindisi', 'libro', 'fotocamera', 'ironman', 'drink', 'hennessy', 'jack', 'grok', 'gemini', 'sigaretta', 'gattino'];   // elenco generato da assembla_v3.py dagli id a-... dello sprite (i nuovi in fondo)
+// Aspetto (admin): UGUALE a ASPETTO_OPZIONI in Code.gs, prima opzione = predefinita. Classe su <body> per l'opzione non predefinita.
+var ASPETTO_OPZIONI = { stile: ['pulito', 'mano'], colore: ['blu', 'verde'], weekend: ['grande', 'uguale'] };
+var ASPETTO_CLASSE = { 'stile:mano': 'mano', 'colore:verde': 'verde', 'weekend:uguale': 'pesi' };
+var ASPETTO_NOMI = { stile: ['Stile', 'Pulito', 'A mano libera'], colore: ['Colore', 'Blu', 'Verde'], weekend: ['Weekend', 'Grandi', 'Uguali'] };
 
-  const $ = id => document.getElementById(id);
-  // Compatibili anche con telefoni vecchi (iOS 12+, Android Chrome 70+).
-  const svuota = (el, ...figli) => { while (el.firstChild) el.removeChild(el.firstChild); el.append(...figli); };
-  // AbortController manca su iOS 12.0-12.1: lì si va senza scadenza invece di non funzionare.
-  const scadenza = ms => { if (!window.AbortController) return undefined; const c = new AbortController(); setTimeout(() => c.abort(), ms); return c.signal; };
-  const oggetto = coppie => { const o = {}; coppie.forEach(([k, v]) => { o[k] = v; }); return o; }; // Object.fromEntries: solo da Chrome 73
-  const norm = s => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
-  const it = (iso, o) => new Date(iso + 'T00:00:00Z').toLocaleDateString('it-IT', Object.assign({ timeZone: 'UTC' }, o));
-  const breve = iso => it(iso, { weekday: 'short', day: 'numeric', month: 'short' });
-  // Memoria del telefono; se è bloccata (navigazione privata, in-app browser) si ricorda solo per questa visita.
-  const mem = {};
-  const store = {
-    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return k in mem ? mem[k] : null; } },
-    set(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
-    del(k) { delete mem[k]; try { localStorage.removeItem(k); } catch (e) {} },
-  };
-
-  let TUTTI = [];
-  for (let d = new Date(DAL + 'T00:00:00Z'); d <= new Date(AL + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + 1)) TUTTI.push(d.toISOString().slice(0, 10));
-  let aperti = TUTTI.filter(g => !CHIUSI.includes(g));
-  let voti = null;          // [{nome, giorni: {iso: tipo}}] dal server
-  let note = {};            // solo admin
-  let scelte = {};          // giorni scelti nel form: {iso: tipo}
-  let vecchio = '';         // nome con cui è salvata la riga che si sta modificando
-  let auto = false;         // giorni precompilati da un voto esistente (non toccati a mano)
-  let autoV = false;        // 'vecchio' trovato scrivendo il nome (non da 'Cambia' o dall'admin)
-  let adminEdit = false;    // l'admin sta modificando il voto di un altro
-  let giornoSel = '';       // giorno toccato nei risultati (all'inizio il migliore)
-
-  // Segreto admin: letto dal link e tolto subito dalla barra degli indirizzi.
-  const qs = new URLSearchParams(location.search);
-  let admin = qs.get('admin') || '';
-  if (admin) history.replaceState(null, '', location.pathname);
-
-  const mio = () => store.get('nome') || '';
-  const votoDi = n => voti && voti.find(v => norm(v.nome) === norm(n));
-  const notaDi = n => Object.prototype.hasOwnProperty.call(note, n) ? note[n] : ''; // anche per un nome come 'constructor'
-  const etichetta = (iso, tipo) => it(iso, { weekday: 'long', day: 'numeric', month: 'long' }) + (tipo && tipo !== '✔' ? ', ' + TIPI[tipo] : '');
-
-  // ---------- calendario ----------
-  function calendario(box, giorni, sel, modo) {
-    // modo 'voto': solo i giorni aperti si toccano; 'giorni': tutti, per aprire/chiudere (admin)
-    svuota(box);
-    const primo = giorni[0], ultimo = giorni[giorni.length - 1];
-    const fine = new Date(ultimo + 'T00:00:00Z');
-    for (let m = new Date(primo.slice(0, 8) + '01T00:00:00Z'); m <= fine; m.setUTCMonth(m.getUTCMonth() + 1)) {
-      const h = document.createElement('h3');
-      h.className = 'mese';
-      h.textContent = m.toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long', year: 'numeric' });
-      const cal = document.createElement('div');
-      cal.className = 'cal';
-      ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom'].forEach(w => {
-        const s = document.createElement('div');
-        s.className = 'wd'; s.setAttribute('aria-hidden', 'true'); s.textContent = w;
-        cal.append(s);
-      });
-      const celle = [];
-      // modo 'ris': sel = {iso: {si, forse}}; ogni giorno è un bottone colorato per numero di persone.
-      const maxR = modo === 'ris' ? Math.max(1, ...Object.keys(sel).map(k => sel[k].si.length)) : 0;
-      for (let i = 0; i < (m.getUTCDay() + 6) % 7; i++) celle.push(document.createElement('div'));
-      const n = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 0)).getUTCDate();
-      for (let g = 1; g <= n; g++) {
-        const iso = m.toISOString().slice(0, 8) + String(g).padStart(2, '0');
-        const ok = modo === 'giorni' ? TUTTI.includes(iso) : aperti.includes(iso);
-        if (!ok) {
-          const x = document.createElement('div');
-          x.className = 'x'; x.setAttribute('aria-hidden', 'true'); x.textContent = g;
-          celle.push(x);
-          continue;
-        }
-        if (modo === 'ris') {
-          const k = sel[iso], n = k.si.length, f = k.forse.length;
-          const bt = document.createElement('button');
-          bt.type = 'button';
-          bt.className = 'd h' + (n ? Math.max(1, Math.ceil(4 * n / maxR)) : 0) + (iso === giornoSel ? ' sel' : '');
-          bt.dataset.g = iso;
-          bt.setAttribute('aria-pressed', iso === giornoSel ? 'true' : 'false');
-          bt.setAttribute('aria-label', etichetta(iso) + ': ' + n + (n === 1 ? ' persona' : ' persone') + (f ? ', ' + f + ' forse' : ''));
-          const num = document.createElement('span');
-          num.setAttribute('aria-hidden', 'true'); num.textContent = g;
-          bt.append(num);
-          if (n || f) {
-            const s = document.createElement('small');
-            s.setAttribute('aria-hidden', 'true'); s.textContent = n ? n : '?';
-            bt.append(s);
-          }
-          bt.addEventListener('click', () => {
-            giornoSel = iso;
-            risultati();
-            const q = $('ris-c').querySelector('[data-g="' + iso + '"]');
-            if (q) q.focus();
-          });
-          celle.push(bt);
-          continue;
-        }
-        const l = document.createElement('label');
-        l.className = 'd' + (sel[iso] ? ' on' : (modo === 'giorni' ? ' chiuso' : ''));
-        const c = document.createElement('input');
-        c.type = 'checkbox'; c.value = iso; c.checked = !!sel[iso];
-        c.setAttribute('aria-label', modo === 'giorni' ? etichetta(iso) + (sel[iso] ? ', aperto' : ', chiuso') : etichetta(iso, sel[iso]));
-        const num = document.createElement('span');
-        num.setAttribute('aria-hidden', 'true'); num.textContent = g;
-        l.append(c, num);
-        if (modo === 'voto' && SIGLA[sel[iso]]) {
-          const s = document.createElement('small');
-          s.setAttribute('aria-hidden', 'true'); s.textContent = SIGLA[sel[iso]];
-          l.append(s);
-        }
-        celle.push(l);
-      }
-      // Solo le settimane con almeno un giorno toccabile.
-      for (let i = 0; i < celle.length; i += 7) {
-        const sett = celle.slice(i, i + 7);
-        if (sett.some(c => c.classList && c.classList.contains('d'))) cal.append(...sett);
-      }
-      box.append(h, cal);
-    }
+// ---------- utilita' ----------
+function $(id) { return document.getElementById(id); }
+function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x !== undefined && x !== null) e.textContent = x; return e; }
+function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); return n; }
+function ha(o, k) { return !!o && Object.prototype.hasOwnProperty.call(o, k); }
+function nuovoId() { return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12); }
+function copia(o) { return JSON.parse(JSON.stringify(o)); }
+function oggetto(coppie) { var o = {}; coppie.forEach(function (c) { o[c[0]] = c[1]; }); return o; } // Object.fromEntries: solo da Chrome 73
+// Nomi: UGUALI a Code.gs. pulisciNome = come si salva e si mostra; norm = chiave di confronto
+// (minuscole, senza accenti e apostrofi: "D’Angelo" = "d'angelo", "Niccolò" = "Niccolo'").
+function pulisciNome(s) { return String(s === null || s === undefined ? '' : s).normalize('NFC').replace(/[‘’`´ʼ]/g, "'").trim().replace(/\s+/g, ' ').slice(0, 60); }
+function norm(s) { return pulisciNome(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/'/g, '').toLowerCase(); }
+var NS = 'http://www.w3.org/2000/svg', XL = 'http://www.w3.org/1999/xlink';
+function use(id, cls, label) {
+  var s = document.createElementNS(NS, 'svg'), u = document.createElementNS(NS, 'use');
+  s.setAttribute('class', cls); u.setAttribute('href', '#' + id); u.setAttributeNS(XL, 'xlink:href', '#' + id); s.appendChild(u);
+  if (label) { s.setAttribute('role', 'img'); s.setAttribute('aria-label', label); } else s.setAttribute('aria-hidden', 'true');
+  s.setAttribute('focusable', 'false');
+  return s;
+}
+function ico(n, c, label) { return use('i-' + n, 'ico' + (c ? ' ' + c : ''), label); }
+function dl(iso, o) { var x = { timeZone: 'UTC' }; for (var k in o) x[k] = o[k]; return new Date(iso + 'T00:00:00Z').toLocaleDateString('it-IT', x); }
+function lungo(iso) { return dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }); }
+function parti(v) { var p = (v || '').split('|'); return { f: p[0] || 'tutto', si: p[1] !== 'forse' }; }
+function maiuscola(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function timeout(ms) { if (!window.AbortController) return undefined; var c = new AbortController(); setTimeout(function () { c.abort(); }, ms); return c.signal; } // manca su iOS 12.0-12.1
+function oggiItalia() { // "oggi" in Italia, non UTC; il server manda il suo e vince
+  try { var p = new Date().toLocaleDateString('it-IT', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/'); if (p.length === 3) return p[2] + '-' + p[1] + '-' + p[0]; } catch (e) {}
+  var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+}
+// Memoria del telefono; se e' bloccata (navigazione privata, in-app browser) si ricorda solo per questa visita.
+var mem = {};
+var store = {
+  get: function (k) { try { var v = localStorage.getItem(k); return v === null && k in mem ? mem[k] : JSON.parse(v); } catch (e) { return k in mem ? mem[k] : null; } },
+  set: function (k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del: function (k) { delete mem[k]; try { localStorage.removeItem(k); } catch (e) {} }
+};
+var ricordo = { // ricordi per nome su questo telefono: 'chiavi', 'privati' (commenti solo-Gilberto)
+  get: function (k, n) { var o = store.get(k); return o && typeof o === 'object' && ha(o, norm(n)) ? String(o[norm(n)]) : ''; },
+  set: function (k, n, v, via) {
+    var o = store.get(k), x = o && typeof o === 'object' ? o : {};
+    if (via) delete x[norm(via)];
+    if (v) x[norm(n)] = v; else delete x[norm(n)];
+    store.set(k, x);
   }
+};
 
-  // Il calendario si ricrea solo se cambiano i giorni aperti; altrimenti si aggiornano le caselle
-  // al loro posto: ricrearle mentre il dito tocca un giorno farebbe perdere il tocco.
-  function disegnaForm() {
-    const c = $('mesi').querySelectorAll('input');
-    if (Array.prototype.map.call(c, x => x.value).join() !== aperti.join()) calendario($('mesi'), TUTTI, scelte, 'voto');
-    else Array.prototype.forEach.call(c, segna);
-    disegnaPrec();
+// ---------- dati e stato ----------
+var TUTTI = [];
+for (var d0 = new Date(DAL + 'T00:00:00Z'); d0 <= new Date(AL + 'T00:00:00Z'); d0.setUTCDate(d0.getUTCDate() + 1)) TUTTI.push(d0.toISOString().slice(0, 10));
+var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
+var OGGI = oggiItalia();
+var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
+var INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
+var CESTINO = [];                 // solo admin: [{nome, quando, come}]
+var qs = new URLSearchParams(location.search);
+var ADMIN = qs.get('admin') || '', adminOk = false;
+if (ADMIN) history.replaceState(null, '', location.pathname); // il segreto non resta nella barra degli indirizzi
+function nuovoS() {
+  return { nome: '', avatar: '', scelte: {}, commento: '', pubblico: false, protetto: false, me: '', voted: false, edit: false, backup: null, focus: '',
+    invio: false, keyIn: '', keyNew: '', keyErr: false, nomeErr: false, adminEdit: '', vecchio: '', auto: false, autoV: false, commAuto: '', commToccato: false,
+    dirty: false, errore: '', wa: null };
+}
+var S = nuovoS();
+var ultimoGet = 0, giro = 0;
+function mio() { return store.get('nome') || ''; }
+function votoDi(n) { return VOTI && n ? VOTI.filter(function (v) { return norm(v.nome) === norm(n); })[0] : undefined; }
+function avail(iso) { return aperti.indexOf(iso) >= 0 && iso >= OGGI && !DECISA; }
+function votabile(iso) { return aperti.indexOf(iso) >= 0 && iso >= OGGI && (!DECISA || adminOk); } // a sondaggio chiuso solo l'admin corregge
+function giorniScelti() { return Object.keys(S.scelte).filter(votabile).sort(); }
+function ngiorni() { return giorniScelti().length; }
+function editable() { return !S.voted || S.edit; }
+function canSend() { return pulisciNome(S.nome) && ngiorni(); }
+function esiste() { return votoDi(S.vecchio || S.nome); }
+function altri(iso) { // gli ALTRI che ci sono: il voto che sto toccando non conta
+  var io = norm(S.vecchio || S.me);
+  return VOTI ? VOTI.filter(function (v) { return v.giorni[iso] && norm(v.nome) !== io; }) : [];
+}
+function giorniVotabili(giorni) { return oggetto(Object.keys(giorni).filter(votabile).map(function (g) { return [g, giorni[g]]; })); }
+function link() { return location.origin + location.pathname; }
+
+// ---------- avatar: componente unico ovunque compare un nome ----------
+function av(nome, scelto) {
+  var a = el('span', 'av'); a.setAttribute('aria-hidden', 'true');
+  var v = votoDi(nome), k = scelto !== undefined && scelto !== null ? scelto : (v && v.avatar);
+  if (k && AVATARI.indexOf(k) >= 0) a.appendChild(use('a-' + k, ''));
+  else if (pulisciNome(nome)) a.textContent = pulisciNome(nome).charAt(0).toUpperCase(); else { a.className += ' vuoto'; a.appendChild(ico('persona')); }
+  return a;
+}
+
+// ---------- aspetto ----------
+function applicaAspetto(a) {
+  Object.keys(ASPETTO_OPZIONI).forEach(function (k) {
+    var v = a && ASPETTO_OPZIONI[k].indexOf(a[k]) >= 0 ? a[k] : ASPETTO_OPZIONI[k][0];
+    ASPETTO_OPZIONI[k].forEach(function (o) { var c = ASPETTO_CLASSE[k + ':' + o]; if (c) document.body.classList.toggle(c, o === v); });
+  });
+}
+applicaAspetto(store.get('aspetto')); // subito, prima del primo disegno: niente sfarfallio alla seconda visita
+
+// ---------- "indietro" del telefono: modifica e fogli sono passi nella cronologia ----------
+var pila = [], ignoraPop = 0, dopoPop = null;
+function passo(cosa) { pila.push(cosa); try { history.pushState({ passo: pila.length }, ''); } catch (e) {} }
+function togliPassi() { if (pila.length) { ignoraPop++; var n = pila.length; pila.length = 0; history.go(-n); } }
+function togliPasso(cosa) { // chiuso a mano: se e' l'ultimo passo si consuma anche nella cronologia
+  var i = pila.lastIndexOf(cosa); if (i < 0) return;
+  if (i === pila.length - 1) { pila.pop(); ignoraPop++; history.back(); } else pila.splice(i, 1);
+}
+window.addEventListener('popstate', function () {
+  if (ignoraPop) { ignoraPop--; if (dopoPop) { var fn = dopoPop; dopoPop = null; fn(); } return; }
+  var x = pila.pop();
+  if (x === 'C') annullaModifica(true); else if (x === 'sheet') closeSheet(true);
+});
+
+// Tastiera aperta (N17/N18): la barra smette di essere fissa solo se il viewport visivo si e' ridotto davvero.
+// Un campo con il fuoco ma senza tastiera (PC, tastiera fisica) non deve mai nascondere il bottone.
+function kbSeAperta() {
+  setTimeout(function () {
+    var v = window.visualViewport, a = document.activeElement, campo = a && (a.id === 'nome' || a.id === 'serve');
+    document.body.classList.toggle('kb', !!(campo && v && v.height < window.innerHeight * 0.75));
+  }, 350);
+}
+if (window.visualViewport) window.visualViewport.addEventListener('resize', kbSeAperta);
+
+// ---------- bozza, coda ----------
+function salvaBozza() {
+  if (S.adminEdit || S.invio || (S.voted && !S.edit)) return;
+  store.set('bozza', { nome: S.nome, avatar: S.avatar, scelte: S.scelte, commento: S.commento, pubblico: S.pubblico, commToccato: S.commToccato, vecchio: S.vecchio, edit: S.edit, me: S.me, keyNew: S.keyNew });
+}
+function coda() { var c = store.get('coda'); return c && typeof c === 'object' && c.dati ? c : null; }
+// Se dopo un invio fallito l'utente cambia qualcosa, la coda (vecchia) non deve piu' partire da sola sopra le modifiche.
+function toccaForm() { if (!S.invio && coda()) { store.del('coda'); renderBar(); } }
+document.addEventListener('input', toccaForm);
+document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#cal .g, #pan')) toccaForm(); });
+
+// ---------- toast "Annulla" (6 s): sostituisce ogni conferma ----------
+var tt;
+function toast(txt, undo) {
+  chiudiToast();
+  var t = el('div', 'toast'); t.id = 'toast'; t.setAttribute('role', 'status'); t.appendChild(el('span', '', txt));
+  if (undo) {
+    var u = el('button', '', 'Annulla'); u.type = 'button'; u.id = 'toast-b';
+    u.addEventListener('click', function () {
+      chiudiToast(); toast('Un attimo…');
+      Promise.resolve().then(undo).then(function () { var t2 = $('toast'); if (t2 && /^Un attimo/.test(t2.textContent)) toast('Annullato'); carica(); }, function (e) { toast('Non annullato: ' + umano(e)); });
+    });
+    t.appendChild(u);
   }
+  var b = $('bar');
+  if (b.hidden) { t.className += ' fisso'; document.body.appendChild(t); } else b.insertBefore(t, b.firstChild);
+  if (undo) tt = setTimeout(chiudiToast, ANNULLA_MS);
+}
+function chiudiToast() { clearTimeout(tt); var t = $('toast'); if (t && t.parentNode) t.parentNode.removeChild(t); }
+function umano(e) { // errori sempre umani: mai "Error", "JSON", "undefined"
+  if (e && e.name === 'Error' && e.message) return e.message;
+  if (e && e.name === 'SyntaxError') return 'Google non risponde. Riprova.';
+  return 'niente connessione. Riprova.';
+}
 
-  function segna(c) {
-    const l = c.parentNode, t = scelte[c.value];
-    c.checked = !!t;
-    l.classList.toggle('on', !!t);
-    const s = l.querySelector('small');
-    if (s) l.removeChild(s);
-    if (SIGLA[t]) {
-      const n = document.createElement('small');
-      n.setAttribute('aria-hidden', 'true'); n.textContent = SIGLA[t];
-      l.append(n);
-    }
-    c.setAttribute('aria-label', etichetta(c.value, t));
-  }
-
-  // Precisazioni facoltative: una riga per ogni giorno scelto.
-  function disegnaPrec() {
-    const prec = $('prec');
-    svuota(prec);
-    const giorni = Object.keys(scelte).filter(g => aperti.includes(g)).sort();
-    if (!giorni.length) {
-      const p = document.createElement('p');
-      p.className = 'chi'; p.textContent = 'Prima tocca qualche giorno nel calendario.';
-      prec.append(p);
-    }
-    giorni.forEach(g => {
-      const r = document.createElement('div');
-      r.className = 'prec';
-      const l = document.createElement('label');
-      l.htmlFor = 'p-' + g; l.textContent = breve(g);
-      const s = document.createElement('select');
-      s.id = 'p-' + g;
-      Object.entries(TIPI).forEach(([v, t]) => s.append(new Option(t, v, false, scelte[g] === v)));
-      s.addEventListener('change', () => { scelte[g] = s.value; auto = false; salvaBozza(); segna($('mesi').querySelector('input[value="' + g + '"]')); });
-      r.append(l, s);
-      prec.append(r);
+// ---------- chiamate al server ----------
+function chiama(dati) {
+  var body = new URLSearchParams();
+  Object.keys(dati).forEach(function (k) { [].concat(dati[k]).forEach(function (x) { if (x !== undefined && x !== null) body.append(k, x); }); });
+  if (!dati.id) body.append('id', nuovoId());
+  if (ADMIN) body.append('admin', ADMIN);
+  // Corpo urlencoded = richiesta "semplice": niente preflight CORS. "occupato" = il server non ha scritto niente: si riprova da soli, stesso id.
+  function prova(n) {
+    return fetch(SERVER, { method: 'POST', body: body, signal: timeout(60000) }).then(function (r) { return r.json(); }).then(function (res) {
+      if (!res.occupato || n === 3) return res;
+      return new Promise(function (ok) { setTimeout(ok, 2000 * n); }).then(function () { return prova(n + 1); });
     });
   }
-
-  $('mesi').addEventListener('change', e => {
-    const c = e.target;
-    if (c.checked) scelte[c.value] = '✔'; else delete scelte[c.value];
-    auto = false;
-    $('msg').textContent = '';
-    segna(c);
-    salvaBozza();
-    disegnaPrec();
+  return prova(1);
+}
+function deveOk(dati) {
+  return chiama(dati).then(function (res) {
+    if (!res.ok) { var e = new Error(res.msg || 'Non riuscito. Riprova.'); e.codice = res.codice; throw e; }
+    return res;
   });
+}
 
-  // ---------- bozza: sopravvive a ricarica, tasto indietro, telefono spento ----------
-  function salvaBozza() {
-    if (adminEdit) return;
-    store.set('bozza', { nome: $('nome').value, note: $('note').value, scelte, vecchio, auto, autoV });
-  }
-  $('note').addEventListener('input', salvaBozza);
-  $('nome').addEventListener('input', salvaBozza);
-
-  // ---------- stati della pagina ----------
-  function statoForm(opz) {
-    $('grazie').hidden = true;
-    $('f').hidden = false;
-    const v = votoDi(vecchio);
-    $('b').textContent = adminEdit ? 'Salva per ' + $('nome').value.trim() : (v ? 'Salva modifiche' : 'Invia');
-    $('annulla').hidden = !(adminEdit || v);
-    $('adm-edit').hidden = !adminEdit;
-    if (adminEdit) $('adm-edit').textContent = 'Stai modificando il voto di ' + vecchio + '.';
-    $('piu').open = !!(opz && opz.apri);
-    disegnaForm();
-  }
-
-  function statoGrazie() {
-    const v = votoDi(mio());
-    if (!v) return statoForm();
-    adminEdit = false;
-    $('f').hidden = true;
-    $('grazie').hidden = false;
-    $('grazie-t').textContent = 'Grazie, ' + v.nome + '! ✔';
-    const g = Object.keys(v.giorni).filter(d => aperti.includes(d)).sort();
-    $('grazie-g').textContent = 'I tuoi giorni: ' + (g.length ? g.map(d => breve(d) + (v.giorni[d] !== '✔' ? ' (' + TIPI[v.giorni[d]].toLowerCase() + ')' : '')).join(', ') : 'nessuno');
-    $('nonsei').textContent = 'Non sei ' + v.nome + '?';
-  }
-
-  function caricaVoto(v, n) {
-    scelte = Object.assign({}, v.giorni);
-    vecchio = v.nome; auto = false; autoV = false;
-    $('nome').value = v.nome;
-    $('note').value = n || '';
-    return Object.values(scelte).some(t => t !== '✔') || !!n;
-  }
-
-  // Nome scritto a mano: se ha già un voto, lo si carica per modificarlo. Si controlla già mentre
-  // si scrive (pausa di 0,4 s): se l'avviso comparisse solo all'uscita dal campo, spingerebbe giù
-  // il calendario proprio mentre il dito tocca un giorno, e il tocco finirebbe nel vuoto.
-  let attesaNome;
-  $('nome').addEventListener('input', () => { clearTimeout(attesaNome); attesaNome = setTimeout(controllaNome, 400); });
-  $('nome').addEventListener('change', () => { clearTimeout(attesaNome); controllaNome(); });
-  function controllaNome() {
-    if (adminEdit) { $('b').textContent = 'Salva per ' + $('nome').value.trim(); return; }
-    const v = votoDi($('nome').value);
-    const prima = JSON.stringify([scelte, vecchio]);
-    // Il voto trovato scrivendo il nome vale finché il nome resta quello. Chi poi aggiunge l'iniziale
-    // (Anna -> Anna B.) è un'altra persona: non deve rinominare la riga della prima Anna.
-    if (autoV && !(v && norm(v.nome) === norm(vecchio))) {
-      vecchio = ''; autoV = false;
-      if (auto) { scelte = {}; auto = false; }
-    }
-    if (v && !vecchio) {
-      vecchio = v.nome; autoV = true;
-      if (!Object.keys(scelte).length) { scelte = Object.assign({}, v.giorni); auto = true; }
-    }
-    const av = $('avviso');
-    av.hidden = !(v && (autoV || norm(v.nome) !== norm(vecchio)));
-    av.textContent = !v ? '' : norm(v.nome) === norm(mio())
-      ? 'Hai già votato: cambia i giorni e premi Salva modifiche.'
-      : 'C\'è già un voto a nome «' + v.nome + '». Se sei tu, cambia pure i giorni. Se sei un\'altra persona, aggiungi l\'iniziale del cognome (es. ' + v.nome.split(' ')[0] + ' B.).';
-    salvaBozza();
-    // Si ridisegna solo se è cambiato qualcosa: ridisegnare mentre il dito tocca un giorno lo farebbe perdere.
-    if (JSON.stringify([scelte, vecchio]) !== prima) statoForm({ apri: $('piu').open });
-  }
-
-  $('cambia').addEventListener('click', () => {
-    const v = votoDi(mio());
-    const apri = caricaVoto(v, '');
-    statoForm({ apri });
-    $('nome').focus();
+// ---------- fogli ----------
+function sheet(titolo, build) {
+  var gia = !!$('over').firstChild;
+  clear($('over'));
+  var v = el('div', 'velo'), s = el('section', 'sheet'); s.setAttribute('role', 'dialog'); s.setAttribute('aria-modal', 'true'); s.setAttribute('aria-label', titolo);
+  v.addEventListener('click', function () { closeSheet(); }); s.appendChild(el('div', 'mani'));
+  var t = el('div', 'sh-t'); t.appendChild(document.createTextNode(titolo));
+  var x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Chiudi'); x.addEventListener('click', function () { closeSheet(); }); t.appendChild(x); s.appendChild(t);
+  build(s); $('over').appendChild(v); $('over').appendChild(s); x.focus();
+  if (!gia) passo('sheet');
+}
+function closeSheet(daIndietro, dopo) {
+  if (!$('over').firstChild) { if (dopo) dopo(); return; }
+  clear($('over'));
+  if (!daIndietro) { dopoPop = dopo || null; togliPasso('sheet'); }
+}
+// UN foglio per le opzioni del voto (accanto a Invia): commento (Solo Gilberto / Tutti), orario e sì/forse del giorno selezionato, avatar.
+function scegliAvatar(s) {
+  var g = el('div', 'grid'); g.id = 'avatar-griglia';
+  [''].concat(AVATARI).forEach(function (a) {
+    var b = el('button'); b.type = 'button'; b.setAttribute('aria-label', a || 'iniziale'); b.setAttribute('aria-pressed', (S.avatar || '') === a ? 'true' : 'false');
+    var v = av(S.nome || 'A', a); if (!a) v.className += ' ini'; b.appendChild(v);
+    b.addEventListener('click', function () { S.avatar = a; S.dirty = true; salvaBozza(); Array.prototype.forEach.call(g.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); renderName(); }); g.appendChild(b);
   });
-  function svuotaForm() {
-    adminEdit = false; auto = false; autoV = false;
-    store.del('bozza');
-    scelte = {}; vecchio = ''; $('nome').value = ''; $('note').value = '';
-    $('avviso').hidden = true; $('bozza').hidden = true; $('msg').textContent = '';
-  }
-  $('nonsei').addEventListener('click', () => {
-    store.del('nome');
-    svuotaForm();
-    statoForm();
-    $('nome').focus();
-  });
-  $('annulla').addEventListener('click', () => {
-    svuotaForm();
-    if (votoDi(mio())) { statoGrazie(); $('grazie-t').focus(); }
-    else statoForm();
-  });
-
-  // ---------- invio ----------
-  async function chiama(dati) {
-    const body = new URLSearchParams();
-    Object.entries(dati).forEach(([k, v]) => [].concat(v).forEach(x => body.append(k, x)));
-    if (admin) body.append('admin', admin);
-    // Corpo urlencoded = richiesta "semplice": niente preflight CORS, niente cookie Google.
-    // "occupato" = il server non ha scritto niente (troppi voti insieme): si riprova da soli.
-    for (let prova = 1; ; prova++) {
-      const res = await (await fetch(SERVER, { method: 'POST', body, signal: scadenza(60000) })).json();
-      if (!res.occupato || prova === 3) return res;
-      await new Promise(ok => setTimeout(ok, 2000 * prova));
-    }
-  }
-
-  $('f').addEventListener('submit', async e => {
-    e.preventDefault();
-    const nome = $('nome').value.trim().replace(/\s+/g, ' ');
-    const giorni = Object.keys(scelte).filter(g => aperti.includes(g)).sort();
-    if (!nome) { $('msg').textContent = 'Scrivi il tuo nome'; $('nome').focus(); return; }
-    if (!giorni.length) { $('msg').textContent = 'Tocca almeno un giorno'; $('mesi').querySelector('input').focus(); return; }
-    const testo = $('b').textContent;
-    const dati = { azione: 'vota', nome, vecchio, note: $('note').value, g: giorni.map(g => scelte[g] === '✔' ? g : g + ':' + scelte[g]) };
-    const nuovo = { nome, giorni: oggetto(giorni.map(g => [g, scelte[g]])) }; // prima dell'attesa: i tocchi durante l'invio non contano
-    $('b').disabled = true; $('b').textContent = 'Invio…'; $('msg').textContent = '';
-    const t = setTimeout(() => { $('lento').hidden = false; }, 3000);
-    try {
-      const res = await chiama(dati);
-      if (!res.ok) throw new Error(res.msg);
-      if (voti) voti = voti.filter(v => norm(v.nome) !== norm(vecchio) && norm(v.nome) !== norm(nome)).concat(nuovo);
-      if (adminEdit) {
-        note[nome] = dati.note;
-        if (norm(vecchio) !== norm(nome)) delete note[vecchio];
-        if (norm(vecchio) === norm(mio())) store.set('nome', nome);
-        svuotaForm();
-        $('adm-msg').textContent = 'Voto di ' + nome + ' aggiornato ✔';
-        if (votoDi(mio())) statoGrazie(); else statoForm();
-        $('adm-msg').scrollIntoView({ block: 'center' });
-      } else {
-        store.set('nome', nome);
-        store.del('bozza');
-        if (admin) note[nome] = dati.note;
-        svuotaForm();
-        statoGrazie();
-        $('grazie-t').focus();
-      }
-      risultati();
-      persone();
-    } catch (err) {
-      $('msg').textContent = err.name === 'Error' && err.message ? err.message
-        : err.name === 'SyntaxError' ? 'Voto NON salvato: il server di Google non risponde. I giorni sono ancora qui, riprova tra poco.'
-        : 'Voto NON salvato: niente connessione. I giorni sono ancora qui, riprova.';
-      $('b').textContent = testo;
-    } finally {
-      clearTimeout(t);
-      $('lento').hidden = true;
-      $('b').disabled = false;
-      if ($('b').textContent === 'Invio…') $('b').textContent = testo;
-    }
-  });
-
-  // ---------- risultati ----------
-  function risultati() {
-    const box = $('ris-c');
-    if (!voti) return;
-    $('ris-t').textContent = 'Chi c\'è finora (' + voti.length + (voti.length === 1 ? ' persona)' : ' persone)');
-    const conta = {};
-    aperti.forEach(g => {
-      conta[g] = { si: voti.filter(v => v.giorni[g] && v.giorni[g] !== 'forse'), forse: voti.filter(v => v.giorni[g] === 'forse') };
+  s.appendChild(g);
+  var ok = el('button', 'btn', 'Fatto'); ok.type = 'button'; ok.id = 'avatar-fatto'; ok.addEventListener('click', function () { closeSheet(); renderBar(); renderName(); }); s.appendChild(ok);
+}
+function sheetAvatar() {
+  sheet('Avatar', scegliAvatar);
+}
+function sheetOpzioni() {
+  sheet('Opzioni', function (s) {
+    var ta = el('textarea'); ta.id = 'commento'; ta.maxLength = MAX_COMMENTO; ta.value = S.commento; ta.setAttribute('aria-label', 'Commento'); ta.placeholder = 'es. il 5 ho un esame';
+    ta.addEventListener('input', function () { S.commento = ta.value; S.commToccato = true; S.dirty = true; salvaBozza(); }); s.appendChild(ta);
+    var vis = el('h3', 'sh-t', 'Chi vede il commento'); vis.style.cssText = 'margin-top:14px;font-size:17px'; s.appendChild(vis);
+    var sg = el('div', 'seg'); sg.setAttribute('role', 'group'); sg.setAttribute('aria-label', 'Chi vede il commento');
+    [[false, 'lucchetto', 'Solo Gilberto'], [true, 'gruppo', 'Tutti']].forEach(function (o) {
+      var b = el('button'); b.type = 'button'; b.setAttribute('aria-pressed', S.pubblico === o[0] ? 'true' : 'false'); b.appendChild(ico(o[1])); b.appendChild(document.createTextNode(o[2]));
+      b.addEventListener('click', function () { S.pubblico = o[0]; S.dirty = true; salvaBozza(); Array.prototype.forEach.call(sg.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); sg.appendChild(b);
     });
-    const conVoti = aperti.filter(g => conta[g].si.length || conta[g].forse.length);
-    if (!conVoti.length) { box.textContent = 'Ancora nessun voto: sei il primo!'; return; }
-    const max = Math.max(...aperti.map(g => conta[g].si.length));
-    const migliori = max ? aperti.filter(g => conta[g].si.length === max) : [];
-    if (!conta[giornoSel]) giornoSel = migliori[0] || conVoti[0];
-
-    const parti = [];
-    if (max) {
-      const top = document.createElement('p');
-      top.className = 'top';
-      top.textContent = '⭐ ' + (migliori.length > 3 ? migliori.length + ' giorni a pari merito' : migliori.map(breve).join(', ')) + ' · ' + max + (max === 1 ? ' persona' : ' persone');
-      parti.push(top);
-    }
-    const leg = document.createElement('p');
-    leg.className = 'chi';
-    leg.textContent = 'Più è scuro, più persone ci sono. Tocca un giorno per vedere chi c\'è.';
-    const cal = document.createElement('div');
-    calendario(cal, TUTTI, conta, 'ris');
-
-    // Chi c'è nel giorno toccato, diviso per fascia: Pomeriggio / Sera (sì), poi Forse e No. Solo nomi, niente frasi.
-    // "Tutto il giorno" conta in tutte e due le fasce.
-    const k = conta[giornoSel];
-    const det = document.createElement('div');
-    det.id = 'giorno-sel';
-    det.setAttribute('aria-live', 'polite');
-    const t = document.createElement('p');
-    t.className = 'top';
-    t.textContent = breve(giornoSel) + ' · ' + k.si.length + (k.si.length === 1 ? ' persona' : ' persone') + (k.forse.length ? ' + ' + k.forse.length + ' forse' : '');
-    det.append(t);
-    const gruppo = (titolo, chi, cls) => {
-      const r = document.createElement('div');
-      r.className = 'fascia';
-      const h = document.createElement('div');
-      h.className = 'fascia-t';
-      h.textContent = titolo + ' · ' + chi.length;
-      r.append(h);
-      chi.forEach(v => {
-        const c = document.createElement('span');
-        c.className = 'chip ' + cls;
-        c.textContent = v.nome;
-        r.append(c);
-      });
-      return r;
-    };
-    const tipo = v => v.giorni[giornoSel];
-    det.append(
-      gruppo('✔ Pomeriggio', k.si.filter(v => tipo(v) !== 'sera'), ''),
-      gruppo('✔ Sera', k.si.filter(v => tipo(v) !== 'pomeriggio'), ''),
-      gruppo('? Forse', k.forse, 'forse'),
-      gruppo('✗ No', voti.filter(v => !tipo(v)), 'no'));
-    parti.push(leg, cal, det);
-    svuota(box, ...parti);
-  }
-
-  // ---------- admin ----------
-  function persone() {
-    if (!admin || !voti) return;
-    $('adm').hidden = false;
-    $('pers-t').textContent = 'Persone (' + voti.length + ')';
-    const ul = $('persone');
-    svuota(ul);
-    voti.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'it')).forEach(v => {
-      const li = document.createElement('li');
-      const t = document.createElement('div');
-      t.className = 'top'; t.textContent = v.nome;
-      const g = Object.keys(v.giorni).filter(d => aperti.includes(d)).sort();
-      const c = document.createElement('div');
-      c.className = 'chi';
-      c.textContent = g.map(d => breve(d) + (v.giorni[d] !== '✔' ? ' (' + v.giorni[d] + ')' : '')).join(', ') || 'nessun giorno aperto';
-      li.append(t, c);
-      if (notaDi(v.nome)) {
-        const n = document.createElement('div');
-        n.className = 'nota'; n.textContent = '“' + notaDi(v.nome) + '”';
-        li.append(n);
+    s.appendChild(sg);
+    var iso = S.focus && S.scelte[S.focus] && editable() ? S.focus : '';
+    if (iso) { // orario e sì/forse del giorno selezionato (scorciatoia: secondo tocco sul giorno)
+      var h = el('h3', 'sh-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })); h.style.cssText = 'margin-top:14px;font-size:17px'; s.appendChild(h);
+      var ct = el('div', 'ctrl'), s1 = el('div', 'seg'), s2 = el('div', 'seg'); s1.setAttribute('role', 'group'); s1.setAttribute('aria-label', 'Orario'); s2.setAttribute('role', 'group'); s2.setAttribute('aria-label', 'Sicuro');
+      var p0 = parti(S.scelte[iso]);
+      function agg(f, si) { S.scelte[iso] = f + '|' + (si ? 'si' : 'forse'); S.auto = false; S.dirty = true; salvaBozza(); renderCal(); }
+      function seg(box, voci, attuale, fn) {
+        voci.forEach(function (o) {
+          var b = el('button', o[3] || ''); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', attuale === o[0] ? 'true' : 'false');
+          (o[2] || []).forEach(function (n) { b.appendChild(ico(n)); }); if (o[3] === 't') b.appendChild(document.createTextNode(o[4]));
+          b.addEventListener('click', function () { fn(o[0]); Array.prototype.forEach.call(box.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); box.appendChild(b);
+        });
       }
-      const r = document.createElement('div');
-      r.className = 'riga';
-      const mod = document.createElement('button');
-      mod.type = 'button'; mod.className = 'sec'; mod.textContent = 'Modifica';
-      mod.setAttribute('aria-label', 'Modifica il voto di ' + v.nome);
-      mod.addEventListener('click', () => {
-        adminEdit = true;
-        const apri = caricaVoto(v, notaDi(v.nome));
-        $('avviso').hidden = true;
-        statoForm({ apri });
-        window.scrollTo(0, 0);
-        $('nome').focus();
+      var cur = p0;
+      seg(s1, [['tutto', 'Tutto il giorno', ['sole', 'luna']], ['pom', 'Pomeriggio', ['sole']], ['sera', 'Sera', ['luna']]], p0.f, function (f) { cur = { f: f, si: cur.si }; agg(cur.f, cur.si); });
+      [['si', 'Sì'], ['forse', 'Forse']].forEach(function (o) {
+        var b = el('button', '', o[0] === 'si' ? 'Sì' : '?'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', (p0.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
+        b.addEventListener('click', function () { cur = { f: cur.f, si: o[0] === 'si' }; agg(cur.f, cur.si); Array.prototype.forEach.call(s2.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); s2.appendChild(b);
       });
-      const del = document.createElement('button');
-      del.type = 'button'; del.className = 'sec'; del.textContent = 'Elimina';
-      del.setAttribute('aria-label', 'Elimina il voto di ' + v.nome);
-      del.addEventListener('click', async () => {
-        const n = Object.keys(v.giorni).length;
-        if (!confirm('Eliminare il voto di ' + v.nome + ' (' + n + (n === 1 ? ' giorno' : ' giorni') + ')?')) return;
-        del.disabled = true;
-        try {
-          const res = await chiama({ azione: 'elimina', nome: v.nome });
-          if (!res.ok) throw new Error(res.msg);
-          voti = voti.filter(x => x !== v);
-          $('adm-msg').textContent = 'Voto di ' + v.nome + ' eliminato.';
-          if (norm(v.nome) === norm(mio())) { store.del('nome'); statoForm(); }
-          risultati(); persone();
-        } catch (err) {
-          del.disabled = false;
-          $('adm-msg').textContent = err.message && err.name === 'Error' ? err.message : 'Non eliminato: niente connessione, riprova.';
-        }
-      });
-      r.append(mod, del);
-      li.append(r);
-      ul.append(li);
+      ct.appendChild(s1); ct.appendChild(s2); s.appendChild(ct);
+    }
+    var ok = el('button', 'btn', 'Fatto'); ok.type = 'button'; ok.id = 'opzioni-fatto'; ok.addEventListener('click', function () { closeSheet(); renderBar(); renderName(); }); s.appendChild(ok);
+  });
+}
+// Punto a parte in alto a destra: ritrovare il proprio voto da un altro telefono / cambiare persona.
+function sheetPersona() {
+  sheet('Il mio voto', function (s) {
+    function riga(i, t, cls, fn) { var b = el('button', 'riga-a' + (cls ? ' ' + cls : '')); b.type = 'button'; b.appendChild(ico(i)); b.appendChild(document.createTextNode(t)); b.addEventListener('click', fn); s.appendChild(b); }
+    riga('chiave', 'Chiave', '', sheetChiave);
+    if (mio()) riga('scambia', 'Non sei ' + mio().split(' ')[0] + '?', '', nonSei);
+    if (votoDi(mio())) riga('cestino', 'Ritira il mio voto', 'del', ritira);
+  });
+}
+function sheetChiave() {
+  sheet('Chiave', function (s) {
+    var i = el('input'); i.type = 'text'; i.id = 'chiave'; i.maxLength = 60; i.autocomplete = 'off'; i.setAttribute('autocapitalize', 'off'); i.setAttribute('autocorrect', 'off'); i.setAttribute('spellcheck', 'false');
+    i.setAttribute('aria-label', 'Chiave'); i.placeholder = 'es. 1234'; i.setAttribute('aria-describedby', 'kh'); i.value = S.keyNew; s.appendChild(i);
+    var p = el('p', 'hint', 'Non è una password vera'); p.id = 'kh'; s.appendChild(p);
+    var ok = el('button', 'btn', 'Proteggi'); ok.type = 'button';
+     ok.addEventListener('click', function () { var k = i.value.trim(); if (!k) { i.focus(); return; } closeSheet(false, function () { if (S.voted && !S.edit) cambia(); S.keyNew = k; S.dirty = true; salvaBozza(); renderBar(); toast('Chiave pronta: premi Salva'); }); });
+    s.appendChild(ok); i.focus();
+  });
+}
+
+// ---------- fila dei votanti (sotto il titolo): un cerchietto per chi ha votato + "N/M"; tocco = elenco di tutti gli invitati ----------
+function renderFila() {
+  var f = $('fila'); if (!f) return;
+  var voti = VOTI || [];
+  f.hidden = !voti.length;
+  clear(f); if (!voti.length) return;
+  var io = norm(S.nome) && votoDi(S.nome) ? norm(S.nome) : norm(mio());
+  var ord = voti.slice().sort(function (a, b) { return (norm(b.nome) === io) - (norm(a.nome) === io) || (b.agg || 0) - (a.agg || 0); });
+  var riga = f.parentNode, larg = (riga.clientWidth || 320) - ($('loc').offsetWidth || 110) - 16 - 56, k = Math.max(3, Math.floor(larg / 24)), mostra = ord.length > k ? ord.slice(0, k - 1) : ord;
+  var bt = el('button', 'fila-b'); bt.type = 'button'; bt.id = 'fila-b';
+  var tot = INVITATI.length ? Math.max(INVITATI.length, voti.length) : 0;
+  bt.setAttribute('aria-label', 'Hanno votato ' + voti.length + (tot ? ' su ' + tot : ''));
+  var cer = el('span', 'fila-c'); cer.setAttribute('aria-hidden', 'true');
+  mostra.forEach(function (v) {
+    var c = el('span', 'fl' + (norm(v.nome) === io ? ' io' : '')); c.appendChild(av(v.nome, v.avatar || ''));
+    if (norm(v.nome) === io) { var ok = el('span', 'fl-ok'); ok.appendChild(ico('spunta')); c.appendChild(ok); }
+    cer.appendChild(c);
+  });
+  if (ord.length > mostra.length) { var piu = el('span', 'fl fl-piu', '+' + (ord.length - mostra.length)); cer.appendChild(piu); }
+  bt.appendChild(cer);
+  var n = el('span', 'fila-n', voti.length + (tot ? '/' + tot : '')); n.setAttribute('aria-hidden', 'true'); bt.appendChild(n);
+  bt.addEventListener('click', sheetInvitati);
+  f.appendChild(bt);
+}
+function sheetInvitati() { // tutti gli invitati: chi ha votato in evidenza (avatar + spunta), gli altri in grigio. Solo nomi e icone.
+  sheet('Invitati', function (s) {
+    var voti = VOTI || [], visti = Object.create(null), righe = [];
+    INVITATI.forEach(function (n) { if (!visti[norm(n)]) { visti[norm(n)] = true; var v = votoDi(n); righe.push({ nome: v ? v.nome : n, v: v }); } });
+    voti.forEach(function (v) { if (!visti[norm(v.nome)]) { visti[norm(v.nome)] = true; righe.push({ nome: v.nome, v: v }); } });
+    righe.sort(function (a, b) { return (!!b.v - !!a.v) || a.nome.localeCompare(b.nome, 'it'); });
+    var ul = el('ul', 'lista'); ul.id = 'elenco-invitati';
+    righe.forEach(function (r) {
+      var li = el('li', 'inv' + (r.v ? ' votato' : ' manca')), d = el('div', 'pers'); d.appendChild(av(r.nome, r.v ? r.v.avatar || '' : ''));
+      d.appendChild(el('b', '', r.nome));
+      if (r.v) { d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato'); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
+      li.appendChild(d); ul.appendChild(li);
     });
-  }
+    s.appendChild(ul);
+  });
+}
 
-  let selGiorni = {};
-  $('apri').addEventListener('click', () => {
-    selGiorni = oggetto(aperti.map(g => [g, true]));
-    calendario($('cal-adm'), TUTTI, selGiorni, 'giorni');
-    $('giorni-box').hidden = false; $('apri').hidden = true; $('f').hidden = true; $('grazie').hidden = true;
-  });
-  $('cal-adm').addEventListener('change', e => {
-    const g = e.target.value;
-    if (!e.target.checked) {
-      const n = voti ? voti.filter(v => v.giorni[g]).length : 0;
-      if (n && !confirm(n + (n === 1 ? ' persona aveva' : ' persone avevano') + ' scelto ' + breve(g) + '. Chiuderlo? I loro voti restano salvati e ricompaiono se lo riapri.')) { e.target.checked = true; return; }
-      delete selGiorni[g];
-    } else selGiorni[g] = true;
-    calendario($('cal-adm'), TUTTI, selGiorni, 'giorni');
-    const c = $('cal-adm').querySelector('input[value="' + g + '"]');
-    if (c) c.focus();
-  });
-  function chiudiGiorni() {
-    $('giorni-box').hidden = true; $('apri').hidden = false;
-    if (votoDi(mio()) && !Object.keys(scelte).length) statoGrazie(); else statoForm();
-  }
-  $('annulla-g').addEventListener('click', chiudiGiorni);
-  $('salva-g').addEventListener('click', async () => {
-    const g = TUTTI.filter(d => selGiorni[d]);
-    if (!g.length) { $('adm-msg').textContent = 'Lascia aperto almeno un giorno.'; return; }
-    $('salva-g').disabled = true;
-    try {
-      const res = await chiama({ azione: 'giorni', g });
-      if (!res.ok) throw new Error(res.msg);
-      aperti = g;
-      $('adm-msg').textContent = 'Giorni salvati ✔';
-      chiudiGiorni(); risultati(); persone();
-    } catch (err) {
-      $('adm-msg').textContent = err.message && err.name === 'Error' ? err.message : 'Non salvato: niente connessione, riprova.';
-    } finally { $('salva-g').disabled = false; }
-  });
-  $('esci').addEventListener('click', () => { location.href = location.pathname; });
-
-  // ---------- avvio ----------
-  async function carica() {
-    $('ris-c').textContent = 'Caricamento…';
-    try {
-      const res = await (await fetch(SERVER, { signal: scadenza(30000) })).json();
-      voti = res.voti; aperti = res.aperti; TUTTI = res.tutti;
-    } catch (e) {
-      const p = document.createElement('p');
-      p.textContent = 'Non riesco a vedere i voti degli altri.';
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'sec'; b.textContent = 'Riprova';
-      b.addEventListener('click', carica);
-      svuota($('ris-c'), p, b);
-      disegnaForm();
-      return;
+// ---------- render ----------
+function renderAll(senzaCalendario) {
+  document.body.className = document.body.className.replace(/\binvio\b/g, '').replace(/\s+/g, ' ').trim() + (S.invio ? ' invio' : '');
+  $('loc').textContent = 'San Bonifacio' + (SCAD ? ' · entro ' + dl(SCAD, { weekday: 'short', day: 'numeric', month: 'short' }) : '');
+  var dec = clear($('decisa'));
+  if (DECISA) {
+    var d = el('div', 'decisa'), g = el('div', 'grande'); g.id = 'data-scelta'; g.setAttribute('aria-label', lungo(DECISA)); g.setAttribute('role', 'img');
+    g.appendChild(el('span', '', dl(DECISA, { weekday: 'short' }))); g.appendChild(el('b', '', String(+DECISA.slice(8)))); g.appendChild(el('span', '', dl(DECISA, { month: 'short' }))); d.appendChild(g);
+    var lk = el('div', 'lk'); lk.appendChild(ico('lucchetto', null, 'Voti chiusi')); d.appendChild(lk);
+    if (adminOk) {
+      var r = el('button', 'btn sec'); r.type = 'button'; r.id = 'riapri'; r.appendChild(document.createTextNode('Riapri i voti'));
+      r.addEventListener('click', riapri); d.appendChild(r);
     }
-    if (admin) {
-      try {
-        const res = await chiama({ azione: 'verifica' });
-        if (res.ok) { note = res.note || {}; $('adminbar').hidden = false; } else admin = '';
-      } catch (e) { admin = ''; }
-    }
-    risultati();
-    persone();
-    if (!$('f').hidden && (Object.keys(scelte).length || $('nome').value.trim())) { statoForm({ apri: $('piu').open }); return; }
-    if (votoDi(mio())) statoGrazie(); else statoForm();
+    dec.appendChild(d);
+    clear($('nomeblk')); $('bar').hidden = true;
+  } else { $('bar').hidden = false; renderName(); }
+  if (!senzaCalendario) renderCal(); if (!DECISA) renderBar(); renderAdmin(); renderStato(); renderFila();
+}
+function renderStato() { // sotto il calendario: solo se i voti degli altri non arrivano
+  var b = clear($('stato'));
+  if (VOTI || !S.letturaKo) return;
+  var p = el('p', 'hint', 'Non vedo i voti degli altri'); b.appendChild(p);
+  var r = el('button', 'btn sec', 'Riprova'); r.type = 'button'; r.id = 'riprova'; r.addEventListener('click', function () { S.letturaKo = false; renderStato(); carica(); }); b.appendChild(r);
+}
+function avatarNome() { return av(S.nome, S.avatar || (votoDi(S.nome) && !S.dirty ? undefined : '')); }
+function renderName() {
+  var blocca = S.voted && !S.edit || !!S.adminEdit, f = $('nome');
+  if (f && document.activeElement === f && f.readOnly === blocca ) {
+    var ab0 = $('avatar'); if (ab0) { var ok0 = ab0.querySelector('.ok-b'); clear(ab0); ab0.appendChild(avatarNome()); if (ok0) ab0.appendChild(ok0); }
+    sugg(); return;
   }
+  var b = clear($('nomeblk'));
+  var row = el('div', 'nome' + (S.nomeErr ? ' err' : ''));
+  var ab = el('button', 'avb'); ab.type = 'button'; ab.id = 'avatar'; ab.setAttribute('aria-label', 'Avatar'); ab.appendChild(avatarNome());
+  if (S.voted && !S.edit) { var ok = el('span', 'ok-b'); ok.appendChild(ico('spunta')); ab.appendChild(ok); ab.setAttribute('aria-label', 'Voto salvato'); }
+  if (!blocca) ab.addEventListener('click', sheetAvatar); else if (S.voted && !S.edit) ab.disabled = true;
+  row.appendChild(ab);
+  var inp = el('input'); inp.type = 'text'; inp.id = 'nome'; inp.value = S.nome; inp.placeholder = 'Il tuo nome'; inp.setAttribute('aria-label', 'Il tuo nome'); inp.autocomplete = 'name';
+  inp.setAttribute('autocapitalize', 'words'); inp.setAttribute('autocorrect', 'off'); inp.setAttribute('spellcheck', 'false'); inp.maxLength = 60; inp.readOnly = blocca;
+  inp.addEventListener('input', function () {
+    S.nome = inp.value; S.nomeErr = false; S.dirty = true; S.errore = ''; S.wa = null; row.className = 'nome';
+    var ab1 = $('avatar'); if (ab1) { var ok1 = ab1.querySelector('.ok-b'); clear(ab1); ab1.appendChild(avatarNome()); if (ok1) ab1.appendChild(ok1); }
+    clearTimeout(attesaNome); attesaNome = setTimeout(controllaNome, 400);
+    salvaBozza(); sugg(); renderCal(); renderBar(); renderFila();
+  });
+  inp.addEventListener('change', function () { clearTimeout(attesaNome); controllaNome(); });
+  inp.addEventListener('focus', kbSeAperta); inp.addEventListener('blur', function () { document.body.classList.remove('kb'); });
+  row.appendChild(inp);
+  b.appendChild(row);
+  var sl = el('div'); sl.id = 'sugg'; b.appendChild(sl); sugg();
+}
+// Nome scritto a mano: se ha gia' un voto lo si carica per modificarlo (pausa di 0,4 s: ridisegnare mentre il dito tocca un giorno lo farebbe perdere).
+var attesaNome;
+function controllaNome() {
+  if (S.adminEdit || (S.voted && !S.edit)) return;
+  var v = votoDi(S.nome), prima = JSON.stringify([S.scelte, S.vecchio]);
+  // Il voto trovato scrivendo il nome vale finche' il nome resta quello (Anna -> Anna B. e' un'altra persona).
+  if (S.autoV && !(v && norm(v.nome) === norm(S.vecchio))) {
+    S.vecchio = ''; S.autoV = false;
+    if (S.auto) { S.scelte = {}; S.auto = false; }
+    if (S.commAuto && S.commento === S.commAuto) { S.commento = ''; S.commToccato = false; }
+    S.commAuto = '';
+  }
+  if (v && !S.vecchio) {
+    S.vecchio = v.nome; S.autoV = true;
+    if (!Object.keys(S.scelte).length) { S.scelte = giorniVotabili(v.giorni); S.auto = true; }
+    var c = v.commento || ricordo.get('privati', v.nome);
+    if (!S.commento.trim() && c) { S.commento = S.commAuto = c; S.pubblico = !!v.commento; }
+    if (v.avatar && !S.avatar) S.avatar = v.avatar;
+  }
+  salvaBozza();
+  if (JSON.stringify([S.scelte, S.vecchio]) !== prima) { renderName(); renderCal(); renderBar(); } else renderBar();
+}
+function sugg() {
+  var box = clear($('sugg')); if (!$('nome') || $('nome').readOnly) return;
+  var q = norm(S.nome); if (!q) return;
+  var visti = Object.create(null), tutti = [];
+  (VOTI || []).forEach(function (v) { visti[norm(v.nome)] = true; tutti.push({ nome: v.nome, v: v }); });
+  INVITATI.forEach(function (n) { if (!visti[norm(n)]) { visti[norm(n)] = true; tutti.push({ nome: n }); } });
+  var m = tutti.filter(function (x) { var k = norm(x.nome); return k.indexOf(q) === 0 || k.indexOf(' ' + q) >= 0; })
+    .sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).slice(0, MAX_SUGG);
+  if (!m.length || (m.length === 1 && norm(m[0].nome) === q)) return;
+  var ul = el('ul', 'sugg');
+  m.forEach(function (x) {
+    var v = x.v, li = el('li'), b = el('button'); b.type = 'button';
+    b.setAttribute('aria-label', x.nome + (v ? ', ha già votato' + (v.protetto ? ', protetto da chiave' : '') : ''));
+    b.appendChild(av(x.nome, v ? v.avatar || '' : ''));
+    var t = el('span'), k = norm(x.nome), i0 = (' ' + k).indexOf(' ' + q);
+    var pre = x.nome.slice(0, i0 < 0 ? 0 : i0), mid = x.nome.substr(i0 < 0 ? 0 : i0, q.length);
+    t.appendChild(document.createTextNode(pre)); t.appendChild(el('b', '', mid)); t.appendChild(document.createTextNode(x.nome.slice(pre.length + mid.length))); b.appendChild(t);
+    if (v && v.protetto) b.appendChild(ico('lucchetto', 's lock'));
+    if (v) b.appendChild(ico('spunta', 's gia'));
+    b.addEventListener('click', function () {
+      S.nome = x.nome; S.nomeErr = false; S.dirty = true; S.focus = '';
+      clearTimeout(attesaNome); controllaNome();
+      renderName(); renderCal(); renderBar(); salvaBozza();
+    });
+    li.appendChild(b); ul.appendChild(li);
+  });
+  box.appendChild(ul);
+}
 
-  // Bozza non inviata (ricarica, indietro, telefono spento): si riprende da dove si era.
-  const bz = store.get('bozza');
-  if (bz && (Object.keys(bz.scelte || {}).length || bz.nome)) {
-    scelte = bz.scelte || {}; vecchio = bz.vecchio || ''; auto = !!bz.auto; autoV = !!bz.autoV;
-    $('nome').value = bz.nome || ''; $('note').value = bz.note || '';
-    $('bozza').hidden = !Object.keys(scelte).length;
-    statoForm({ apri: Object.values(scelte).some(t => t !== '✔') || !!bz.note });
+function renderCal() {
+  var c = clear($('cal')), conta = {}, max = 1;
+  TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
+  var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
+  Object.keys(mesi).sort().forEach(function (mk) {
+    var giorni = mesi[mk], y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, first = new Date(Date.UTC(y, mm, 1)), n = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
+    var celle = [], i;
+    for (i = 0; i < lead; i++) celle.push(el('div', 'g vuoto'));
+    for (var d = 1; d <= n; d++) {
+      var iso = mk + '-' + (d < 10 ? '0' : '') + d;
+      if (giorni.indexOf(iso) < 0) { celle.push(el('div', 'g vuoto')); continue; }
+      if (!avail(iso)) { var x = el('div', 'g x', String(d)); x.setAttribute('aria-hidden', 'true'); celle.push(x); continue; } // passato, chiuso o voti chiusi: stesso segno
+      var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
+      var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
+      if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
+      if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
+      else if (!VOTI) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
+      if (mine && (p.f !== 'tutto' || !p.si)) { var fq = el('span', 'fq'); fq.setAttribute('aria-hidden', 'true'); if (p.f === 'pom') fq.appendChild(ico('sole', 's')); else if (p.f === 'sera') fq.appendChild(ico('luna', 's')); if (!p.si) fq.appendChild(document.createTextNode('?')); b.appendChild(fq); }
+      if (iso === OGGI) b.className += ' oggi';
+      if (iso === S.focus) b.className += ' foc';
+      b.setAttribute('aria-label', lungo(iso) + (mine ? ', ci sei' + (p.f === 'pom' ? ', pomeriggio' : p.f === 'sera' ? ', sera' : '') + (p.si ? '' : ', forse') : '') + (iso === OGGI ? ', oggi' : '') + (nn ? ', ' + nn + (nn === 1 ? ' altro' : ' altri') : ''));
+      b.setAttribute('aria-pressed', mine ? 'true' : 'false');
+      b.addEventListener('click', onDay);
+      celle.push(b);
+    }
+    var h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize';
+    var cal = el('div', 'cal'), tot = 0;
+    ['L', 'M', 'M', 'G', 'V', 'S', 'D'].forEach(function (w) { var xx = el('div', 'wd', w); xx.setAttribute('aria-hidden', 'true'); cal.appendChild(xx); });
+    for (i = 0; i < celle.length; i += 7) {
+      var sett = celle.slice(i, i + 7); while (sett.length < 7) sett.push(el('div', 'g vuoto'));
+      if (sett.some(function (xx) { return xx.getAttribute && xx.getAttribute('data-g'); })) { sett.forEach(function (xx) { cal.appendChild(xx); }); tot++; } // le settimane senza giorni toccabili spariscono
+    }
+    if (tot) { c.appendChild(h); c.appendChild(cal); }
+  });
+  renderPanel();
+}
+function onDay(e) {
+  document.body.classList.remove('kb'); // si sta toccando il calendario: la barra torna fissa
+  var iso = e.currentTarget.getAttribute('data-g');
+  if (S.invio || DECISA) return;
+  if (editable()) {
+    if (!S.scelte[iso]) { S.scelte[iso] = TOCCO; S.focus = ''; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
+    else S.focus = S.focus === iso ? '' : iso;
+  } else S.focus = S.focus === iso ? '' : iso;
+  renderCal(); renderBar();
+  var q = $('cal').querySelector('[data-g="' + iso + '"]'); if (q) q.focus({ preventScroll: true });
+}
+function renderPanel() {
+  var bar = $('bar'), old = bar.querySelector('.pan'); if (old) bar.removeChild(old);
+  if (!S.focus || DECISA) return;
+  var iso = S.focus, p = parti(S.scelte[iso]), pan = el('div', 'pan'), t = el('div', 'pan-t'); pan.id = 'pan'; pan.setAttribute('role', 'group'); pan.setAttribute('aria-label', lungo(iso));
+  t.appendChild(document.createTextNode(dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })));
+  var x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Chiudi'); x.addEventListener('click', function () { S.focus = ''; renderCal(); renderBar(); }); t.appendChild(x); pan.appendChild(t);
+  if (editable() && S.scelte[iso]) {
+    var ct = el('div', 'ctrl'), s1 = el('div', 'seg'), s2 = el('div', 'seg'); s1.setAttribute('role', 'group'); s1.setAttribute('aria-label', 'Orario'); s2.setAttribute('role', 'group'); s2.setAttribute('aria-label', 'Sicuro');
+    [['tutto', 'Tutto il giorno', ['sole', 'luna']], ['pom', 'Pomeriggio', ['sole']], ['sera', 'Sera', ['luna']]].forEach(function (o) {
+      var b = el('button'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', p.f === o[0] ? 'true' : 'false'); o[2].forEach(function (n) { b.appendChild(ico(n)); });
+      b.addEventListener('click', function () { S.scelte[iso] = o[0] + '|' + (p.si ? 'si' : 'forse'); S.auto = false; S.dirty = true; salvaBozza(); renderCal(); renderBar(); keep('Orario'); }); s1.appendChild(b);
+    });
+    [['si', 'Sì', 'Sì'], ['forse', '?', 'Forse']].forEach(function (o) {
+      var b = el('button', '', o[1]); b.type = 'button'; b.setAttribute('aria-label', o[2]); b.setAttribute('aria-pressed', (p.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
+      b.addEventListener('click', function () { S.scelte[iso] = p.f + '|' + o[0]; S.auto = false; S.dirty = true; salvaBozza(); renderCal(); renderBar(); keep('Sicuro'); }); s2.appendChild(b);
+    });
+    ct.appendChild(s1); ct.appendChild(s2);
+    var rm = el('button', 'x', '×'); rm.type = 'button'; rm.setAttribute('aria-label', 'Togli questo giorno'); rm.style.cssText = 'width:44px;height:44px;margin-left:4px;border:0;background:none;font-size:26px;color:var(--err)';
+    rm.addEventListener('click', function () { delete S.scelte[iso]; S.focus = ''; S.auto = false; S.dirty = true; salvaBozza(); renderCal(); renderBar(); }); ct.appendChild(rm);
+    pan.appendChild(ct);
+  }
+  var gi = altri(iso);
+  if (gi.length) {
+    var ch = el('div', 'chips');
+    gi.forEach(function (v) {
+      var c = el('button', 'chip' + (parti(v.giorni[iso]).si ? '' : ' forse')); c.type = 'button'; c.appendChild(av(v.nome)); c.appendChild(document.createTextNode(v.nome));
+      c.setAttribute('aria-label', v.nome + (parti(v.giorni[iso]).si ? '' : ', forse'));
+      if (adminOk) c.addEventListener('click', function () { sheetPersone(v.nome); }); else { c.disabled = true; c.style.cursor = 'default'; }
+      ch.appendChild(c);
+    });
+    pan.appendChild(ch);
+  }
+  bar.insertBefore(pan, bar.querySelector('.toast') ? bar.querySelector('.toast').nextSibling : bar.firstChild);
+}
+function keep(grp) { var g = $('bar').querySelector('[aria-label="' + grp + '"] [aria-pressed="true"]'); if (g) g.focus({ preventScroll: true }); }
+
+function renderBar() {
+  if (document.activeElement && document.activeElement.id === 'serve' && !S.invio && !S.errore) return;
+  var bar = $('bar'), tz = bar.querySelector('.toast'), pn = bar.querySelector('.pan');
+  Array.prototype.slice.call(bar.children).forEach(function (c) { if (c !== tz && c !== pn) bar.removeChild(c); });
+  var ex = esiste(), needKey = ex && ex.protetto && !S.adminEdit && !ricordo.get('chiavi', ex.nome);
+  if (S.errore) { // messaggio umano + (se la rete e' giu') il bottone WhatsApp
+    var er = el('div', 'errbox'); er.id = 'errore'; er.setAttribute('role', 'alert'); er.appendChild(document.createTextNode(S.errore)); bar.appendChild(er);
+    if (S.wa) {
+      var a = el('a', 'btn sec'); a.id = 'wa'; a.href = 'https://wa.me/?text=' + encodeURIComponent(S.wa); a.target = '_blank'; a.rel = 'noopener'; a.appendChild(document.createTextNode('Manda a Gilberto su WhatsApp')); a.style.marginTop = '0'; a.style.marginBottom = '8px'; bar.appendChild(a);
+    }
+  }
+  if (needKey) {
+    var cr = el('div', 'chiave-r' + (S.keyErr ? ' err' : '')); cr.appendChild(ico('lucchetto'));
+    var ki = el('input'); ki.type = 'text'; ki.id = 'serve'; ki.maxLength = 60; ki.autocomplete = 'off'; ki.setAttribute('autocapitalize', 'off'); ki.setAttribute('autocorrect', 'off'); ki.setAttribute('spellcheck', 'false'); ki.placeholder = 'Chiave'; ki.setAttribute('aria-label', 'Chiave del voto'); ki.value = S.keyIn;
+    ki.addEventListener('input', function () { S.keyIn = ki.value; if (S.keyErr) { S.keyErr = false; cr.className = 'chiave-r'; var em = cr.querySelector('.em'); if (em) cr.removeChild(em); } });
+    ki.addEventListener('focus', function () { kbSeAperta(); setTimeout(function () { try { ki.scrollIntoView({ block: 'center' }); } catch (e) {} }, 300); }); ki.addEventListener('blur', function () { document.body.classList.remove('kb'); });
+    cr.appendChild(ki); if (S.keyErr) { ki.setAttribute('aria-invalid', 'true'); var em = el('span', 'em', 'Chiave sbagliata'); em.id = 'serve-e'; em.setAttribute('role', 'alert'); cr.appendChild(em); } bar.appendChild(cr);
+  }
+  var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
+  if (S.voted && !S.edit) {
+    b.className += ' cambia'; b.type = 'button'; b.appendChild(ico('matita')); b.appendChild(document.createTextNode('Cambia'));
+    b.addEventListener('click', cambia);
   } else {
-    disegnaForm();
+    var nb = el('button', 'ib'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('puntini')); if (S.commento) nb.appendChild(el('span', 'pt')); nb.addEventListener('click', sheetOpzioni); r.appendChild(nb);
+    if (S.edit || S.adminEdit) { var cb = el('button', 'ib'); cb.type = 'button'; cb.id = 'annulla-mod'; cb.setAttribute('aria-label', 'Annulla le modifiche'); cb.appendChild(el('span', '', '×')); cb.firstChild.style.cssText = 'font-size:30px;line-height:1'; cb.addEventListener('click', function () { annullaModifica(); }); r.appendChild(cb); }
+    if (S.invio) { b.className += ' lavora'; b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salvo…' : 'Invio…')); b.setAttribute('aria-busy', 'true'); }
+    else {
+      if (coda()) b.appendChild(ico('orologio')); // in attesa di rete: parte da solo
+      b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salva' : 'Invia'));
+      if (ngiorni()) b.appendChild(el('span', 'n', String(ngiorni())));
+      if (!canSend()) b.setAttribute('aria-disabled', 'true');
+    }
+    b.addEventListener('click', function (e) { e.preventDefault(); invia(); });
+  }
+  r.appendChild(b); bar.appendChild(r);
+}
+function cambia() {
+  S.edit = true; S.vecchio = S.me; S.backup = copia({ scelte: S.scelte, commento: S.commento, pubblico: S.pubblico, avatar: S.avatar }); S.focus = ''; S.keyNew = '';
+  passo('C'); renderName(); renderCal(); renderBar();
+}
+function annullaModifica(daIndietro) {
+  if (S.adminEdit) { S = nuovoS(); store.del('bozza'); if (!daIndietro) togliPassi(); renderAll(); return; }
+  var bk = S.backup; if (!bk) { renderAll(); return; }
+  S.scelte = bk.scelte; S.commento = bk.commento; S.pubblico = bk.pubblico; S.avatar = bk.avatar; S.edit = false; S.vecchio = ''; S.keyNew = ''; S.focus = ''; S.errore = ''; S.wa = null;
+  store.del('bozza'); if (!daIndietro) togliPassi(); renderAll();
+}
+
+// ---------- invio ----------
+function invia(daCoda) {
+  if (S.invio) return; // doppio tocco / rete che ripete
+  S.errore = ''; S.wa = null; S.keyErr = false;
+  var c = daCoda ? coda() : null, dati, riga;
+  if (c) { dati = c.dati; riga = votoDi(dati.vecchio || dati.nome) || votoDi(dati.nome); }
+  else {
+    var nome = pulisciNome(S.nome), giorni = giorniScelti();
+    if (!nome) { S.nomeErr = true; renderName(); $('nome').focus(); return; }
+    if (!giorni.length) { S.errore = 'Tocca almeno un giorno'; renderBar(); return; }
+    riga = votoDi(S.vecchio || nome) || votoDi(nome);
+    var chiave = '', nuovaChiave = '';
+    if (riga && riga.protetto && !S.adminEdit) {
+      chiave = ricordo.get('chiavi', riga.nome) || S.keyIn.trim();
+      if (!chiave) { renderBar(); var k = $('serve'); if (k) k.focus(); return; }
+      if (S.keyNew && norm(S.keyNew) !== norm(chiave)) nuovaChiave = S.keyNew;
+    } else if (!S.adminEdit) chiave = S.keyNew;
+    dati = { azione: 'vota', nome: nome, vecchio: S.vecchio, commento: S.commento.trim().slice(0, MAX_COMMENTO), vis: S.pubblico ? 'tutti' : 'admin', avatar: S.avatar, chiave: chiave, nuovaChiave: nuovaChiave,
+      visto: S.adminEdit || (riga && ricordo.get('privati', riga.nome)) ? '1' : '', toccato: S.commToccato ? '1' : '',
+      g: giorni.map(function (g) { return S.scelte[g] === TOCCO ? g : g + ':' + S.scelte[g]; }), id: nuovoId() };
+  }
+  var prima = riga ? Object.assign({}, riga, { privato: S.adminEdit ? privati[norm(riga.nome)] || '' : ricordo.get('privati', riga.nome) }) : null;
+  var eraAdmin = !!S.adminEdit, snapS = copia(S);
+  S.invio = true; S.focus = ''; renderAll(); // stato "in corso" SUBITO, prima del fetch; resta fermo anche durante i ritentativi
+  chiama(dati).then(function (res) {
+    S.invio = false;
+    if (!res.ok) {
+      store.del('coda');
+      if (res.codice === 'chiave') {
+        if (riga) ricordo.set('chiavi', riga.nome, '');
+        S.keyErr = !!dati.chiave; renderAll(); var k = $('serve'); if (k) k.focus(); return;
+      }
+      if (res.codice === 'chiuso') carica();
+      S.errore = res.msg || 'Non salvato. Riprova.'; renderAll(); return;
+    }
+    store.del('coda');
+    dopoVoto(dati, riga, prima, eraAdmin, snapS);
+  }, function (err) {
+    S.invio = false;
+    if (!eraAdmin) store.set('coda', { dati: dati, quando: Date.now() }); // rete giu': il voto resta in coda sul telefono e parte da solo (stesso id)
+    S.errore = 'Non salvato: ' + umano(err).replace(/^./, function (s) { return s.toLowerCase(); });
+    S.wa = 'Festa di laurea - voto di ' + dati.nome + ': ' + [].concat(dati.g).map(function (x) { var q = x.split(':'); return dl(q[0], { weekday: 'short', day: 'numeric', month: 'short' }) + (q[1] ? (parti(q[1]).f === 'pom' ? ' pomeriggio' : parti(q[1]).f === 'sera' ? ' sera' : '') + (parti(q[1]).si ? '' : ' forse') : ''); }).join('; ') + (dati.commento && dati.vis === 'tutti' ? '. Commento: ' + dati.commento : '');
+    renderAll();
+  });
+}
+// Dopo la risposta ok del server (mai prima): ricordi del telefono, dati locali, stato "salvato", annulla.
+function dopoVoto(dati, riga, prima, eraAdmin, snapS) {
+  var nome = dati.nome, usata = dati.nuovaChiave || dati.chiave;
+  if (!eraAdmin) {
+    if (usata) ricordo.set('chiavi', nome, usata, riga && riga.nome);
+    ricordo.set('privati', nome, dati.vis === 'admin' ? dati.commento : '', riga && riga.nome);
+  } else {
+    if (riga) delete privati[norm(riga.nome)];
+    if (dati.vis === 'admin' && dati.commento) privati[norm(nome)] = dati.commento;
+  }
+  var giorni = {}; // i giorni non votabili (chiusi, passati) restano quelli di prima, come sul server
+  if (riga) Object.keys(riga.giorni).forEach(function (g) { if (!votabile(g)) giorni[g] = riga.giorni[g]; });
+  [].concat(dati.g).forEach(function (x) { var k = x.indexOf(':'); giorni[k < 0 ? x : x.slice(0, k)] = k < 0 ? TOCCO : x.slice(k + 1); });
+  var nuovo = { nome: nome, giorni: giorni, commento: dati.vis === 'tutti' ? dati.commento : '', protetto: !!(usata || (riga && riga.protetto)), avatar: dati.avatar || '', agg: Date.now() };
+  if (VOTI) VOTI = VOTI.filter(function (v) { return v !== riga && norm(v.nome) !== norm(nome); }).concat(nuovo);
+  store.del('bozza'); togliPassi(); closeSheet(true);
+  if (eraAdmin) {
+    var chiSono = riga && norm(riga.nome) === norm(mio());
+    if (chiSono) store.set('nome', nome);
+    S = nuovoS(); applicaVotoMio(); renderAll();
+    toast('Salvato', function () { return annullaVoto(prima, nuovo, true, snapS); });
+  } else {
+    store.set('nome', nome);
+    S = nuovoS(); applicaVotoMio(); renderAll(); window.scrollTo(0, 0);
+    toast(riga ? 'Salvato' : 'Inviato', function () { return annullaVoto(prima, nuovo, false, snapS); });
   }
   carica();
+}
+// Annulla un voto appena salvato: se prima non c'era si ritira, altrimenti si rimette com'era.
+function annullaVoto(prima, ora, eraAdmin, snapS) {
+  var chiave = eraAdmin ? '' : ricordo.get('chiavi', ora.nome);
+  if (!prima) {
+    return deveOk({ azione: 'ritira', nome: ora.nome, chiave: chiave }).then(function () {
+      VOTI = VOTI.filter(function (v) { return norm(v.nome) !== norm(ora.nome); });
+      if (!eraAdmin) { store.del('nome'); S = snapS; S.invio = false; S.errore = ''; S.wa = null; S.voted = false; S.edit = false; salvaBozza(); } else S = nuovoS();
+      renderAll(); toast('Annullato');
+    });
+  }
+  var c = prima.commento || prima.privato || '', noto = eraAdmin || !!c;
+  return deveOk({ azione: 'vota', nome: prima.nome, vecchio: ora.nome, commento: c, vis: prima.commento ? 'tutti' : 'admin', avatar: prima.avatar || '', chiave: chiave,
+    visto: noto ? '1' : '', toccato: noto ? '1' : '',
+    g: Object.keys(prima.giorni).filter(votabile).map(function (g) { return prima.giorni[g] === TOCCO ? g : g + ':' + prima.giorni[g]; }) }).then(function () {
+    VOTI = VOTI.filter(function (v) { return norm(v.nome) !== norm(ora.nome) && norm(v.nome) !== norm(prima.nome); }).concat(prima);
+    if (!eraAdmin) { ricordo.set('privati', prima.nome, prima.privato, ora.nome); store.set('nome', prima.nome); } else if (prima.privato) privati[norm(prima.nome)] = prima.privato;
+    S = nuovoS(); applicaVotoMio(); renderAll(); toast('Annullato');
+  });
+}
+function nonSei() {
+  closeSheet(); var chi = mio(), prima = copia(S);
+  store.del('nome'); store.del('bozza'); togliPassi(); S = nuovoS(); renderAll();
+  toast('Voto di ' + chi.split(' ')[0] + ' salvato', function () { store.set('nome', chi); S = prima; renderAll(); });
+}
+function ritira() {
+  var eraInModifica = S.edit;
+  closeSheet();
+  var v = votoDi(mio()); if (!v) return;
+  var chiave = ricordo.get('chiavi', v.nome), priv = ricordo.get('privati', v.nome);
+  deveOk({ azione: 'ritira', nome: v.nome, chiave: chiave }).then(function () {
+    VOTI = VOTI.filter(function (x) { return x !== v; }); store.del('nome'); store.del('bozza'); togliPassi(); S = nuovoS(); renderAll();
+    toast('Voto ritirato', function () {
+      var c = v.commento || priv;
+      return deveOk({ azione: 'vota', nome: v.nome, commento: c, vis: v.commento ? 'tutti' : 'admin', avatar: v.avatar || '', chiave: chiave, visto: '1',
+        g: Object.keys(v.giorni).filter(votabile).map(function (g) { return v.giorni[g] === TOCCO ? g : g + ':' + v.giorni[g]; }) }).then(function () {
+        VOTI = VOTI.filter(function (x) { return norm(x.nome) !== norm(v.nome); }).concat(Object.assign({}, v, { agg: Date.now() }));
+        store.set('nome', v.nome); S = nuovoS(); applicaVotoMio(); renderAll();
+      });
+    });
+  }, function (e) { S.errore = e.codice === 'chiave' ? 'Serve la chiave' : 'Non ritirato: ' + umano(e).replace(/^./, function (s) { return s.toLowerCase(); }); S.edit = eraInModifica; renderAll(); });
+}
+
+// ---------- il mio voto salvato -> stato "salvato" ----------
+function applicaVotoMio() {
+  var v = votoDi(mio());
+  if (!v || S.edit || S.adminEdit || S.invio) return;
+  if (S.dirty) return; // una bozza non inviata vince sul voto salvato
+  S.voted = true; S.me = v.nome; S.nome = v.nome; S.scelte = giorniVotabili(v.giorni);
+  S.commento = v.commento || ricordo.get('privati', v.nome); S.pubblico = !!v.commento; S.avatar = v.avatar || ''; S.protetto = !!v.protetto;
+}
+
+// ---------- admin ----------
+function bindPersona() { var b = $('persona'); if (b) b.addEventListener('click', sheetPersona); }
+bindPersona();
+function renderAdmin() {
+  var a = $('adm'); a.hidden = !adminOk; if (!adminOk) return;
+  var i = clear($('admin-in'));
+  function bt(cls, icon, txt, fn, label, id) { var b = el('button', cls || ''); b.type = 'button'; if (id) b.id = id; if (icon) b.appendChild(ico(icon)); b.appendChild(document.createTextNode(txt)); if (label) b.setAttribute('aria-label', label); b.addEventListener('click', fn); i.appendChild(b); }
+  bt('', 'gruppo', String(VOTI ? VOTI.length : 0), function () { sheetPersone(''); }, 'Persone', 'adm-persone');
+  bt('', 'calendario', 'Giorni', sheetGiorni, null, 'adm-giorni');
+  bt('', 'puntini', 'Altro', sheetAdminAltro, 'Altro', 'adm-altro');
+  bt('ee', null, 'Esci', function () { location.href = location.pathname; }, null, 'esci');
+}
+function persona(v, aperta, vai) {
+  var li = el('li'), b = el('button', 'pers'); b.type = 'button'; b.setAttribute('aria-expanded', aperta ? 'true' : 'false'); b.setAttribute('aria-label', v.nome);
+  b.appendChild(av(v.nome)); b.appendChild(el('b', '', v.nome)); if (v.protetto) b.appendChild(ico('lucchetto', 's'));
+  b.appendChild(el('span', 'q', String(Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length))); b.addEventListener('click', vai); li.appendChild(b);
+  if (aperta) {
+    var d = el('div', 'dett');
+    Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).sort().forEach(function (g) {
+      var p = parti(v.giorni[g]), m = el('span', 'mini' + (p.si ? '' : ' f')); m.setAttribute('aria-label', lungo(g) + (p.f === 'pom' ? ', pomeriggio' : p.f === 'sera' ? ', sera' : '') + (p.si ? '' : ', forse'));
+      m.appendChild(el('span', '', dl(g, { weekday: 'short' }))); m.appendChild(el('b', '', String(+g.slice(8))));
+      if (p.f !== 'tutto') m.appendChild(ico(p.f === 'pom' ? 'sole' : 'luna'));
+      d.appendChild(m);
+    });
+    var priv = privati[norm(v.nome)];
+    if (v.commento || priv) { var q = el('p', 'cit'); q.appendChild(ico(v.commento ? 'nuvola' : 'lucchetto', null, v.commento ? 'Commento per tutti' : 'Commento solo per Gilberto')); q.appendChild(document.createTextNode(v.commento || priv)); d.appendChild(q); }
+    var du = el('div', 'duo');
+    var m1 = el('button', 'btn sec'); m1.type = 'button'; m1.setAttribute('aria-label', 'Modifica il voto di ' + v.nome); m1.appendChild(ico('matita')); m1.appendChild(document.createTextNode('Modifica')); m1.firstChild.style.marginRight = '8px';
+    m1.addEventListener('click', function () {
+      S = nuovoS(); S.adminEdit = v.nome; S.vecchio = v.nome; S.nome = v.nome; S.avatar = v.avatar || ''; S.scelte = giorniVotabili(v.giorni);
+      S.commento = v.commento || privati[norm(v.nome)] || ''; S.pubblico = !!v.commento; S.protetto = !!v.protetto;
+       closeSheet(false, function () { passo('C'); renderAll(); window.scrollTo(0, 0); });
+    });
+    var m2 = el('button', 'btn del'); m2.type = 'button'; m2.setAttribute('aria-label', 'Elimina il voto di ' + v.nome); m2.appendChild(ico('cestino')); m2.appendChild(document.createTextNode('Elimina')); m2.firstChild.style.marginRight = '8px';
+    m2.addEventListener('click', function () {
+      closeSheet();
+      deveOk({ azione: 'elimina', nome: v.nome }).then(function () {
+        VOTI = VOTI.filter(function (x) { return x !== v; }); CESTINO.push({ nome: v.nome });
+        if (norm(v.nome) === norm(mio())) { store.del('nome'); S = nuovoS(); }
+        renderAll(); toast(v.nome + ' eliminato', function () { return deveOk({ azione: 'ripristina', nome: v.nome }); });
+      }, function (e) { toast('Non eliminato: ' + umano(e)); });
+    });
+    du.appendChild(m1); du.appendChild(m2); d.appendChild(du);
+    if (v.protetto) {
+      var m3 = el('button', 'btn sec'); m3.type = 'button'; m3.setAttribute('aria-label', 'Togli la chiave di ' + v.nome); m3.appendChild(ico('chiave')); m3.appendChild(document.createTextNode('Togli la chiave')); m3.firstChild.style.marginRight = '8px';
+      m3.addEventListener('click', function () {
+        closeSheet();
+        deveOk({ azione: 'togliChiave', nome: v.nome }).then(function (res) {
+          v.protetto = false; renderAll();
+          toast('Chiave tolta', res.hash ? function () { return deveOk({ azione: 'rimettiChiave', nome: v.nome, hash: res.hash }); } : null);
+        }, function (e) { toast('Non riuscito: ' + umano(e)); });
+      });
+      d.appendChild(m3);
+    }
+    li.appendChild(d);
+  }
+  return li;
+}
+function sheetPersone(aperta) {
+  function head(s) { var t = el('div', 'sh-t'); t.appendChild(document.createTextNode('Persone')); var n = el('span', '', ' ' + (VOTI ? VOTI.length : 0)); n.style.cssText = 'margin-left:8px;color:var(--mut);font-weight:600'; t.appendChild(n); var x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Chiudi'); x.addEventListener('click', function () { closeSheet(); }); t.appendChild(x); s.appendChild(t); }
+  function build(s) {
+    var ul = el('ul', 'lista');
+    (VOTI || []).slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) { ul.appendChild(persona(v, v.nome === aperta, function () { aperta = aperta === v.nome ? '' : v.nome; clear(s); s.appendChild(el('div', 'mani')); head(s); build(s); })); });
+    s.appendChild(ul);
+    // Mancano: invitati che non hanno ancora votato + messaggio pronto per il gruppo
+    var manca = INVITATI.filter(function (n) { return !votoDi(n); });
+    var h = el('h3', 'sh-t', 'Mancano'); h.style.marginTop = '18px'; h.id = 'mancano-t'; var n2 = el('span', '', ' ' + manca.length); n2.style.cssText = 'margin-left:8px;color:var(--mut);font-weight:600'; h.appendChild(n2); s.appendChild(h);
+    var ch = el('div', 'chips'); ch.id = 'mancano'; manca.forEach(function (n) { var c = el('span', 'chip'); c.appendChild(av(n, '')); c.appendChild(document.createTextNode(n)); ch.appendChild(c); }); s.appendChild(ch);
+  }
+  sheet('Persone', function (s) { clear(s); s.appendChild(el('div', 'mani')); head(s); build(s); });
+}
+function sheetGiorni() {
+  sheet('Giorni', function (s) {
+    var tmp = TUTTI.filter(function (g) { return aperti.indexOf(g) >= 0; }), wrap = el('div'); // tmp = giorni aperti
+    function ridisegna() {
+      clear(wrap); var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
+      Object.keys(mesi).sort().forEach(function (mk) {
+        var y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, lead = (new Date(Date.UTC(y, mm, 1)).getUTCDay() + 6) % 7, h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize';
+        var cal = el('div', 'cal'), i; for (i = 0; i < lead; i++) cal.appendChild(el('div', 'g vuoto'));
+        mesi[mk].forEach(function (g) {
+          var ap = tmp.indexOf(g) >= 0, b = el('button', 'g ' + (ap ? 'aperto-adm' : 'chiuso-adm'), String(+g.slice(8))); b.type = 'button'; b.setAttribute('data-g', g);
+          b.setAttribute('aria-pressed', ap ? 'true' : 'false'); b.setAttribute('aria-label', lungo(g) + (ap ? ', aperto' : ', chiuso'));
+          b.addEventListener('click', function () { var k = tmp.indexOf(g); if (k < 0) tmp.push(g); else tmp.splice(k, 1); ridisegna(); var q = wrap.querySelector('[data-g="' + g + '"]'); if (q) q.focus(); }); cal.appendChild(b);
+        });
+        wrap.appendChild(h); wrap.appendChild(cal);
+      });
+    }
+    ridisegna(); s.appendChild(wrap);
+    var ok = el('button', 'btn', 'Salva'); ok.type = 'button'; ok.id = 'salva-giorni';
+    ok.addEventListener('click', function () {
+      if (!tmp.length) { toast('Lascia aperto almeno un giorno'); return; }
+      var era = aperti.slice(), nuovi = TUTTI.filter(function (g) { return tmp.indexOf(g) >= 0; });
+      closeSheet();
+      deveOk({ azione: 'giorni', g: nuovi }).then(function () {
+        aperti = nuovi; Object.keys(S.scelte).forEach(function (g) { if (aperti.indexOf(g) < 0) delete S.scelte[g]; }); renderAll();
+        toast('Giorni salvati', function () { return deveOk({ azione: 'giorni', g: era }).then(function () { aperti = era; renderAll(); }); });
+      }, function (e) { toast('Non salvato: ' + umano(e)); });
+    });
+    s.appendChild(ok);
+  });
+}
+function sheetAdminAltro() {
+  sheet('Altro', function (s) {
+    function riga(i, t, n, fn, id) { var b = el('button', 'riga-a'); b.type = 'button'; if (id) b.id = id; b.appendChild(ico(i)); b.appendChild(document.createTextNode(t)); if (n !== null) b.appendChild(el('span', 'n', String(n))); b.addEventListener('click', fn); s.appendChild(b); }
+    riga('calendario', 'Scadenza', null, sheetScadenza, 'riga-scadenza');
+    riga('spunta', 'Scegli la data', null, sheetData, 'riga-data');
+    riga('cestino', 'Cestino', CESTINO.length, sheetCestino, 'riga-cestino');
+    riga('matita', 'Aspetto', null, sheetAspetto, 'riga-aspetto');
+  });
+}
+function sheetScadenza() {
+  sheet('Scadenza', function (s) {
+    var i = el('input'); i.type = 'date'; i.id = 'scad-in'; i.value = SCAD; i.min = OGGI; i.setAttribute('aria-label', 'Scadenza'); i.placeholder = 'aaaa-mm-gg'; s.appendChild(i);
+    var du = el('div', 'duo'), ok = el('button', 'btn', 'Salva'), no = el('button', 'btn sec', 'Togli'); ok.type = no.type = 'button'; ok.id = 'scad-salva'; no.id = 'scad-togli';
+    function manda(v, testo) {
+      if (v && !/^\d{4}-\d\d-\d\d$/.test(v)) { toast('Data non valida (aaaa-mm-gg)'); return; }
+      var era = SCAD; closeSheet();
+      deveOk({ azione: 'scadenza', data: v }).then(function () { SCAD = v; renderAll(); toast(testo, function () { return deveOk({ azione: 'scadenza', data: era }).then(function () { SCAD = era; renderAll(); }); }); }, function (e) { toast('Non salvato: ' + umano(e)); });
+    }
+    ok.addEventListener('click', function () { manda(i.value.trim(), 'Scadenza salvata'); }); no.addEventListener('click', function () { manda('', 'Scadenza tolta'); });
+    du.appendChild(ok); du.appendChild(no); s.appendChild(du);
+  });
+}
+function sheetData() {
+  sheet('Scegli la data', function (s) {
+    var tot = {}; TUTTI.forEach(function (g) { tot[g] = (VOTI || []).filter(function (v) { return v.giorni[g] && parti(v.giorni[g]).si; }).length; });
+    var top = TUTTI.filter(function (g) { return aperti.indexOf(g) >= 0 && g >= OGGI; }).sort(function (a, b) { return tot[b] - tot[a] || (a < b ? -1 : 1); }).slice(0, 3), sel = top[0], bts = [];
+    top.forEach(function (g) {
+      var b = el('button', 'rad'); b.type = 'button'; b.setAttribute('data-g', g); b.setAttribute('aria-pressed', g === sel ? 'true' : 'false');
+      var m = el('span', 'mini'); m.appendChild(el('span', '', dl(g, { weekday: 'short' }))); m.appendChild(el('b', '', String(+g.slice(8)))); b.appendChild(m);
+      b.appendChild(document.createTextNode(dl(g, { weekday: 'long', day: 'numeric', month: 'long' }))); var cn = el('span', '', String(tot[g])); cn.style.cssText = 'margin-left:auto;color:var(--mut)'; b.appendChild(cn);
+      b.addEventListener('click', function () { sel = g; bts.forEach(function (x) { x[0].setAttribute('aria-pressed', x[1] === g ? 'true' : 'false'); }); }); bts.push([b, g]); s.appendChild(b);
+    });
+    var ok = el('button', 'btn'); ok.type = 'button'; ok.id = 'chiudi-voti'; ok.appendChild(ico('lucchetto')); ok.firstChild.style.marginRight = '8px'; ok.appendChild(document.createTextNode('Chiudi i voti'));
+    ok.addEventListener('click', function () {
+      if (!sel) return; var scelta = sel; closeSheet();
+      deveOk({ azione: 'scegliData', data: scelta }).then(function () { DECISA = scelta; S.focus = ''; renderAll(); toast(dl(scelta, { weekday: 'short', day: 'numeric', month: 'short' }) + ' scelto', riapri); }, function (e) { toast('Non riuscito: ' + umano(e)); });
+    });
+    s.appendChild(ok);
+  });
+}
+function riapri() {
+  var era = DECISA;
+  return deveOk({ azione: 'riapri' }).then(function () { DECISA = ''; applicaVotoMio(); renderAll(); toast('Voti riaperti', function () { return deveOk({ azione: 'scegliData', data: era }).then(function () { DECISA = era; renderAll(); }); }); }, function (e) { toast('Non riuscito: ' + umano(e)); });
+}
+function sheetCestino() {
+  sheet('Cestino', function (s) {
+    if (!CESTINO.length) return;
+    var ul = el('ul', 'lista');
+    CESTINO.slice().reverse().forEach(function (v) {
+      var li = el('li'), r = el('div', 'pers'); r.appendChild(av(v.nome, '')); r.appendChild(el('b', '', v.nome));
+      var b = el('button', 'btn sec', 'Ripristina'); b.type = 'button'; b.style.cssText = 'width:auto;margin:0;padding:0 14px;min-height:46px;font-size:16px'; b.setAttribute('aria-label', 'Ripristina il voto di ' + v.nome);
+      b.addEventListener('click', function () {
+        closeSheet();
+        deveOk({ azione: 'ripristina', nome: v.nome }).then(function () { CESTINO = CESTINO.filter(function (x) { return x !== v; }); toast(v.nome + ' ripristinato', function () { return deveOk({ azione: 'elimina', nome: v.nome }); }); carica(); }, function (e) { toast('Non ripristinato: ' + umano(e)); });
+      });
+      r.appendChild(b); li.appendChild(r); ul.appendChild(li);
+    });
+    s.appendChild(ul);
+  });
+}
+function sheetAspetto() { // tocco = anteprima solo qui; "Applica a tutti" salva; "Annulla" torna al salvato
+  sheet('Aspetto', function (s) {
+    var scelta = Object.assign({}, aspettoSalvato);
+    Object.keys(ASPETTO_OPZIONI).forEach(function (k) {
+      var nomi = ASPETTO_NOMI[k], sg = el('div', 'seg'); sg.id = 'asp-' + k; sg.setAttribute('role', 'group'); sg.setAttribute('aria-label', nomi[0]);
+      ASPETTO_OPZIONI[k].forEach(function (o, i) {
+        var b = el('button', '', nomi[i + 1]); b.type = 'button'; b.setAttribute('data-o', o); b.setAttribute('aria-pressed', (scelta[k] || ASPETTO_OPZIONI[k][0]) === o ? 'true' : 'false');
+        b.addEventListener('click', function () { scelta[k] = o; anteprima = scelta; applicaAspetto(scelta); Array.prototype.forEach.call(sg.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); sg.appendChild(b);
+      });
+      s.appendChild(sg);
+    });
+    var du = el('div', 'duo'), ok = el('button', 'btn', 'Applica a tutti'), no = el('button', 'btn sec', 'Annulla'); ok.type = no.type = 'button'; ok.id = 'asp-applica'; no.id = 'asp-annulla';
+    ok.addEventListener('click', function () {
+      var era = Object.assign({}, aspettoSalvato), dati = { azione: 'aspetto' }; Object.keys(scelta).forEach(function (k) { dati['a_' + k] = scelta[k]; });
+      closeSheet();
+      deveOk(dati).then(function () {
+        aspettoSalvato = Object.assign({}, scelta); anteprima = null; store.set('aspetto', aspettoSalvato);
+        toast('Aspetto applicato', function () { var a = { azione: 'aspetto' }; Object.keys(ASPETTO_OPZIONI).forEach(function (k) { a['a_' + k] = era[k] || ASPETTO_OPZIONI[k][0]; }); return deveOk(a).then(function () { aspettoSalvato = era; store.set('aspetto', era); applicaAspetto(era); }); });
+      }, function (e) { applicaAspetto(aspettoSalvato); toast('Non applicato: ' + umano(e)); });
+    });
+    no.addEventListener('click', function () { anteprima = null; applicaAspetto(aspettoSalvato); closeSheet(); });
+    du.appendChild(ok); du.appendChild(no); s.appendChild(du);
+  });
+}
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+
+// ---------- avvio, aggiornamenti ----------
+var firmaCalendario = null;
+function carica() {
+  var io = ++giro;
+  return fetch(SERVER, { signal: timeout(30000) }).then(function (r) { return r.json(); }).then(function (res) {
+    if (!res || !res.ok || !Array.isArray(res.voti)) throw new SyntaxError('risposta');
+    return res;
+  }).then(function (res) {
+    if (io !== giro) return;
+    ultimoGet = Date.now();
+    if ((res.paginaMinima || 0) > VERSIONE && !S.invio) { // pagina vecchia rispetto al server: si ricarica da sola, una volta, con la bozza salvata
+      var gia = false;
+      try { gia = sessionStorage.getItem('ricarica') === String(res.paginaMinima); sessionStorage.setItem('ricarica', String(res.paginaMinima)); } catch (e) { gia = true; }
+      if (!gia) { salvaBozza(); location.reload(); return; }
+    }
+    var nuovaFirmaCalendario = JSON.stringify([res.voti, res.aperti, res.tutti, res.oggi, res.chiuso, res.dataScelta]);
+    var calendarioCambiato = nuovaFirmaCalendario !== firmaCalendario;
+    firmaCalendario = nuovaFirmaCalendario;
+    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; OGGI = res.oggi || OGGI;
+    DECISA = res.chiuso ? res.dataScelta : ''; SCAD = res.scadenza || ''; S.letturaKo = false;
+    aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
+    var passo2 = ADMIN ? chiama({ azione: 'verifica' }).then(function (v) {
+      if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; } else { ADMIN = ''; adminOk = false; }
+    }, function () { /* rete: si riprova al prossimo caricamento */ }) : Promise.resolve();
+    return passo2.then(function () {
+      if (io !== giro) return;
+      if (!S.invio) {
+        // il voto salvato sul server non c'e' piu' (eliminato da Gilberto): si torna al modulo vuoto
+        if (S.voted && !S.edit && !votoDi(S.me)) { var nm = S.nome; S = nuovoS(); S.nome = nm; calendarioCambiato = true; }
+        applicaVotoMio();
+        if (S.nome.trim() && !S.voted && !S.adminEdit) controllaNome();
+      }
+      renderAll(!calendarioCambiato);
+      document.body.setAttribute('data-pronto', '1'); // voti arrivati (i test aspettano questo)
+      if (coda() && !S.invio) invia(true); // voto rimasto in coda (rete giu'): riparte da solo, stesso id
+    });
+  }).catch(function () {
+    if (io !== giro) return;
+    if (!VOTI) { S.letturaKo = true; renderStato(); }
+  });
+}
+// Dati vecchi: la pagina che torna visibile dopo piu' di un minuto ricarica i voti; torna la rete: parte il voto in coda.
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && Date.now() - ultimoGet > RICARICA_MS && !S.invio) carica(); });
+window.addEventListener('resize', function () { renderFila(); });
+window.addEventListener('online', function () { if (coda() && !S.invio) invia(true); });
+document.addEventListener('focusin', function (e) { var id = e.target.id; if (id === 'commento' || id === 'chiave') setTimeout(function () { try { e.target.scrollIntoView({ block: 'center' }); } catch (x) {} }, 300); });
+
+// Bozza non inviata (ricarica, indietro, telefono spento): si riprende da dove si era. Viene dal telefono, anche da una versione vecchia: valori non validi = un tocco.
+(function () {
+  var bz = store.get('bozza');
+  if (bz && typeof bz === 'object' && bz.scelte && typeof bz.scelte === 'object' && (Object.keys(bz.scelte).length || bz.nome)) {
+    S.nome = String(bz.nome || ''); S.avatar = AVATARI.indexOf(bz.avatar) >= 0 ? bz.avatar : ''; S.commento = String(bz.commento || '').slice(0, MAX_COMMENTO); S.pubblico = !!bz.pubblico;
+    S.commToccato = !!bz.commToccato; S.vecchio = String(bz.vecchio || ''); S.keyNew = String(bz.keyNew || ''); S.dirty = true;
+    Object.keys(bz.scelte).forEach(function (g) { if (/^\d{4}-\d\d-\d\d$/.test(g)) S.scelte[g] = VALIDO.test(bz.scelte[g]) ? bz.scelte[g] : TOCCO; });
+  }
+  renderAll();
+  carica();
+})();
 </script>
 </body>
 </html>
