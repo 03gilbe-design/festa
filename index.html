@@ -222,8 +222,8 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 @-webkit-keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
 @keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
 .carico .g[data-g]{background-image:none;background-color:#dfe3e8;color:transparent;pointer-events:none;opacity:.72}
-.carico .g.sk-onda{-webkit-animation:accendi 2.8s ease-in-out infinite;animation:accendi 2.8s ease-in-out infinite}
-.carico .g.sk-ferma{opacity:.72}
+.carico .g.sk-onda{-webkit-animation:accendi 2.4s ease-in-out infinite;animation:accendi 2.4s ease-in-out infinite}
+.carico .g.sk-ferma{-webkit-animation:accendi 2.4s ease-in-out -1.2s infinite;animation:accendi 2.4s ease-in-out -1.2s infinite}
 .carico .g[data-g] .o{opacity:0}
 .caricamento{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 8px;color:var(--ink);font-weight:700}
 .caricamento .spin{flex:none;border-color:var(--line);border-top-color:var(--acc)}
@@ -314,8 +314,6 @@ header h1 { padding-right: 50px; }
 @media (prefers-reduced-motion: reduce) { .g .o.sk { -webkit-animation: none; animation: none; } }
 .invia .ico { width: 22px; height: 22px; }
 .bar .ib:not([aria-disabled]) .ico{color:var(--acc)}
-.g.x.nx{text-decoration:none;flex-direction:column;line-height:1.05;font-weight:600}
-.g.x.nx small{display:block;font-size:11px;font-weight:600;text-decoration:none}
 .bar .ib{background:var(--acc)}
 .bar .ib .ico,.bar .ib:not([aria-disabled]) .ico{color:var(--onacc)}
 </style>
@@ -458,6 +456,7 @@ var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
 var INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var T_AVVIO = Date.now();
 var cachePagina = store.get('cachePagina');
 if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.quando < 43200000 && Array.isArray(cachePagina.voti) && Array.isArray(cachePagina.aperti) && Array.isArray(cachePagina.tutti)) {
   VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; OGGI = cachePagina.oggi || OGGI;
@@ -887,7 +886,9 @@ function sugg() {
   box.appendChild(ul);
 }
 
+var SPILL = {};
 function renderCal() {
+  SPILL = {};
   var c = clear($('cal')), conta = {}, max = 1;
   if (c.classList) c.classList[VOTI ? 'remove' : 'add']('carico'); // finche' i voti non arrivano: tessere con la luce che scorre (come YouTube)
   c.setAttribute('aria-busy', VOTI ? 'false' : 'true');
@@ -897,13 +898,9 @@ function renderCal() {
   Object.keys(mesi).sort().forEach(function (mk) {
     var giorni = mesi[mk], y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, first = new Date(Date.UTC(y, mm, 1)), n = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
     var celle = [], i;
-    for (i = 0; i < lead; i++) celle.push(el('div', 'g vuoto'));
-    for (var d = 1; d <= n; d++) {
-      var iso = mk + '-' + (d < 10 ? '0' : '') + d;
-      if (giorni.indexOf(iso) < 0) { celle.push(el('div', 'g vuoto')); continue; }
-      if (!avail(iso)) { var x = el('div', 'g x', String(d)); x.setAttribute('aria-hidden', 'true'); celle.push(x); continue; } // passato, chiuso o voti chiusi: stesso segno
+    function tessera(iso, d, y, mm) {
       var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
-      if (!VOTI) { var wd = new Date(Date.UTC(y, mm, d)).getUTCDay(), onda = wd !== 0 && wd !== 6 && d % 3 === 1; b.disabled = true; b.className += onda ? ' sk-onda' : ' sk-ferma'; if (onda) { b.style.webkitAnimationDelay = (-d * 170) + 'ms'; b.style.animationDelay = (-d * 170) + 'ms'; } }
+      if (!VOTI) { b.disabled = true; b.className += (d + y + mm) % 2 ? ' sk-onda' : ' sk-ferma'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
@@ -915,14 +912,22 @@ function renderCal() {
       b.setAttribute('aria-label', lungo(iso) + (mine ? ', ci sei' + (p.f === 'pom' ? ', pomeriggio' : p.f === 'sera' ? ', sera' : '') + (p.si ? '' : ', forse') : '') + (iso === OGGI ? ', oggi' : '') + (nn ? ', ' + nn + (nn === 1 ? ' altro' : ' altri') : ''));
       b.setAttribute('aria-pressed', mine ? 'true' : 'false');
       b.addEventListener('click', onDay);
-      celle.push(b);
+      return b;
+    }
+    for (i = 0; i < lead; i++) celle.push(el('div', 'g vuoto'));
+    for (var d = 1; d <= n; d++) {
+      var iso = mk + '-' + (d < 10 ? '0' : '') + d;
+      if (giorni.indexOf(iso) < 0 || SPILL[iso]) { celle.push(el('div', 'g vuoto')); continue; }
+      if (!avail(iso)) { var x = el('div', 'g x', String(d)); x.setAttribute('aria-hidden', 'true'); celle.push(x); continue; } // passato, chiuso o voti chiusi: stesso segno
+      celle.push(tessera(iso, d, y, mm));
     }
     // caselle vuote in fondo all'ultima riga: i giorni del mese dopo che esistono ma non si possono scegliere vanno li' (barrati), non in una riga a parte
     var segue = new Date(Date.UTC(y, mm, n)), vuote = (7 - celle.length % 7) % 7;
     while (vuote > 0) {
       segue = new Date(segue.getTime() + 86400000);
       var si_ = segue.toISOString().slice(0, 10);
-      if (TUTTI.indexOf(si_) >= 0 && !avail(si_)) { var xs = el('div', 'g x nx', String(segue.getUTCDate())); xs.appendChild(el('small', '', 'nov')); xs.setAttribute('aria-hidden', 'true'); celle.push(xs); vuote--; }
+      if (TUTTI.indexOf(si_) >= 0 && !avail(si_)) { var xs = el('div', 'g x', String(segue.getUTCDate())); xs.setAttribute('aria-hidden', 'true'); celle.push(xs); SPILL[si_] = 1; vuote--; }
+      else if (TUTTI.indexOf(si_) >= 0 && si_.slice(0, 7) !== mk) { SPILL[si_] = 1; celle.push(tessera(si_, +si_.slice(8), +si_.slice(0, 4), +si_.slice(5, 7) - 1)); vuote--; }
       else { while (vuote-- > 0) celle.push(el('div', 'g vuoto')); }
     }
     var h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize';
@@ -1322,7 +1327,8 @@ function carica() {
   var io = ++giro;
   return fetch(SERVER, { signal: timeout(30000) }).then(function (r) { return r.json(); }).then(function (res) {
     if (!res || !res.ok || !Array.isArray(res.voti)) throw new SyntaxError('risposta');
-    return res;
+    var w = !VOTI ? Math.max(0, 1500 - (Date.now() - T_AVVIO)) : 0; // la prima volta l'animazione resta visibile almeno 1,5 s
+    return w ? new Promise(function (ok) { setTimeout(function () { ok(res); }, w); }) : res;
   }).then(function (res) {
     if (io !== giro) return;
     ultimoGet = Date.now();
