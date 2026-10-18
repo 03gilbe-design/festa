@@ -221,7 +221,10 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 
 @-webkit-keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
 @keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
-.carico .g[data-g]{background-image:none;background-color:#e3e6ea;-webkit-animation:accendi 1.6s ease-in-out infinite;animation:accendi 1.6s ease-in-out infinite;color:var(--mut)}
+.carico .g[data-g]{background-image:none;background-color:#e3e6ea;-webkit-animation:accendi 1.6s ease-in-out infinite;animation:accendi 1.6s ease-in-out infinite;color:transparent;pointer-events:none}
+.carico .g[data-g] .o{opacity:0}
+.caricamento{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 8px;color:var(--ink);font-weight:700}
+.caricamento .spin{flex:none;border-color:var(--line);border-top-color:var(--acc)}
 @media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}@keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}.carico .g[data-g]{background-color:#2b2f36}}
 @media (prefers-reduced-motion:reduce){.carico .g[data-g]{-webkit-animation:none;animation:none}}
 
@@ -287,7 +290,7 @@ body.invio .ib, body.invio .sugg { pointer-events: none; }
 .nome input:focus { outline: none; border-color: var(--acc); }
 .av.vuoto .ico { width: 55%; height: 55%; color: var(--mut); }
 .fila-b { display: flex; align-items: center; max-width: 100%; min-height: 44px; margin-right: -4px; padding: 0; border: 0; background: none; color: var(--mut); }
-.fila-c { display: flex; align-items: center; min-width: 0; padding-left: 8px; overflow: hidden; }
+.fila-c { display: flex; align-items: center; min-width: 0; padding-left: 8px; overflow: visible; }
 .fl { position: relative; flex: none; width: 30px; height: 30px; margin-left: -8px; border-radius: 50%; box-shadow: 0 0 0 2px var(--bg); background: var(--bg); }
 .fl .av { width: 100%; height: 100%; font-size: 14px; }
 .fl.io { z-index: 1; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--acc); }
@@ -387,7 +390,7 @@ var VERSIONE = 2;                 // se il server dice paginaMinima > VERSIONE l
 var DAL = '2026-10-19', AL = '2026-11-29', CHIUSI0 = ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-07']; // come Code.gs: si disegna subito, poi il server conferma
 var TOCCO = 'tutto|si';
 var VALIDO = /^(tutto|pom|sera)\|(si|forse)$/;
-var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 6000, RICARICA_MS = 60000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
+var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 6000, RICARICA_MS = 60000, AGGIORNA_LIVE_MS = 30000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
 var AVATARI = ['jeans', 'gpt', 'claude', 'razzo', 'medico', 'soldi', 'computer', 'gatto', 'cane', 'pizza', 'palla', 'chitarra', 'caffe', 'fiore', 'sole', 'gufo', 'cappello', 'brindisi', 'libro', 'fotocamera', 'ironman', 'drink', 'hennessy', 'jack', 'gemini', 'sigaretta', 'gattino'];   // elenco generato da assembla_v3.py dagli id a-... dello sprite (i nuovi in fondo)
 // Aspetto (admin): UGUALE a ASPETTO_OPZIONI in Code.gs, prima opzione = predefinita. Classe su <body> per l'opzione non predefinita.
 var ASPETTO_OPZIONI = { stile: ['pulito', 'mano'], colore: ['blu', 'verde'], weekend: ['grande', 'uguale'] };
@@ -617,6 +620,7 @@ function chipsChiViene(iso, tutti, max) { // chi ha detto di esserci quel giorno
   var ch = el('div', 'chips'); ch.className += ' chiviene';
   (tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso)).slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) {
     var t = notaDi(v.commento, iso), c = el('span', 'chip' + (t ? ' conn' : '')), nm = v.nome.split(' ')[0] + (/forse/.test(v.giorni[iso]) ? ' ?' : '');
+    c.setAttribute('data-nome', norm(v.nome)); c.setAttribute('aria-label', v.nome + (t ? ': ' + t : ''));
     c.appendChild(av(v.nome, v.avatar || ''));
     if (t) { var cb = el('span', 'cb'); cb.appendChild(el('span', 'cn2', nm)); cb.appendChild(el('span', 'ct', t)); c.appendChild(cb); } else c.appendChild(document.createTextNode(nm));
     ch.appendChild(c);
@@ -815,7 +819,7 @@ function renderName() {
   row.appendChild(inp);
   b.appendChild(row);
   if (S.voted && !S.edit) {
-    var cambiaB = el('button', 'btn sec cambia-nome'); cambiaB.type = 'button'; cambiaB.id = 'b'; cambiaB.appendChild(ico('matita')); cambiaB.appendChild(document.createTextNode('Modifica il tuo voto'));
+    var cambiaB = el('button', 'btn sec cambia-nome'); cambiaB.type = 'button'; cambiaB.id = 'modifica-voto'; cambiaB.appendChild(ico('matita')); cambiaB.appendChild(document.createTextNode('Modifica il tuo voto'));
     cambiaB.addEventListener('click', cambia); b.appendChild(cambiaB);
   }
   var sl = el('div'); sl.id = 'sugg'; b.appendChild(sl); sugg();
@@ -874,6 +878,8 @@ function sugg() {
 function renderCal() {
   var c = clear($('cal')), conta = {}, max = 1;
   if (c.classList) c.classList[VOTI ? 'remove' : 'add']('carico'); // finche' i voti non arrivano: tessere con la luce che scorre (come YouTube)
+  c.setAttribute('aria-busy', VOTI ? 'false' : 'true');
+  if (!VOTI) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
@@ -884,7 +890,7 @@ function renderCal() {
       var iso = mk + '-' + (d < 10 ? '0' : '') + d;
       if (giorni.indexOf(iso) < 0) { celle.push(el('div', 'g vuoto')); continue; }
       if (!avail(iso)) { var x = el('div', 'g x', String(d)); x.setAttribute('aria-hidden', 'true'); celle.push(x); continue; } // passato, chiuso o voti chiusi: stesso segno
-      var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
+      var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d))); if (!VOTI) { b.disabled = true; b.style.webkitAnimationDelay = (-d * 90) + 'ms'; b.style.animationDelay = (-d * 90) + 'ms'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
@@ -919,7 +925,7 @@ function renderCal() {
 function onDay(e) {
   document.body.classList.remove('kb'); // si sta toccando il calendario: la barra torna fissa
   var iso = e.currentTarget.getAttribute('data-g');
-  if (S.invio || DECISA) return;
+  if (!VOTI || S.invio || DECISA) return;
   if (!editable()) { sheetChiViene(iso); return; }
   if (!S.scelte[iso]) { S.scelte[iso] = TOCCO; S.focus = iso; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
   else togliGiorno(iso); // secondo tocco = toglie (i dettagli stanno nel foglio del pulsante accanto a Invia)
@@ -944,7 +950,8 @@ function renderBar() {
   if (document.activeElement && document.activeElement.id === 'serve' && !S.invio && !S.errore) return;
   var bar = $('bar'), tz = bar.querySelector('.toast');
   Array.prototype.slice.call(bar.children).forEach(function (c) { if (c !== tz) bar.removeChild(c); });
-  if (S.voted && !S.edit) return;
+  bar.hidden = !!(S.voted && !S.edit);
+  if (bar.hidden) return;
   var ex = esiste(), needKey = ex && ex.protetto && !S.adminEdit && !ricordo.get('chiavi', ex.nome);
   if (S.errore) { // messaggio umano + (se la rete e' giu') il bottone WhatsApp
     var er = el('div', 'errbox'); er.id = 'errore'; er.setAttribute('role', 'alert'); er.appendChild(document.createTextNode(S.errore)); bar.appendChild(er);
@@ -1339,6 +1346,7 @@ function carica() {
 }
 // Dati vecchi: la pagina che torna visibile dopo piu' di un minuto ricarica i voti; torna la rete: parte il voto in coda.
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && Date.now() - ultimoGet > RICARICA_MS && !S.invio) carica(); });
+setInterval(function () { if (document.visibilityState === 'visible' && Date.now() - ultimoGet >= AGGIORNA_LIVE_MS && !S.invio && !S.dirty && !S.edit && !S.adminEdit) carica(); }, 5000);
 window.addEventListener('resize', function () { renderFila(); });
 window.addEventListener('online', function () { if (coda() && !S.invio) invia(true); });
 document.addEventListener('focusin', function (e) { var id = e.target.id; if (id === 'commento' || id === 'chiave') setTimeout(function () { try { e.target.scrollIntoView({ block: 'center' }); } catch (x) {} }, 300); });
