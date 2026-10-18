@@ -212,6 +212,12 @@ body.mano .squig, body.mano .av svg, body.mano h1 { -webkit-filter: url(#mano); 
 body.mano .squig { stroke-width: 4; }
 body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .cal > * { font-size: 17px !important; }
 
+@-webkit-keyframes shim{0%{background-position:150% 0}100%{background-position:-50% 0}}
+@keyframes shim{0%{background-position:150% 0}100%{background-position:-50% 0}}
+.carico .g[data-g]{background-image:-webkit-linear-gradient(left,rgba(255,255,255,0) 20%,rgba(255,255,255,.85) 50%,rgba(255,255,255,0) 80%);background-image:linear-gradient(90deg,rgba(255,255,255,0) 20%,rgba(255,255,255,.85) 50%,rgba(255,255,255,0) 80%);background-size:60% 100%;background-repeat:no-repeat;background-color:var(--line);-webkit-animation:shim 1.1s linear infinite;animation:shim 1.1s linear infinite;color:var(--mut)}
+@media (prefers-color-scheme:dark){.carico .g[data-g]{background-image:-webkit-linear-gradient(left,rgba(255,255,255,0) 20%,rgba(255,255,255,.18) 50%,rgba(255,255,255,0) 80%);background-image:linear-gradient(90deg,rgba(255,255,255,0) 20%,rgba(255,255,255,.18) 50%,rgba(255,255,255,0) 80%)}}
+@media (prefers-reduced-motion:reduce){.carico .g[data-g]{-webkit-animation:none;animation:none}}
+
 .cbox{margin-top:8px;border:2px solid var(--fill);border-radius:12px;overflow:hidden;background:var(--bg)}
 .sheet .cbox .dnote{margin:0;border:0;border-radius:0;background:transparent}
 .sheet .cbox .seg.vis{margin:0;border-radius:0;background:var(--fill)}
@@ -848,6 +854,7 @@ function sugg() {
 
 function renderCal() {
   var c = clear($('cal')), conta = {}, max = 1;
+  if (c.classList) c.classList[VOTI ? 'remove' : 'add']('carico'); // finche' i voti non arrivano: tessere con la luce che scorre (come YouTube)
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
