@@ -468,7 +468,7 @@ var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
 var INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
-var T_AVVIO = Date.now(), CARICO = true; // CARICO: animazione di caricamento a ogni apertura, anche con i dati in cache
+var T_AVVIO = Date.now(), CARICO = !/[?&]admin=/.test(location.search); // niente animazione per l'admin; // CARICO: animazione di caricamento a ogni apertura, anche con i dati in cache
 var cachePagina = store.get('cachePagina');
 if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.quando < 43200000 && Array.isArray(cachePagina.voti) && Array.isArray(cachePagina.aperti) && Array.isArray(cachePagina.tutti)) {
   VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; OGGI = cachePagina.oggi || OGGI;
