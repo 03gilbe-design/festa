@@ -212,6 +212,11 @@ body.mano .squig, body.mano .av svg, body.mano h1 { -webkit-filter: url(#mano); 
 body.mano .squig { stroke-width: 4; }
 body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .cal > * { font-size: 17px !important; }
 
+.sheet.sx{padding-top:58px}
+.sheet.sx .mani{position:absolute;top:8px;left:50%;margin-left:-20px}
+
+.sheet .xc{position:absolute;top:10px;right:12px;z-index:2;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--fill);color:var(--ink);font-size:26px;font-weight:600;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
+
 @-webkit-keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
 @keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
 .carico .g[data-g]{background-image:none;background-color:#e3e6ea;-webkit-animation:accendi 1.6s ease-in-out infinite;animation:accendi 1.6s ease-in-out infinite;color:var(--mut)}
@@ -574,6 +579,10 @@ function sheet(titolo, build, senzaTesta) { // senzaTesta: niente titolo ne' x (
   var x = null;
   if (!senzaTesta) { var t = el('div', 'sh-t'); t.appendChild(document.createTextNode(titolo));
     x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Chiudi'); x.addEventListener('click', function () { closeSheet(); }); t.appendChild(x); s.appendChild(t); }
+  if (senzaTesta) { s.className += ' sx'; var xc = el('button', 'xc', '×'); xc.type = 'button'; xc.setAttribute('aria-label', 'Chiudi'); xc.addEventListener('click', function () { closeSheet(); }); s.appendChild(xc); }
+  var ty = null, tx = 0; // trascinare il foglio verso il basso (dall'inizio) lo chiude
+  s.addEventListener('touchstart', function (e) { ty = s.scrollTop > 0 ? null : e.touches[0].clientY; tx = e.touches[0].clientX; }, { passive: true });
+  s.addEventListener('touchmove', function (e) { if (ty === null) return; var dy = e.touches[0].clientY - ty, dx = e.touches[0].clientX - tx; if (dy > 90 && dy > Math.abs(dx) * 1.5) { ty = null; closeSheet(); } }, { passive: true });
   build(s); $('over').appendChild(v); $('over').appendChild(s);
   if (x) x.focus(); else { s.tabIndex = -1; try { s.focus({ preventScroll: true }); } catch (e) {} }
   if (!gia) passo('sheet');
@@ -624,8 +633,7 @@ function sheetOpzioni() {
       var box = el('div', 'dbox');
       if (!iso || !S.scelte[iso]) return box;
       var h = el('h3', 'sh-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' })); h.style.cssText = 'margin-top:14px;font-size:17px';
-      var rm = el('button', 'x', '×'); rm.type = 'button'; rm.id = 'togli-giorno'; rm.setAttribute('aria-label', 'Togli questo giorno'); rm.style.cssText = 'color:var(--err);border-color:var(--err)';
-      rm.addEventListener('click', function () { togliGiorno(iso); renderCal(); renderBar(); sheetOpzioni(); }); h.appendChild(rm); box.appendChild(h);
+      box.appendChild(h);
       var ct = el('div', 'ctrl'), s1 = el('div', 'seg'), s2 = el('div', 'seg'); s1.setAttribute('role', 'group'); s1.setAttribute('aria-label', 'Orario'); s2.setAttribute('role', 'group'); s2.setAttribute('aria-label', 'Sicuro');
       var p0 = parti(S.scelte[iso]);
       function agg(f, si) { S.scelte[iso] = f + '|' + (si ? 'si' : 'forse'); S.auto = false; S.dirty = true; salvaBozza(); renderCal(); }
