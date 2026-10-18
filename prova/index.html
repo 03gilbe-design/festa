@@ -214,6 +214,18 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 
 /* aggiunte del codice (stati che il prototipo non mostra) */
 .errbox { margin-bottom: 8px; padding: 10px 12px; border-radius: 12px; background: var(--errbg); color: var(--err); font-weight: 700; font-size: 16px; }
+.pan { max-height: 300px; }
+.pan .seg button { font-size: 14px; padding: 0 2px; white-space: nowrap; }
+.ctrl { flex-wrap: wrap; } .ctrl .seg:first-child { -webkit-box-flex: 1; flex: 1 1 100%; margin-bottom: 8px; } .ctrl .seg + .seg { -webkit-box-flex: 1; flex: 1 1 0; margin-left: 0; }
+.seg button.t { font-size: 15px; }
+.g .fq { position: absolute; bottom: 3px; left: 0; right: 0; text-align: center; font-size: 11px; font-weight: 700; }
+.pan .dnote { display: block; width: 100%; box-sizing: border-box; min-height: 44px; margin-top: 8px; padding: 10px 12px; font: inherit; font-size: 16px; border: 2px solid var(--bg); border-radius: 12px; background: var(--bg); color: var(--ink); resize: none; }
+.g .pm { position: absolute; bottom: 2px; left: 0; right: 0; display: flex; justify-content: center; opacity: .8; pointer-events: none; }
+.g .pm .ico { width: 16px; height: 16px; }
+.g .pm.nuovo { -webkit-animation: pmp 1.1s ease-in-out 2; animation: pmp 1.1s ease-in-out 2; }
+@-webkit-keyframes pmp { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes pmp { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .g .pm.nuovo { -webkit-animation: none; animation: none; } }
 .grid .av { display: block; }
 .grid .av.ini { display: block; }
 .grid .av.ini .t { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: var(--mut); }
@@ -566,7 +578,7 @@ function sheetOpzioni() {
         });
       }
       var cur = p0;
-      seg(s1, [['tutto', 'Tutto il giorno', ['sole', 'luna']], ['pom', 'Pomeriggio', ['sole']], ['sera', 'Sera', ['luna']]], p0.f, function (f) { cur = { f: f, si: cur.si }; agg(cur.f, cur.si); });
+      seg(s1, [['tutto', 'Tutto il giorno', [], 't', 'Tutto il giorno'], ['pom', 'Pomeriggio', [], 't', 'Pomeriggio'], ['sera', 'Sera', [], 't', 'Sera']], p0.f, function (f) { cur = { f: f, si: cur.si }; agg(cur.f, cur.si); });
       [['si', 'Sì'], ['forse', 'Forse']].forEach(function (o) {
         var b = el('button', '', o[0] === 'si' ? 'Sì' : '?'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', (p0.si ? 'si' : 'forse') === o[0] ? 'true' : 'false');
         b.addEventListener('click', function () { cur = { f: cur.f, si: o[0] === 'si' }; agg(cur.f, cur.si); Array.prototype.forEach.call(s2.children, function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); }); }); s2.appendChild(b);
@@ -756,7 +768,8 @@ function renderCal() {
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (!VOTI) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
-      if (mine && (p.f !== 'tutto' || !p.si)) { var fq = el('span', 'fq'); fq.setAttribute('aria-hidden', 'true'); if (p.f === 'pom') fq.appendChild(ico('sole', 's')); else if (p.f === 'sera') fq.appendChild(ico('luna', 's')); if (!p.si) fq.appendChild(document.createTextNode('?')); b.appendChild(fq); }
+      if (mine && (p.f !== 'tutto' || !p.si)) { var fq = el('span', 'fq'); fq.setAttribute('aria-hidden', 'true'); if (p.f === 'pom') fq.appendChild(document.createTextNode('pom')); else if (p.f === 'sera') fq.appendChild(document.createTextNode('sera')); if (!p.si) fq.appendChild(document.createTextNode('?')); b.appendChild(fq); }
+      if (mine && p.f === 'tutto' && p.si) { var pm = el('span', 'pm' + (store.get('dettagli_visti') ? '' : ' nuovo')); pm.setAttribute('aria-hidden', 'true'); pm.appendChild(ico('puntini', 's')); b.appendChild(pm); }
       if (iso === OGGI) b.className += ' oggi';
       if (iso === S.focus) b.className += ' foc';
       b.setAttribute('aria-label', lungo(iso) + (mine ? ', ci sei' + (p.f === 'pom' ? ', pomeriggio' : p.f === 'sera' ? ', sera' : '') + (p.si ? '' : ', forse') : '') + (iso === OGGI ? ', oggi' : '') + (nn ? ', ' + nn + (nn === 1 ? ' altro' : ' altri') : ''));
@@ -781,10 +794,18 @@ function onDay(e) {
   if (S.invio || DECISA) return;
   if (editable()) {
     if (!S.scelte[iso]) { S.scelte[iso] = TOCCO; S.focus = ''; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
-    else S.focus = S.focus === iso ? '' : iso;
+    else { S.focus = S.focus === iso ? '' : iso; if (S.focus) store.set('dettagli_visti', 1); }
   } else S.focus = S.focus === iso ? '' : iso;
   renderCal(); renderBar();
   var q = $('cal').querySelector('[data-g="' + iso + '"]'); if (q) q.focus({ preventScroll: true });
+}
+// Commento di un giorno: sta dentro il commento della persona, una riga per giorno ("24/10: ho un esame"). Il server non cambia.
+function chiaveGiorno(iso) { return (+iso.slice(8)) + '/' + (+iso.slice(5, 7)) + ': '; }
+function notaGiorno(iso) { var k = chiaveGiorno(iso), r = String(S.commento || '').split('\n'); for (var i = 0; i < r.length; i++) if (r[i].indexOf(k) === 0) return r[i].slice(k.length); return ''; }
+function setNotaGiorno(iso, testo) {
+  var k = chiaveGiorno(iso), r = String(S.commento || '').split('\n').filter(function (x) { return x !== '' && x.indexOf(k) !== 0; });
+  testo = String(testo || '').replace(/\s*\n\s*/g, ' ').trim(); if (testo) r.push(k + testo);
+  S.commento = r.join('\n').slice(0, MAX_COMMENTO); S.commToccato = true; S.dirty = true; salvaBozza();
 }
 function renderPanel() {
   var bar = $('bar'), old = bar.querySelector('.pan'); if (old) bar.removeChild(old);
@@ -795,7 +816,7 @@ function renderPanel() {
   if (editable() && S.scelte[iso]) {
     var ct = el('div', 'ctrl'), s1 = el('div', 'seg'), s2 = el('div', 'seg'); s1.setAttribute('role', 'group'); s1.setAttribute('aria-label', 'Orario'); s2.setAttribute('role', 'group'); s2.setAttribute('aria-label', 'Sicuro');
     [['tutto', 'Tutto il giorno', ['sole', 'luna']], ['pom', 'Pomeriggio', ['sole']], ['sera', 'Sera', ['luna']]].forEach(function (o) {
-      var b = el('button'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', p.f === o[0] ? 'true' : 'false'); o[2].forEach(function (n) { b.appendChild(ico(n)); });
+      var b = el('button'); b.type = 'button'; b.setAttribute('aria-label', o[1]); b.setAttribute('aria-pressed', p.f === o[0] ? 'true' : 'false'); b.appendChild(document.createTextNode(o[1]));
       b.addEventListener('click', function () { S.scelte[iso] = o[0] + '|' + (p.si ? 'si' : 'forse'); S.auto = false; S.dirty = true; salvaBozza(); renderCal(); renderBar(); keep('Orario'); }); s1.appendChild(b);
     });
     [['si', 'Sì', 'Sì'], ['forse', '?', 'Forse']].forEach(function (o) {
@@ -806,6 +827,8 @@ function renderPanel() {
     var rm = el('button', 'x', '×'); rm.type = 'button'; rm.setAttribute('aria-label', 'Togli questo giorno'); rm.style.cssText = 'width:44px;height:44px;margin-left:4px;border:0;background:none;font-size:26px;color:var(--err)';
     rm.addEventListener('click', function () { delete S.scelte[iso]; S.focus = ''; S.auto = false; S.dirty = true; salvaBozza(); renderCal(); renderBar(); }); ct.appendChild(rm);
     pan.appendChild(ct);
+    var dn = el('textarea', 'dnote'); dn.id = 'nota-giorno'; dn.rows = 2; dn.maxLength = 120; dn.value = notaGiorno(iso); dn.placeholder = 'Commento per questo giorno (es. ho un esame)'; dn.setAttribute('aria-label', 'Commento per questo giorno');
+    dn.addEventListener('input', function () { setNotaGiorno(iso, dn.value); }); pan.appendChild(dn);
   }
   var gi = altri(iso);
   if (gi.length) {
