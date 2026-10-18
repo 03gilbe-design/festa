@@ -461,7 +461,7 @@ var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
 var INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
-var T_AVVIO = Date.now();
+var T_AVVIO = Date.now(), CARICO = true; // CARICO: animazione di caricamento a ogni apertura, anche con i dati in cache
 var cachePagina = store.get('cachePagina');
 if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.quando < 43200000 && Array.isArray(cachePagina.voti) && Array.isArray(cachePagina.aperti) && Array.isArray(cachePagina.tutti)) {
   VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; OGGI = cachePagina.oggi || OGGI;
@@ -895,9 +895,9 @@ var SPILL = {};
 function renderCal() {
   SPILL = {};
   var c = clear($('cal')), conta = {}, max = 1;
-  if (c.classList) c.classList[VOTI ? 'remove' : 'add']('carico'); // finche' i voti non arrivano: tessere con la luce che scorre (come YouTube)
-  c.setAttribute('aria-busy', VOTI ? 'false' : 'true');
-  if (!VOTI) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
+  if (c.classList) c.classList[CARICO ? 'add' : 'remove']('carico'); // finche' i voti non arrivano: tessere con la luce che scorre (come YouTube)
+  c.setAttribute('aria-busy', CARICO ? 'true' : 'false');
+  if (CARICO) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
@@ -905,11 +905,11 @@ function renderCal() {
     var celle = [], i;
     function tessera(iso, d, y, mm) {
       var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
-      if (!VOTI) { b.disabled = true; b.className += (d + y + mm) % 2 ? ' sk-onda' : ' sk-ferma'; }
+      if (CARICO) { b.disabled = true; b.className += (d + y + mm) % 2 ? ' sk-onda' : ' sk-ferma'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
-      else if (!VOTI) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
+      else if (CARICO) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
       if (mine && (p.f !== 'tutto' || !p.si)) { var fq = el('span', 'fq'); fq.setAttribute('aria-hidden', 'true'); if (p.f === 'pom') fq.appendChild(document.createTextNode('pom')); else if (p.f === 'sera') fq.appendChild(document.createTextNode('sera')); if (!p.si) fq.appendChild(document.createTextNode('?')); b.appendChild(fq); }
       if (iso === OGGI) b.className += ' oggi';
@@ -1328,12 +1328,13 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape') clos
 
 // ---------- avvio, aggiornamenti ----------
 var firmaCalendario = null;
+setTimeout(function () { if (CARICO && VOTI) { CARICO = false; renderCal(); } }, 8000);
 function carica() {
   var io = ++giro;
   return fetch(SERVER, { signal: timeout(30000) }).then(function (r) { return r.json(); }).then(function (res) {
     if (!res || !res.ok || !Array.isArray(res.voti)) throw new SyntaxError('risposta');
-    var w = !VOTI ? Math.max(0, 1500 - (Date.now() - T_AVVIO)) : 0; // la prima volta l'animazione resta visibile almeno 1,5 s
-    return w ? new Promise(function (ok) { setTimeout(function () { ok(res); }, w); }) : res;
+    var w = CARICO ? Math.max(0, 1500 - (Date.now() - T_AVVIO)) : 0; // l'animazione resta visibile almeno 1,5 s a ogni apertura
+    return w ? new Promise(function (ok) { setTimeout(function () { CARICO = false; ok(res); }, w); }) : (CARICO = false, res);
   }).then(function (res) {
     if (io !== giro) return;
     ultimoGet = Date.now();
