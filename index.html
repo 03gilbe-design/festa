@@ -219,10 +219,15 @@ body.pesi .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } body.pesi .
 
 .sheet .xc{position:absolute;top:10px;right:12px;z-index:2;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--fill);color:var(--ink);font-size:26px;font-weight:600;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
 
-@-webkit-keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
-@keyframes accendi{0%,100%{background-color:#e3e6ea}50%{background-color:#eef0f3}}
-.carico .g[data-g]{background-image:none;background-color:#e3e6ea;-webkit-animation:accendi 1.6s ease-in-out infinite;animation:accendi 1.6s ease-in-out infinite;color:var(--mut)}
-@media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}@keyframes accendi{0%,100%{background-color:#2b2f36}50%{background-color:#3a3f48}}.carico .g[data-g]{background-color:#2b2f36}}
+@-webkit-keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
+@keyframes accendi{0%,100%{background-color:#d5d9df;opacity:.28}50%{background-color:#8f98a5;opacity:1}}
+.carico .g[data-g]{background-image:none;background-color:#dfe3e8;color:transparent;pointer-events:none;opacity:.72}
+.carico .g.sk-onda{-webkit-animation:accendi 2.8s ease-in-out infinite;animation:accendi 2.8s ease-in-out infinite}
+.carico .g.sk-ferma{opacity:.72}
+.carico .g[data-g] .o{opacity:0}
+.caricamento{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 8px;color:var(--ink);font-weight:700}
+.caricamento .spin{flex:none;border-color:var(--line);border-top-color:var(--acc)}
+@media (prefers-color-scheme:dark){@-webkit-keyframes accendi{0%,100%{background-color:#20242a;opacity:.3}50%{background-color:#4b535f;opacity:1}}@keyframes accendi{0%,100%{background-color:#20242a;opacity:.3}50%{background-color:#4b535f;opacity:1}}.carico .g[data-g]{background-color:#343a43}}
 @media (prefers-reduced-motion:reduce){.carico .g[data-g]{-webkit-animation:none;animation:none}}
 
 .cbox{margin-top:8px;border:2px solid var(--fill);border-radius:12px;overflow:hidden;background:var(--bg)}
@@ -282,19 +287,22 @@ body.invio .ib, body.invio .sugg { pointer-events: none; }
 .locrow .loc { margin: 0; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #fila { flex: 1 1 auto; min-width: 0; display: flex; justify-content: flex-end; }
 .avb.edit { box-sizing: border-box; border: 2px solid var(--mut); }
-.ed-b { position: absolute; right: -6px; bottom: -6px; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--bg); border: 3px solid var(--bg); pointer-events: none; }
-.ed-b .ico { width: 12px; height: 12px; stroke-width: 2.6; }
+.ed-b { position: absolute; right: -7px; bottom: -7px; display: flex; align-items: center; justify-content: center; width: 29px; height: 29px; border-radius: 50%; background: var(--acc); color: var(--onacc); border: 3px solid var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,.22); pointer-events: none; }
+.ed-b .ico { width: 15px; height: 15px; stroke-width: 2.8; }
 .nome input:focus { outline: none; border-color: var(--acc); }
 .av.vuoto .ico { width: 55%; height: 55%; color: var(--mut); }
 .fila-b { display: flex; align-items: center; max-width: 100%; min-height: 44px; margin-right: -4px; padding: 0; border: 0; background: none; color: var(--mut); }
-.fila-c { display: flex; align-items: center; min-width: 0; padding-left: 8px; overflow: hidden; }
+.fila-c { display: flex; align-items: center; min-width: 0; padding-left: 8px; overflow: visible; }
 .fl { position: relative; flex: none; width: 30px; height: 30px; margin-left: -8px; border-radius: 50%; box-shadow: 0 0 0 2px var(--bg); background: var(--bg); }
 .fl .av { width: 100%; height: 100%; font-size: 14px; }
 .fl.io { z-index: 1; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--acc); }
 .fl-ok { position: absolute; right: -5px; bottom: -4px; display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--acc); color: var(--onacc); border: 2px solid var(--bg); }
 .fl-ok .ico { width: 10px; height: 10px; stroke-width: 3.6; }
 .fl-piu { display: flex; align-items: center; justify-content: center; background: var(--fill); color: var(--mut); font-size: 12px; font-weight: 700; }
-.fila-n { margin-left: 10px; font-size: 16px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.fila-n { display: flex; align-items: center; gap: 4px; margin-left: 10px; font-size: 16px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.fila-n .ico { width: 16px; height: 16px; }
+.cambia-nome { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 64px); min-height: 44px; margin: 8px 0 0 64px; }
+.cambia-nome .ico { width: 18px; height: 18px; }
 .inv.manca .pers { opacity: .5; }
 .inv .pers .gia { color: var(--acc); margin-left: 8px; }
 header .wrap { position: relative; }
@@ -384,7 +392,7 @@ var VERSIONE = 2;                 // se il server dice paginaMinima > VERSIONE l
 var DAL = '2026-10-19', AL = '2026-11-29', CHIUSI0 = ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-07']; // come Code.gs: si disegna subito, poi il server conferma
 var TOCCO = 'tutto|si';
 var VALIDO = /^(tutto|pom|sera)\|(si|forse)$/;
-var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 6000, RICARICA_MS = 60000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
+var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 6000, RICARICA_MS = 60000, AGGIORNA_LIVE_MS = 30000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
 var AVATARI = ['jeans', 'gpt', 'claude', 'razzo', 'medico', 'soldi', 'computer', 'gatto', 'cane', 'pizza', 'palla', 'chitarra', 'caffe', 'fiore', 'sole', 'gufo', 'cappello', 'brindisi', 'libro', 'fotocamera', 'ironman', 'drink', 'hennessy', 'jack', 'gemini', 'sigaretta', 'gattino'];   // elenco generato da assembla_v3.py dagli id a-... dello sprite (i nuovi in fondo)
 // Aspetto (admin): UGUALE a ASPETTO_OPZIONI in Code.gs, prima opzione = predefinita. Classe su <body> per l'opzione non predefinita.
 var ASPETTO_OPZIONI = { stile: ['pulito', 'mano'], colore: ['blu', 'verde'], weekend: ['grande', 'uguale'] };
@@ -445,6 +453,11 @@ var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
 var INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var cachePagina = store.get('cachePagina');
+if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.quando < 43200000 && Array.isArray(cachePagina.voti) && Array.isArray(cachePagina.aperti) && Array.isArray(cachePagina.tutti)) {
+  VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; OGGI = cachePagina.oggi || OGGI;
+  DECISA = cachePagina.chiuso ? cachePagina.dataScelta : ''; SCAD = cachePagina.scadenza || ''; aspettoSalvato = cachePagina.aspetto || {};
+}
 var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
 var CESTINO = [];                 // solo admin: [{nome, quando, come}]
 var qs = new URLSearchParams(location.search);
@@ -614,6 +627,7 @@ function chipsChiViene(iso, tutti, max) { // chi ha detto di esserci quel giorno
   var ch = el('div', 'chips'); ch.className += ' chiviene';
   (tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso)).slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) {
     var t = notaDi(v.commento, iso), c = el('span', 'chip' + (t ? ' conn' : '')), nm = v.nome.split(' ')[0] + (/forse/.test(v.giorni[iso]) ? ' ?' : '');
+    c.setAttribute('data-nome', norm(v.nome)); c.setAttribute('aria-label', v.nome + (t ? ': ' + t : ''));
     c.appendChild(av(v.nome, v.avatar || ''));
     if (t) { var cb = el('span', 'cb'); cb.appendChild(el('span', 'cn2', nm)); cb.appendChild(el('span', 'ct', t)); c.appendChild(cb); } else c.appendChild(document.createTextNode(nm));
     ch.appendChild(c);
@@ -740,7 +754,7 @@ function renderFila() {
   });
   if (ord.length > mostra.length) { var piu = el('span', 'fl fl-piu', '+' + (ord.length - mostra.length)); cer.appendChild(piu); }
   bt.appendChild(cer);
-  var n = el('span', 'fila-n', voti.length + (tot ? '/' + tot : '')); n.setAttribute('aria-hidden', 'true'); bt.appendChild(n);
+  var n = el('span', 'fila-n'); n.setAttribute('aria-hidden', 'true'); n.appendChild(ico('persona')); n.appendChild(document.createTextNode(voti.length + (tot ? '/' + tot : ''))); bt.appendChild(n);
   bt.addEventListener('click', sheetInvitati);
   f.appendChild(bt);
 }
@@ -794,10 +808,10 @@ function renderName() {
   }
   var b = clear($('nomeblk'));
   var row = el('div', 'nome' + (S.nomeErr ? ' err' : ''));
-  var ab = el('button', 'avb'); ab.type = 'button'; ab.id = 'avatar'; ab.setAttribute('aria-label', 'Avatar'); ab.appendChild(avatarNome());
-  if (S.voted && !S.edit) { var ok = el('span', 'ok-b'); ok.appendChild(ico('spunta')); ab.appendChild(ok); ab.setAttribute('aria-label', 'Voto salvato'); }
-  if (!blocca) { ab.className += ' edit'; var eb = el('span', 'ed-b'); eb.appendChild(ico('matita')); ab.appendChild(eb); }
-  if (!blocca) ab.addEventListener('click', sheetAvatar); else if (S.voted && !S.edit) ab.disabled = true;
+  var ab = el('button', 'avb'); ab.type = 'button'; ab.id = 'avatar'; ab.setAttribute('aria-label', blocca ? 'Avatar' : 'Modifica avatar'); ab.appendChild(avatarNome());
+  if (!S.adminEdit) { ab.className += ' edit'; var eb = el('span', 'ed-b'); eb.appendChild(ico('matita')); ab.appendChild(eb); ab.setAttribute('aria-label', 'Modifica avatar'); }
+  if (!blocca) ab.addEventListener('click', sheetAvatar);
+  else if (S.voted && !S.edit) ab.addEventListener('click', function () { cambia(); sheetAvatar(); });
   row.appendChild(ab);
   var inp = el('input'); inp.type = 'text'; inp.id = 'nome'; inp.value = S.nome; inp.placeholder = 'Il tuo nome'; inp.setAttribute('aria-label', 'Il tuo nome'); inp.autocomplete = 'name';
   inp.setAttribute('autocapitalize', 'words'); inp.setAttribute('autocorrect', 'off'); inp.setAttribute('spellcheck', 'false'); inp.maxLength = 60; inp.readOnly = blocca;
@@ -811,6 +825,10 @@ function renderName() {
   inp.addEventListener('focus', kbSeAperta); inp.addEventListener('blur', function () { document.body.classList.remove('kb'); });
   row.appendChild(inp);
   b.appendChild(row);
+  if (S.voted && !S.edit) {
+    var cambiaB = el('button', 'btn sec cambia-nome'); cambiaB.type = 'button'; cambiaB.id = 'modifica-voto'; cambiaB.appendChild(ico('matita')); cambiaB.appendChild(document.createTextNode('Modifica il tuo voto'));
+    cambiaB.addEventListener('click', cambia); b.appendChild(cambiaB);
+  }
   var sl = el('div'); sl.id = 'sugg'; b.appendChild(sl); sugg();
 }
 // Nome scritto a mano: se ha gia' un voto lo si carica per modificarlo (pausa di 0,4 s: ridisegnare mentre il dito tocca un giorno lo farebbe perdere).
@@ -867,6 +885,8 @@ function sugg() {
 function renderCal() {
   var c = clear($('cal')), conta = {}, max = 1;
   if (c.classList) c.classList[VOTI ? 'remove' : 'add']('carico'); // finche' i voti non arrivano: tessere con la luce che scorre (come YouTube)
+  c.setAttribute('aria-busy', VOTI ? 'false' : 'true');
+  if (!VOTI) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
@@ -878,6 +898,7 @@ function renderCal() {
       if (giorni.indexOf(iso) < 0) { celle.push(el('div', 'g vuoto')); continue; }
       if (!avail(iso)) { var x = el('div', 'g x', String(d)); x.setAttribute('aria-hidden', 'true'); celle.push(x); continue; } // passato, chiuso o voti chiusi: stesso segno
       var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
+      if (!VOTI) { var wd = new Date(Date.UTC(y, mm, d)).getUTCDay(), onda = wd !== 0 && wd !== 6 && d % 3 === 1; b.disabled = true; b.className += onda ? ' sk-onda' : ' sk-ferma'; if (onda) { b.style.webkitAnimationDelay = (-d * 170) + 'ms'; b.style.animationDelay = (-d * 170) + 'ms'; } }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
       if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
@@ -912,7 +933,7 @@ function renderCal() {
 function onDay(e) {
   document.body.classList.remove('kb'); // si sta toccando il calendario: la barra torna fissa
   var iso = e.currentTarget.getAttribute('data-g');
-  if (S.invio || DECISA) return;
+  if (!VOTI || S.invio || DECISA) return;
   if (!editable()) { sheetChiViene(iso); return; }
   if (!S.scelte[iso]) { S.scelte[iso] = TOCCO; S.focus = iso; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
   else togliGiorno(iso); // secondo tocco = toglie (i dettagli stanno nel foglio del pulsante accanto a Invia)
@@ -937,6 +958,8 @@ function renderBar() {
   if (document.activeElement && document.activeElement.id === 'serve' && !S.invio && !S.errore) return;
   var bar = $('bar'), tz = bar.querySelector('.toast');
   Array.prototype.slice.call(bar.children).forEach(function (c) { if (c !== tz) bar.removeChild(c); });
+  bar.hidden = !!(S.voted && !S.edit);
+  if (bar.hidden) return;
   var ex = esiste(), needKey = ex && ex.protetto && !S.adminEdit && !ricordo.get('chiavi', ex.nome);
   if (S.errore) { // messaggio umano + (se la rete e' giu') il bottone WhatsApp
     var er = el('div', 'errbox'); er.id = 'errore'; er.setAttribute('role', 'alert'); er.appendChild(document.createTextNode(S.errore)); bar.appendChild(er);
@@ -952,10 +975,7 @@ function renderBar() {
     cr.appendChild(ki); if (S.keyErr) { ki.setAttribute('aria-invalid', 'true'); var em = el('span', 'em', 'Chiave sbagliata'); em.id = 'serve-e'; em.setAttribute('role', 'alert'); cr.appendChild(em); } bar.appendChild(cr);
   }
   var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
-  if (S.voted && !S.edit) {
-    b.className += ' cambia'; b.type = 'button'; b.appendChild(ico('matita')); b.appendChild(document.createTextNode('Cambia'));
-    b.addEventListener('click', cambia);
-  } else {
+  {
     var nb = el('button', 'ib'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); r.appendChild(nb);
     if (S.edit || S.adminEdit) { var cb = el('button', 'ib'); cb.type = 'button'; cb.id = 'annulla-mod'; cb.setAttribute('aria-label', 'Annulla le modifiche'); cb.appendChild(el('span', '', '×')); cb.firstChild.style.cssText = 'font-size:30px;line-height:1'; cb.addEventListener('click', function () { annullaModifica(); }); r.appendChild(cb); }
     if (S.invio) { b.className += ' lavora'; b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salvo…' : 'Invio…')); b.setAttribute('aria-busy', 'true'); }
@@ -1311,6 +1331,7 @@ function carica() {
     firmaCalendario = nuovaFirmaCalendario;
     VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; OGGI = res.oggi || OGGI;
     DECISA = res.chiuso ? res.dataScelta : ''; SCAD = res.scadenza || ''; S.letturaKo = false;
+    store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
     aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
     var passo2 = ADMIN ? chiama({ azione: 'verifica' }).then(function (v) {
       if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; } else { ADMIN = ''; adminOk = false; }
@@ -1334,6 +1355,7 @@ function carica() {
 }
 // Dati vecchi: la pagina che torna visibile dopo piu' di un minuto ricarica i voti; torna la rete: parte il voto in coda.
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && Date.now() - ultimoGet > RICARICA_MS && !S.invio) carica(); });
+setInterval(function () { if (document.visibilityState === 'visible' && Date.now() - ultimoGet >= AGGIORNA_LIVE_MS && !S.invio && !S.dirty && !S.edit && !S.adminEdit) carica(); }, 5000);
 window.addEventListener('resize', function () { renderFila(); });
 window.addEventListener('online', function () { if (coda() && !S.invio) invia(true); });
 document.addEventListener('focusin', function (e) { var id = e.target.id; if (id === 'commento' || id === 'chiave') setTimeout(function () { try { e.target.scrollIntoView({ block: 'center' }); } catch (x) {} }, 300); });
