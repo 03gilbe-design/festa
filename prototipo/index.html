@@ -1,0 +1,1114 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Festa di laurea di Gilberto</title>
+<style>
+/* =====================================================================
+   CSS DA COPIARE COSI' COM'E' (sezione "PROTOTIPO" in fondo: non copiare)
+   Vincoli: iOS 12+, Chrome 70+. Niente :has, niente gap su flex, aspect-ratio
+   con min-height di riserva, :focus-visible solo come affinamento.
+   ===================================================================== */
+:root {
+  --blu: #1d4ed8;      /* 6.70:1 su bianco */
+  --blu-sc: #1e3a8a;   /* 10.4:1 su bianco, 7.9:1 su --blu-ch */
+  --blu-ch: #dbeafe;   /* sfondo "forse" e chip */
+  --blu-m: #93c5fd;
+  --ink: #111827;      /* 17.7:1 */
+  --grigio: #4b5563;   /* 7.56:1 su bianco, 6.6:1 su --fondo2 */
+  --bordo: #6b7280;    /* 4.83:1: bordo dei giorni toccabili */
+  --linea: #e5e7eb;
+  --fondo2: #eef2f7;   /* sezione "Chi c'e'" */
+  --ok: #15803d;       /* 5.02:1 */
+  --err: #b91c1c;      /* 6.47:1 */
+  --giallo: #fde047;
+  --focus: #f59e0b;
+  --bg: #ffffff; --card: #ffffff; --acc: #1d4ed8; --nota: #fef9c3; --errbg: #fef2f2; --grigiobg: #f3f4f6;
+  --sk: #dde3ea; --spento: #767676; --toast: #111827;
+  --h0b: #ffffff; --h0f: #4b5563; --h1b: #dbeafe; --h1f: #1e3a8a; --h2b: #93c5fd; --h2f: #1e3a8a;
+  --h3b: #2563eb; --h3f: #ffffff; --h4b: #1e3a8a; --h4f: #ffffff;
+  color-scheme: light dark;
+}
+/* TEMA SCURO vero (evita che Chrome/Samsung "forza scuro" invertano la mappa). Nella mappa: piu' CHIARO = piu' persone. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a; --card: #1e293b; --fondo2: #0b1222; --ink: #f1f5f9; --grigio: #cbd5e1; --bordo: #94a3b8; --linea: #334155;
+    --acc: #93c5fd; --blu-ch: #172554; --blu-sc: #bfdbfe; --blu-m: #1d4ed8; --nota: #422006; --errbg: #450a0a; --err: #fca5a5;
+    --grigiobg: #334155; --sk: #334155; --spento: #8391a7; --toast: #334155;
+    --h0b: #1e293b; --h0f: #cbd5e1; --h1b: #1e3a8a; --h1f: #dbeafe; --h2b: #1d4ed8; --h2f: #ffffff;
+    --h3b: #60a5fa; --h3f: #0f172a; --h4b: #bfdbfe; --h4f: #0f172a;
+  }
+}
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.4 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; overflow-wrap: break-word; }
+.wrap { max-width: 440px; margin: 0 auto; padding: 0 16px; }
+h1, h2, h3, p { margin: 0; }
+
+/* ---------- icone (set unico, griglia 24, tratto 2) ---------- */
+.ico { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; flex: none; }
+.ico.s { width: 14px; height: 14px; stroke-width: 2.6; }   /* dentro le caselle: tratto piu' spesso per restare leggibile */
+.ico.xs { width: 11px; height: 11px; stroke-width: 3; }
+.ico.pieno { fill: currentColor; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; white-space: nowrap; }
+
+/* ---------- testata: biglietto d'invito ---------- */
+.testa { position: relative; background: var(--blu); color: #fff; padding: 22px 0 30px; }
+.testa .wrap { display: flex; align-items: center; }
+.testa .wrap > .ico { width: 44px; height: 44px; stroke-width: 1.8; margin-right: 12px; }
+.testa h1 { font-size: 24px; line-height: 1.15; letter-spacing: -.01em; }
+.testa p { color: #dbeafe; font-size: 16px; margin-top: 4px; } /* 5.6:1 su --blu */
+/* bordo inferiore a dentelli, come un biglietto strappato */
+.testa:after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 10px;
+  background: radial-gradient(circle at 10px 10px, var(--bg) 6px, transparent 6.5px) 0 0 / 20px 10px repeat-x; }
+
+/* testata: facce di chi ha risposto (N5) e scadenza con barretta del tempo (N9) */
+.testa-info { display: flex; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.facce { display: inline-flex; align-items: center; margin: 4px 14px 0 0; }
+.facce i svg { width: 100%; height: 100%; display: block; }
+.facce i { overflow: hidden; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-right: -7px; border-radius: 50%; background: #dbeafe; color: #1e3a8a; border: 2px solid var(--blu); font-style: normal; font-size: 13px; font-weight: 700; }
+.facce b { display: inline-flex; align-items: center; margin-left: 12px; font-size: 16px; }
+.facce b .ico { margin-right: 2px; }
+.scad { display: inline-flex; align-items: center; margin-top: 4px; padding: 3px 10px 3px 6px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 15px; font-weight: 700; }
+.scad .ico { margin-right: 4px; }
+.tempo { display: inline-block; width: 44px; height: 6px; margin-left: 8px; border-radius: 3px; background: rgba(255,255,255,.3); overflow: hidden; }
+.tempo i { display: block; height: 100%; background: #fff; }
+/* giorni passati (N8): grigi, barrati, non toccabili. Oggi: pallino rosso (come i calendari del telefono) */
+.x.passato { text-decoration: line-through; }
+.oggi:before { content: ""; position: absolute; top: 4px; left: 4px; width: 8px; height: 8px; border-radius: 50%; background: #dc2626; }
+/* giorni aggiunti dopo il proprio voto (N12): tacca gialla in alto */
+.d.nuovo { box-shadow: inset 0 5px 0 var(--giallo); }
+/* privacy del nome (N31) */
+.passo .occhio { margin-left: 8px; color: var(--grigio); width: 20px; height: 20px; }
+
+/* ---------- passi 1 / 2 ---------- */
+.passo { display: flex; align-items: center; font-size: 20px; font-weight: 700; margin: 24px 0 10px; }
+fieldset > .passo { float: left; width: 100%; margin-top: 26px; } /* legend: float per avere il margine anche su Safari vecchio */
+fieldset > .passo + * { clear: both; }
+.passo .num { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--blu); color: #fff; font-size: 16px; margin-right: 10px; flex: none; }
+.passo.fatto .num { background: var(--ok); }
+input[type=text], textarea { width: 100%; padding: 12px 14px; font: inherit; color: var(--ink); background: var(--card); border: 2px solid var(--bordo); border-radius: 12px; -webkit-appearance: none; }
+input[type=text]:focus, textarea:focus { border-color: var(--acc); outline: 3px solid var(--focus); outline-offset: 1px; }
+textarea { min-height: 76px; resize: vertical; }
+.lab { display: flex; align-items: center; font-weight: 700; font-size: 17px; margin: 22px 0 8px; }
+.lab .ico { margin-right: 8px; color: var(--acc); }
+/* chiave facoltativa: bottoncino discreto sotto il nome, chiuso di default */
+.chiave-t { display: inline-flex; align-items: center; min-height: 44px; margin-top: 2px; padding: 0 4px; border: 0; background: none; color: var(--grigio); font: inherit; font-size: 16px; cursor: pointer; }
+.chiave-t .ico { margin-right: 6px; }
+.chiave-t .giu { width: 18px; height: 18px; margin: 0 0 0 2px; }
+.chiave-t[aria-expanded="true"] { color: var(--acc); }
+.chiave-t[aria-expanded="true"] .giu { -webkit-transform: rotate(180deg); transform: rotate(180deg); }
+.chiave-box { padding: 10px 12px 12px; border-radius: 12px; background: var(--fondo2); }
+.chiave-box small, .chiave-bar small { display: flex; align-items: center; margin-top: 6px; font-size: 15px; color: var(--grigio); }
+.chiave-box small .ico, .chiave-bar small .ico { width: 16px; height: 16px; margin-right: 5px; }
+/* campo chiave nella barra: solo quando serve (voto protetto, altro telefono) */
+.chiave-bar { margin-bottom: 10px; }
+.chiave-bar .campo { display: flex; align-items: center; }
+.chiave-bar .campo > .ico { width: 30px; height: 30px; margin-right: 8px; color: var(--ink); }
+.chiave-bar input { -webkit-box-flex: 1; flex: 1; min-width: 0; }
+.chiave-bar.sbagliata input { border-color: var(--err); }
+.chiave-bar.sbagliata small { color: var(--err); font-weight: 700; }
+.sugg .prot { margin-left: auto; margin-right: 6px; color: var(--grigio); }
+.sugg .prot + .gia { margin-left: 0; }
+.nota-nome { display: flex; align-items: flex-start; margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: var(--nota); font-size: 16px; }
+.nota-nome .ico { margin-right: 8px; color: var(--ink); }
+
+/* suggerimenti nome (elenco invitati), max 5, attaccati sotto il campo */
+.sugg { list-style: none; margin: -2px 0 0; padding: 0; border: 2px solid var(--acc); border-top: 0; border-radius: 0 0 12px 12px; overflow: hidden; }
+.sugg.aperto + * { margin-top: 0; }
+input.con-sugg { border-color: var(--acc); border-radius: 12px 12px 0 0; }
+.sugg button { display: flex; align-items: center; width: 100%; min-height: 48px; padding: 6px 12px; border: 0; border-top: 1px solid var(--linea); background: var(--card); color: var(--ink); font: inherit; font-size: 17px; text-align: left; cursor: pointer; }
+.sugg button:active { background: var(--blu-ch); }
+.sugg .av { width: 30px; height: 30px; font-size: 14px; background: var(--blu-ch); color: var(--blu-sc); }
+.sugg mark { background: none; color: inherit; font-weight: 700; }
+.sugg .gia { margin-left: auto; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ok); color: #fff; flex: none; }
+.sugg .gia .ico { width: 16px; height: 16px; stroke-width: 3; }
+.sugg .votato .av { background: var(--ok); color: #fff; }
+
+/* ---------- calendario (voto e risultati) ---------- */
+.mese { font-size: 17px; font-weight: 700; margin: 18px 0 6px; color: var(--grigio); text-transform: capitalize; }
+.cal { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) repeat(3, minmax(0, 1.45fr)); gap: 4px; }
+/* VEN SAB DOM piu' grandi: colonne 1.45x + numero piu' grande. Ogni riga ha sempre 7 figli -> basta nth-child.
+   320 px: feriali 32x48, weekend 46x48 (altezza sempre 48: bersaglio comodo anche se stretto). 375 px: 38 / 55. */
+.cal > :nth-child(7n+5), .cal > :nth-child(7n+6), .cal > :nth-child(7n) { font-size: 21px; font-weight: 700; }
+.cal > .wd:nth-child(n+5) { color: var(--ink); font-size: 15px; }
+.wd { text-align: center; font-size: 13px; font-weight: 700; color: var(--grigio); padding-bottom: 2px; }
+.d, .x { position: relative; display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 10px; font-size: 17px; font-weight: 600; line-height: 1; }
+.x { color: var(--spento); font-weight: 400; text-decoration: line-through; }                       /* giorno non votabile: solo il numero, niente bordo */
+.d { border: 2px solid var(--bordo); background: var(--card); color: var(--ink); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.d input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.d:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+.d:active { -webkit-transform: scale(.94); transform: scale(.94); }
+.d.on { background: var(--blu); border-color: var(--blu); color: #fff; }
+.d.forse { background: var(--blu-ch); border: 2px dashed var(--acc); color: var(--blu-sc); }
+/* segni in basso: sole = pomeriggio, luna = sera, ? = forse */
+.d .m { position: absolute; left: 0; right: 0; bottom: 2px; display: flex; justify-content: center; }
+.d .m .ico + .ico { margin-left: 1px; }
+.d .n, .t > span:first-child { margin-top: 6px; }               /* lascia spazio al segno "altri" in alto a destra */
+.d.con-m .n { margin-top: -4px; }
+/* "altri": quante ALTRE persone hanno detto si' (persona + numero), in alto a destra */
+.ppl { position: absolute; top: 2px; right: 3px; display: flex; align-items: center; font-size: 13px; font-weight: 700; color: var(--grigio); line-height: 1; }
+.ppl .ico { margin-right: 1px; }
+.d.on .ppl { color: #dbeafe; }
+.d.forse .ppl { color: var(--blu-sc); }
+
+/* ---------- piastrella giorno piccola (striscia, foglio, riepilogo, admin) ---------- */
+.mini { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 48px; min-height: 52px; border-radius: 10px; background: var(--blu); color: #fff; margin-right: 10px; flex: none; line-height: 1.1; }
+.mini b { font-size: 19px; }
+.mini span { font-size: 13px; }
+.mini.forse { background: var(--blu-ch); color: var(--blu-sc); border: 2px dashed var(--acc); }
+.segm-box { -webkit-box-flex: 1; flex: 1; min-width: 0; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.segm { display: flex; }
+.segm + .segm { margin-top: 6px; }
+.segm input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.segm label { -webkit-box-flex: 1; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 48px; min-width: 0; padding: 4px 2px; border: 2px solid var(--acc); border-left-width: 0; background: var(--card); color: var(--acc); font-size: 13px; font-weight: 700; cursor: pointer; text-align: center; }
+.segm label:first-of-type { border-left-width: 2px; border-radius: 10px 0 0 10px; }
+.segm label:last-of-type { border-radius: 0 10px 10px 0; }
+.segm label .ico { margin-bottom: 2px; }
+.segm input:checked + label { background: var(--blu); color: #fff; }
+.segm input:focus + label { outline: 3px solid var(--focus); outline-offset: 1px; position: relative; z-index: 1; }
+.segm.prob label { -webkit-box-orient: horizontal; flex-direction: row; font-size: 15px; min-height: 44px; }
+.segm.prob label .ico { margin: 0 4px 0 0; }
+.segm.prob input:checked + label.l-forse { background: var(--blu-ch); color: var(--blu-sc); border-style: dashed; }
+
+/* ---------- bottoni ---------- */
+.btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 54px; margin-top: 14px; padding: 0 16px; font: inherit; font-size: 20px; font-weight: 700; line-height: 1.2; text-align: center; border: 2px solid var(--blu); border-radius: 14px; background: var(--blu); color: #fff; cursor: pointer; -webkit-appearance: none; }
+.btn .ico { margin-right: 8px; }
+.btn:active { -webkit-transform: translateY(1px); transform: translateY(1px); }
+.btn:disabled { background: var(--bordo); border-color: var(--bordo); }
+.btn.sec { background: var(--card); color: var(--acc); }
+.link { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; margin-top: 4px; background: none; border: 0; color: var(--acc); font: inherit; font-size: 17px; text-decoration: underline; cursor: pointer; }
+button:focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+button:focus:not(:focus-visible) { outline: none; }
+.conta { white-space: nowrap; display: inline-block; margin-left: 10px; padding: 3px 10px; border-radius: 999px; background: var(--card); color: var(--acc); font-size: 16px; }
+.conta.bump { -webkit-animation: bump .25s ease-out; animation: bump .25s ease-out; }
+@-webkit-keyframes bump { 50% { -webkit-transform: scale(1.25); } }
+@keyframes bump { 50% { transform: scale(1.25); } }
+/* barra fissa in basso, sempre visibile mentre si vota: [foglio] [striscia giorni] [nuvoletta | Invia] */
+.barra { position: -webkit-sticky; position: sticky; bottom: 0; z-index: 3; margin: 16px -16px 0; padding: 10px 16px 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: var(--card); border-top: 1px solid var(--linea); box-shadow: 0 -8px 18px rgba(17,24,39,.10); }
+.riga-b { display: flex; align-items: stretch; }
+.riga-b .btn { margin-top: 0; -webkit-box-flex: 1; flex: 1; min-width: 0; }
+.barra:not(.pronta) .btn { background: var(--card); color: var(--acc); }   /* nessun giorno: Invia "spento" (contorno) */
+.tondo-b { position: relative; display: flex; align-items: center; justify-content: center; width: 54px; min-height: 54px; margin-right: 8px; padding: 0; border: 2px solid var(--acc); border-radius: 14px; background: var(--card); color: var(--acc); cursor: pointer; flex: none; -webkit-appearance: none; }
+.tondo-b .ico { width: 26px; height: 26px; }
+.tondo-b.attivo { background: var(--blu-ch); }
+.pallino { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--ok); border: 2px solid var(--card); }
+/* striscia dei giorni scelti (scorre in orizzontale DENTRO la barra) */
+.striscia { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: -2px -16px 10px; padding: 2px 16px 2px; }
+.striscia .mini { margin-right: 6px; border: 0; font: inherit; cursor: pointer; -webkit-appearance: none; padding: 4px 0; }
+.striscia .mini.forse { border: 2px dashed var(--acc); }
+.mini .m { display: flex; margin-top: 2px; }
+.mini.attivo { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--ink); }
+/* foglio che sale sopra la striscia: orario/forse di un giorno, oppure commento */
+.foglio { margin: -10px -16px 10px; padding: 14px 16px; border-bottom: 1px solid var(--linea); background: var(--card); border-radius: 18px 18px 0 0; -webkit-animation: sale .2s ease-out; animation: sale .2s ease-out; }
+@-webkit-keyframes sale { from { -webkit-transform: translateY(12px); opacity: 0; } }
+@keyframes sale { from { transform: translateY(12px); opacity: 0; } }
+.foglio-t { display: flex; align-items: center; font-weight: 700; font-size: 18px; margin-bottom: 10px; }
+.foglio-t > .ico { margin-right: 8px; color: var(--acc); }
+.chi-legge { margin-top: 8px; }
+.foglio-t .mini { width: 44px; min-height: 48px; margin-right: 10px; }
+.chiudi { margin-left: auto; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--fondo2); color: var(--ink); cursor: pointer; flex: none; }
+.spin { width: 20px; height: 20px; margin-right: 10px; border: 3px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; -webkit-animation: gira .8s linear infinite; animation: gira .8s linear infinite; }
+@-webkit-keyframes gira { to { -webkit-transform: rotate(360deg); } }
+@keyframes gira { to { transform: rotate(360deg); } }
+
+/* ---------- messaggi ---------- */
+.err { display: flex; align-items: center; margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: var(--errbg); color: var(--err); font-weight: 700; font-size: 17px; }
+.err .ico { margin-right: 10px; }
+.lento { display: flex; align-items: center; justify-content: center; margin-top: 6px; font-size: 15px; color: var(--grigio); }
+/* INVIO IN CORSO (entro 100 ms dal tocco): bottone blu con spinner + striscia che scorre dentro; resto attenuato e bloccato */
+.btn.lavora, .btn.lavora:disabled { position: relative; overflow: hidden; background: var(--blu); border-color: var(--blu); color: #fff; }
+.btn.lavora:after { content: ""; position: absolute; left: 0; bottom: 0; width: 40%; height: 4px; background: rgba(255,255,255,.85); -webkit-animation: scorre 1.1s linear infinite; animation: scorre 1.1s linear infinite; }
+@-webkit-keyframes scorre { from { -webkit-transform: translateX(-100%); } to { -webkit-transform: translateX(250%); } }
+@keyframes scorre { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+form.in-corso fieldset, form.in-corso .striscia, form.in-corso .tondo-b, form.in-corso input[type=text] { opacity: .5; pointer-events: none; }
+/* OLTRE ~4 s: compare una barra che avanza piano (mai al 100% finche' il server non conferma) */
+.progresso { height: 6px; margin-top: 10px; border-radius: 3px; background: var(--linea); overflow: hidden; }
+.progresso i { display: block; width: 92%; height: 100%; background: var(--blu); border-radius: 3px; -webkit-transform-origin: left; transform-origin: left; -webkit-animation: avanza 25s cubic-bezier(.1,.6,.3,1) both; animation: avanza 25s cubic-bezier(.1,.6,.3,1) both; }
+@-webkit-keyframes avanza { from { -webkit-transform: scaleX(.08); } }
+@keyframes avanza { from { transform: scaleX(.08); } }
+/* ERRORE: bordo rosso in cima alla barra + messaggio; bottone di nuovo attivo, scelte intatte */
+.barra.errore { border-top: 3px solid var(--err); }
+/* skeleton per i dati del server dentro il calendario di voto (numerini "altri") */
+.ppl.sk-ppl { width: 18px; height: 9px; border-radius: 5px; background: var(--sk); -webkit-animation: resp 1.2s ease-in-out infinite; animation: resp 1.2s ease-in-out infinite; }
+.sk-riga { height: 44px; margin-top: 10px; border-radius: 12px; background: var(--sk); -webkit-animation: resp 1.2s ease-in-out infinite; animation: resp 1.2s ease-in-out infinite; }
+.sk-riga.corta { width: 70%; }
+
+/* ---------- dopo l'invio ---------- */
+.grazie { margin-top: 24px; padding: 20px 16px; border: 2px solid var(--ok); border-radius: 18px; text-align: center; }
+.grazie .tondo { display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: var(--ok); color: #fff; }
+.grazie .tondo .ico { width: 34px; height: 34px; stroke-width: 2.6; }
+/* SUCCESSO: il tondo verde "scoppia" e la spunta si disegna (solo dopo la conferma del server) */
+/* chiusura festosa (N32): alloro di laurea ai lati del tondo */
+.festa { display: flex; align-items: center; justify-content: center; }
+.festa .alloro { width: 30px; height: 60px; stroke-width: 1.6; color: var(--ok); fill: none; -webkit-animation: pop .5s .1s ease-out both; animation: pop .5s .1s ease-out both; }
+.festa .alloro.dx { -webkit-transform: scaleX(-1); transform: scaleX(-1); -webkit-animation-name: popdx; animation-name: popdx; }
+.festa .tondo { margin: 0 6px; }
+@-webkit-keyframes popdx { from { -webkit-transform: scale(-.4, .4); opacity: 0; } to { -webkit-transform: scaleX(-1); } }
+@keyframes popdx { from { transform: scale(-.4, .4); opacity: 0; } to { transform: scaleX(-1); } }
+/* sondaggio chiuso / data scelta (N10) */
+.decisa { margin-top: 24px; padding: 22px 16px; border-radius: 18px; background: var(--blu); color: #fff; text-align: center; }
+.decisa .festa .alloro { color: #fde047; }
+.decisa .grande { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 96px; height: 104px; border-radius: 18px; background: #fff; color: #1e3a8a; line-height: 1.05; }
+.decisa .grande span { font-size: 17px; font-weight: 700; }
+.decisa .grande b { font-size: 46px; }
+.decisa h2 { font-size: 26px; margin-top: 12px; }
+.decisa .chiusi { display: inline-flex; align-items: center; margin-top: 10px; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 15px; }
+.decisa .chiusi .ico { margin-right: 6px; }
+.decisa .btn.sec { background: #fff; color: #1d4ed8; border-color: #fff; }
+.t.scelto { box-shadow: 0 0 0 3px var(--fondo2), 0 0 0 6px var(--giallo); }
+/* bottone fisso con tastiera aperta (N17/N18): il codice mette body.tastiera quando il focus e' su nome/chiave (fuori dalla barra) */
+html { scroll-padding-bottom: 190px; }
+body.tastiera .barra { position: relative; box-shadow: none; }
+.grazie .tondo { -webkit-animation: pop .35s ease-out both; animation: pop .35s ease-out both; }
+.grazie .tondo .ico { stroke-dasharray: 24; -webkit-animation: disegna .4s .2s ease-out both; animation: disegna .4s .2s ease-out both; }
+@-webkit-keyframes pop { from { -webkit-transform: scale(.4); opacity: 0; } 70% { -webkit-transform: scale(1.1); } }
+@keyframes pop { from { transform: scale(.4); opacity: 0; } 70% { transform: scale(1.1); } }
+@-webkit-keyframes disegna { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+@keyframes disegna { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+.link.discreto { color: var(--grigio); font-size: 16px; }
+.link .ico { margin-right: 6px; }
+.grazie h2 { font-size: 24px; margin-top: 10px; }
+.io { position: relative; display: inline-block; margin: 0 8px; -webkit-animation: pop .35s ease-out both; animation: pop .35s ease-out both; }
+.io .av { width: 76px; height: 76px; margin: 0; font-size: 30px; }
+.io .ok-b { position: absolute; right: -6px; bottom: -6px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--ok); color: #fff; border: 3px solid var(--card); }
+.io .ok-b .ico { width: 18px; height: 18px; stroke-width: 3.2; stroke-dasharray: 24; -webkit-animation: disegna .4s .25s ease-out both; animation: disegna .4s .25s ease-out both; }
+.grazie .miei { margin-top: 16px; }
+.miei { display: flex; flex-wrap: wrap; justify-content: center; margin: 12px -3px 0; }
+.miei .mini { margin: 3px; position: relative; }
+.miei .mini .m { display: flex; margin-top: 2px; }
+.citaz { display: flex; align-items: flex-start; text-align: left; margin-top: 14px; padding: 10px 12px; background: var(--fondo2); border-radius: 12px; font-size: 16px; color: var(--ink); }
+.citaz .ico { margin-right: 8px; color: var(--grigio); }
+
+/* ---------- Chi c'e' (risultati) ---------- */
+.tutti { margin-top: 36px; background: var(--fondo2); padding: 24px 0 32px; }
+.tit { display: flex; align-items: center; font-size: 22px; font-weight: 700; }
+.pill { display: inline-flex; align-items: center; margin-left: 10px; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 16px; }
+.pill .ico { margin-right: 4px; }
+.top { display: flex; align-items: center; margin-top: 14px; padding: 10px 12px; background: var(--card); border-radius: 14px; font-weight: 700; }
+.top .stella-b { margin-right: 10px; }
+.top .ppl2 { margin-left: auto; display: flex; align-items: center; color: var(--blu-sc); }
+.top .ppl2 .ico { margin-right: 3px; }
+.stella-b { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--giallo); color: #111827; flex: none; }
+.scala .barra-g { display: block; -webkit-box-flex: 1; flex: 1; height: 12px; margin: 0 8px; border-radius: 6px; border: 1px solid var(--linea); background: linear-gradient(to right, var(--h0b), var(--h1b), var(--h2b), var(--h3b), var(--h4b)); }
+.scala b { display: inline-flex; align-items: center; font-size: 14px; }
+.scala { display: flex; align-items: center; justify-content: flex-end; margin-top: 12px; font-size: 14px; color: var(--grigio); }
+.scala i { display: inline-block; width: 18px; height: 18px; border-radius: 5px; margin-left: 3px; }
+.scala i:last-of-type { margin-right: 6px; }
+.scala span:first-child { margin-right: 3px; }
+/* mappa di calore: piastrelle piene, senza bordo (cosi' non sembra il calendario da toccare per votare) */
+.t { position: relative; display: flex; align-items: center; justify-content: center; min-height: 48px; width: auto; margin: 0; padding: 0; border: 0; border-radius: 10px; font: inherit; font-size: 17px; font-weight: 600; line-height: 1; cursor: pointer; -webkit-appearance: none; }
+.h0, .scala .h0 { background: var(--h0b); color: var(--h0f); }
+.h1, .scala .h1 { background: var(--h1b); color: var(--h1f); }
+.h2, .scala .h2 { background: var(--h2b); color: var(--h2f); }   /* 6.0:1 */
+.h3, .scala .h3 { background: var(--h3b); color: var(--h3f); }                  /* 5.17:1 */
+.h4, .scala .h4 { background: var(--h4b); color: var(--h4f); }
+.t .ppl { color: inherit; }
+.t.sel { box-shadow: 0 0 0 3px var(--fondo2), 0 0 0 6px var(--ink); z-index: 1; }
+.t.solo-forse { background: var(--card); border: 2px dashed var(--acc); color: var(--blu-sc); }
+.t .stella-b { position: absolute; top: -7px; left: -7px; width: 20px; height: 20px; z-index: 2; }
+.giorno { margin-top: 18px; background: var(--card); border-radius: 16px; padding: 14px; }
+.giorno-t { display: flex; align-items: center; font-weight: 700; font-size: 19px; }
+.giorno-t .mini { width: 44px; min-height: 44px; margin-right: 10px; }
+.gr { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--linea); }
+.gr-t { display: flex; align-items: center; font-weight: 700; font-size: 16px; color: var(--ink); }
+.gr-t .ico { margin-right: 6px; color: var(--acc); }
+.gr-t .n { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--blu-ch); color: var(--blu-sc); font-size: 14px; }
+.gr.no .gr-t .ico { color: var(--grigio); }
+.gr.no .gr-t .n { background: var(--grigiobg); color: var(--grigio); }
+.chips { display: flex; flex-wrap: wrap; margin: 4px -3px 0; }
+.chip { display: inline-flex; align-items: center; max-width: 100%; margin: 4px 3px 0; padding: 5px 11px; border-radius: 999px; background: var(--blu-ch); color: var(--blu-sc); font-size: 15px; border: 1.5px solid var(--blu-ch); }
+.chip.forse { background: var(--card); border: 1.5px dashed var(--acc); }
+.chip.forse .ico { margin-left: 3px; }
+.chip.no { background: var(--grigiobg); border-color: var(--grigiobg); color: var(--grigio); }
+.vuoto { text-align: center; padding: 24px 12px; color: var(--grigio); }
+.vuoto .ico { width: 40px; height: 40px; stroke-width: 1.6; color: var(--acc); display: block; margin: 0 auto 6px; }
+/* commenti */
+.comm { margin-top: 26px; }
+.comm h3 { display: flex; align-items: center; font-size: 19px; }
+.comm h3 .ico { margin-right: 8px; color: var(--acc); }
+.comm ul { list-style: none; margin: 0; padding: 0; }
+.comm li { display: flex; align-items: flex-start; margin-top: 12px; }
+/* avatar: simbolo disegnato o iniziale su colore ricavato dal nome */
+.av svg { width: 100%; height: 100%; display: block; }
+.av.c0 { background: #1d4ed8; } .av.c1 { background: #15803d; } .av.c2 { background: #b45309; }
+.av.c3 { background: #7c3aed; } .av.c4 { background: #be123c; } .av.c5 { background: #0f766e; }
+.av.disegno { background: none; }
+.chip .av { width: 24px; height: 24px; margin: -3px 6px -3px -8px; font-size: 12px; }
+.chip.no .av { opacity: .7; }
+/* scelta avatar: bottone tondo accanto al nome (con matitina), griglia che si apre sotto */
+.nome-riga { display: flex; align-items: center; }
+.nome-riga input { -webkit-box-flex: 1; flex: 1; min-width: 0; }
+.av-btn { position: relative; width: 52px; height: 52px; margin-right: 8px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; flex: none; }
+.av-btn .av { width: 52px; height: 52px; margin: 0; font-size: 20px; }
+.av-btn .vuoto-av { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; border: 2px dashed var(--bordo); color: var(--grigio); }
+.av-btn .mat { position: absolute; right: -2px; bottom: -2px; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--card); border: 2px solid var(--acc); color: var(--acc); }
+.av-btn .mat .ico { width: 12px; height: 12px; stroke-width: 3; }
+.griglia-av { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 10px; padding: 12px; border-radius: 14px; background: var(--fondo2); }
+.griglia-av input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.griglia-av label { position: relative; display: flex; justify-content: center; padding: 3px 0; border-radius: 50%; cursor: pointer; }
+.griglia-av label .av { width: 48px; height: 48px; margin: 0; font-size: 19px; }
+.griglia-av input:checked + label .av { box-shadow: 0 0 0 3px var(--fondo2), 0 0 0 6px var(--acc); }
+.griglia-av input:checked + label:after { content: ""; position: absolute; right: 2px; bottom: 0; width: 18px; height: 18px; border-radius: 50%; background: var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat; }
+.griglia-av input:focus + label { outline: 3px solid var(--focus); }
+/* segmenti solo-icona (orario / forse): testo nascosto, icone grandi */
+.segm.solo-ico label { min-height: 52px; }
+.segm.solo-ico label .ico { width: 26px; height: 26px; margin: 0; }
+.segm.solo-ico label .doppia .ico { width: 20px; height: 20px; }
+/* conteggi: icona + numero, la parola solo per i lettori di schermo */
+.scala .ico { width: 18px; height: 18px; color: var(--grigio); }
+.av { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--blu); color: #fff; font-weight: 700; font-size: 15px; margin-right: 10px; flex: none; }
+.bolla { position: relative; background: var(--card); border-radius: 4px 14px 14px 14px; padding: 8px 12px; font-size: 16px; min-width: 0; }
+.bolla b { display: block; font-size: 14px; color: var(--grigio); }
+/* caricamento: piastrelle grigie che respirano */
+.sk { min-height: 48px; border-radius: 10px; background: var(--sk); -webkit-animation: resp 1.2s ease-in-out infinite; animation: resp 1.2s ease-in-out infinite; }
+@-webkit-keyframes resp { 50% { opacity: .45; } }
+@keyframes resp { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .sk, .sk-riga, .ppl.sk-ppl, .spin, .conta.bump, .btn.lavora:after, .progresso i, .grazie .tondo, .grazie .tondo .ico, .foglio, .toast, .toast:after { -webkit-animation: none; animation: none; } .d:active, .btn:active { transform: none; } }
+
+/* ---------- "annulla" temporaneo: sostituisce ogni conferma. 6 s, la riga sotto si accorcia ---------- */
+.toast { position: fixed; left: 12px; right: 12px; bottom: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 6; max-width: 416px; margin: 0 auto; display: flex; align-items: center; padding: 6px 6px 6px 14px; border-radius: 14px; background: var(--toast); color: #fff; font-size: 17px; box-shadow: 0 8px 24px rgba(17,24,39,.3); overflow: hidden; -webkit-animation: sale .2s ease-out; animation: sale .2s ease-out; }
+.toast > .ico { margin-right: 8px; color: #86efac; }   /* spunta verde chiaro: "e' salvato" */
+.barra .toast { position: relative; left: auto; right: auto; bottom: auto; margin: 0 0 10px; }   /* con la barra: sta SOPRA i bottoni, non li copre */
+.toast span { -webkit-box-flex: 1; flex: 1; min-width: 0; }
+.toast button { display: flex; align-items: center; min-height: 44px; margin-left: 8px; padding: 0 12px; border: 0; border-radius: 10px; background: var(--giallo); color: #111827; font: inherit; font-size: 17px; font-weight: 700; cursor: pointer; flex: none; }
+.toast button .ico { margin-right: 4px; }
+.toast:after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--giallo); -webkit-transform-origin: left; transform-origin: left; -webkit-animation: tempo 6s linear forwards; animation: tempo 6s linear forwards; }
+@-webkit-keyframes tempo { to { -webkit-transform: scaleX(0); } }
+@keyframes tempo { to { transform: scaleX(0); } }
+/* cio' che sta per sparire resta visibile, sbiadito, finche' l'annulla e' possibile */
+.uscita { opacity: .45; }
+.uscita .chi { text-decoration: line-through; }
+/* "tu" nei risultati: anello attorno al proprio nome (resta anche dopo "Non sei...?") */
+.chip.tu { border: 2px solid var(--acc); font-weight: 700; }
+
+/* ---------- admin: giorni aperti/chiusi, cestino ---------- */
+.d.chiuso { border-style: dashed; background: var(--card); color: var(--spento); }
+.d.chiuso .n { text-decoration: line-through; }
+.cestino { margin-top: 18px; padding: 12px; border-radius: 14px; background: var(--grigiobg); }
+.cestino .gr-t .ico { color: var(--grigio); }
+.cestino li { display: flex; align-items: center; margin-top: 10px; }
+.cestino .chi { -webkit-box-flex: 1; flex: 1; min-width: 0; color: var(--grigio); font-weight: 700; }
+.cestino .btn { width: auto; margin: 0; min-height: 44px; font-size: 16px; padding: 0 12px; }
+.cestino ul { list-style: none; margin: 0; padding: 0; }
+
+.admin-az { display: flex; margin-top: 12px; }
+.admin-az .btn { margin-top: 0; min-height: 46px; font-size: 16px; padding: 0 8px; -webkit-box-flex: 1; flex: 1; min-width: 0; }
+.admin-az .btn + .btn { margin-left: 8px; }
+.mancano .btn { margin-top: 10px; min-height: 46px; font-size: 16px; }
+.persone li.nuovo { box-shadow: inset 5px 0 0 var(--giallo); }
+.persone .nuovo-p { width: 10px; height: 10px; margin-left: 8px; border-radius: 50%; background: var(--giallo); border: 2px solid #a16207; }
+
+/* ---------- admin ---------- */
+.adminbar { position: -webkit-sticky; position: sticky; top: 0; z-index: 4; background: var(--giallo); color: #111827; font-weight: 700; }
+.adminbar .wrap { display: flex; align-items: center; justify-content: space-between; min-height: 48px; }
+.adminbar .link { width: auto; margin: 0; color: #111827; }
+.modifichi { display: flex; align-items: center; margin-top: 16px; padding: 10px 12px; border-radius: 12px; background: var(--nota); border: 2px solid var(--giallo); font-weight: 700; }
+.modifichi .ico { margin-right: 8px; }
+.persone { list-style: none; margin: 12px 0 0; padding: 0; }
+.persone li { background: var(--card); border-radius: 14px; padding: 12px; margin-top: 10px; }
+.persone .chi { display: flex; align-items: center; font-weight: 700; }
+.persone .chi .av { width: 30px; height: 30px; font-size: 14px; }
+.persone .miei { justify-content: flex-start; margin-top: 6px; }
+.persone .miei .mini { width: 40px; min-height: 44px; }
+.persone .miei .mini b { font-size: 16px; }
+.persone .citaz { margin-top: 8px; background: var(--fondo2); }
+.citaz.privato { background: var(--nota); }
+.mancano { margin-top: 18px; padding: 12px; border-radius: 14px; border: 2px dashed var(--bordo); }
+.mancano .gr-t .n { background: var(--grigiobg); color: var(--grigio); }
+.chip.manca { background: var(--card); border: 1.5px solid var(--bordo); color: var(--grigio); }
+.azioni { display: flex; margin-top: 8px; }
+.azioni .btn { -webkit-box-flex: 1; flex: 1; min-width: 0; padding: 0 8px; margin-top: 0; min-height: 46px; font-size: 16px; }
+.azioni .btn + .btn { margin-left: 8px; }
+.azioni .btn.del { color: var(--err); border-color: var(--err); }
+.azioni .btn.icona { -webkit-box-flex: 0; flex: none; width: 46px; padding: 0; }
+.azioni .btn.icona .ico { margin: 0; }
+.persone .chi .prot { margin-left: 6px; color: var(--grigio); }
+
+/* ZOOM 200% / TESTO GRANDE (WCAG 1.4.4, 1.4.10): 375 px zoomati al 200% = 188 px di viewport. Tutto rientra, niente scroll orizzontale. */
+@media (max-width: 300px) {
+  .wrap { padding: 0 8px; }
+  .barra { margin-left: -8px; margin-right: -8px; padding-left: 8px; padding-right: 8px; }
+  .striscia { margin-left: -8px; margin-right: -8px; padding-left: 8px; padding-right: 8px; }
+  .testa .wrap > .ico, .facce i { display: none; }
+  .passo { font-size: 18px; }
+  .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; }
+  .cal > *, .cal > :nth-child(7n+5), .cal > :nth-child(7n+6), .cal > :nth-child(7n) { font-size: 14px; }
+  .d, .x, .t, .sk { min-height: 40px; border-width: 1px; border-radius: 6px; }
+  .d .n, .t > span:first-child { margin-top: 10px; }
+  .ppl { top: 1px; right: 1px; font-size: 13px; }
+  .ppl .ico, .d .m { display: none; }
+  .d.con-m .n { margin-top: 10px; }
+  .tondo-b { width: 46px; min-height: 46px; }
+  .btn { font-size: 18px; padding: 6px 10px; }
+  .conta { margin-left: 6px; padding: 2px 8px; }
+  .av-btn, .av-btn .av, .av-btn .vuoto-av { width: 44px; height: 44px; }
+  .segm label { font-size: 13px; }
+  .griglia-av { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* schermo basso (orizzontale, zoom forte): la barra non resta fissa, sta in fondo al form e non copre niente (N17) */
+@media (max-height: 500px) { .barra { position: relative; box-shadow: none; } }
+
+/* =====================================================================
+   VARIANTI: classi su <body>. Default = nessuna classe (la raccomandata). Nessun cambio a HTML/JS.
+   ===================================================================== */
+.tondo-b .etich { display: none; }
+/* V1 weekend: grande (default) | uguale | solo nella mappa */
+body.v-weekend-uguale .cal, body.v-weekend-solo-mappa form .cal { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+body.v-weekend-uguale .cal > *, body.v-weekend-solo-mappa form .cal > * { font-size: 17px; font-weight: 600; }
+body.v-weekend-uguale .cal > .wd, body.v-weekend-solo-mappa form .cal > .wd { font-size: 13px; color: var(--grigio); }
+/* V2 mappa di calore: blu (default) | verde | caldo (giallo -> rosso) */
+body.v-mappa-verde { --h1b: #dcfce7; --h1f: #14532d; --h2b: #86efac; --h2f: #14532d; --h3b: #16a34a; --h3f: #fff; --h4b: #14532d; --h4f: #fff; }
+body.v-mappa-caldo { --h1b: #fef9c3; --h1f: #713f12; --h2b: #fde047; --h2f: #713f12; --h3b: #f97316; --h3f: #111827; --h4b: #b91c1c; --h4f: #fff; }
+/* V3 commento: nuvoletta sola (default) | nuvoletta + parola */
+body.v-commento-parola .tondo-b { width: auto; padding: 0 12px; }
+body.v-commento-parola .tondo-b .etich { display: inline; margin-left: 6px; font-size: 16px; font-weight: 700; }
+/* V4 avatar: ovunque (default) | non nelle etichette dei giorni | da nessuna parte */
+body.v-avatar-no-etichette .chip .av { display: none; }
+body.v-avatar-no .chip .av, body.v-avatar-no .av-btn, body.v-avatar-no .griglia-av, body.v-avatar-no .facce i { display: none; }
+/* V5 densita' calendario: comodo 48 (default) | compatto 40 | ampio 56 */
+body.v-cal-compatto .d, body.v-cal-compatto .x, body.v-cal-compatto .t, body.v-cal-compatto .sk { min-height: 40px; }
+body.v-cal-compatto .d .n, body.v-cal-compatto .t > span:first-child { margin-top: 3px; }
+body.v-cal-ampio .d, body.v-cal-ampio .x, body.v-cal-ampio .t, body.v-cal-ampio .sk { min-height: 56px; }
+body.v-cal-ampio .cal { gap: 6px; }
+/* V6 bottone fisso: barra piena (default) | galleggiante (niente fondo, bottoni con ombra) */
+body.v-barra-galleggiante .barra { background: none; border-top: 0; box-shadow: none; }
+body.v-barra-galleggiante .barra .btn, body.v-barra-galleggiante .barra .tondo-b, body.v-barra-galleggiante .striscia .mini { box-shadow: 0 6px 16px rgba(17,24,39,.25); }
+body.v-barra-galleggiante .striscia { padding-bottom: 8px; }
+/* V7 forse: tratteggio + ? (default) | righe diagonali + ? */
+body.v-forse-righe .d.forse, body.v-forse-righe .mini.forse, body.v-forse-righe .t.solo-forse { border-style: solid; background: repeating-linear-gradient(135deg, var(--blu-ch) 0 5px, var(--card) 5px 10px); }
+/* V9 risultati: mappa di calore (default) | classifica a barre dei 6 giorni migliori (piu' corta, diversa dal calendario di voto) */
+.classifica { display: none; list-style: none; margin: 14px 0 0; padding: 0; }
+.classifica button { display: flex; align-items: center; width: 100%; margin-top: 6px; padding: 4px; border: 0; border-radius: 14px; background: var(--card); color: var(--ink); font: inherit; cursor: pointer; }
+.classifica button.sel { box-shadow: 0 0 0 3px var(--ink); }
+.classifica .mini { width: 44px; min-height: 48px; margin-right: 10px; }
+.classifica .pista { -webkit-box-flex: 1; flex: 1; display: flex; height: 16px; border-radius: 8px; background: var(--grigiobg); overflow: hidden; }
+.classifica .pista .si { background: var(--blu); }
+.classifica .pista .fo { background: repeating-linear-gradient(135deg, var(--blu-m) 0 4px, transparent 4px 8px); }
+.classifica .nn { display: inline-flex; align-items: center; min-width: 58px; justify-content: flex-end; margin: 0 6px; font-weight: 700; }
+.classifica .nn .ico.pieno { color: #ca8a04; margin-right: 3px; }
+body.v-ris-classifica .classifica { display: block; }
+body.v-ris-classifica .mappa, body.v-ris-classifica .scala { display: none; }
+/* V11 calendario unico: niente mappa separata; gli ALTRI = bollino scuro sull'angolo (come le notifiche), IO = casella piena */
+body.v-unico .mappa, body.v-unico .scala, body.v-unico .classifica { display: none; }
+body.v-unico form .ppl { top: -7px; right: -5px; z-index: 1; padding: 3px 5px; border-radius: 999px; background: var(--ink); color: var(--bg); box-shadow: 0 0 0 2px var(--bg); }
+body.v-unico form .d.on .ppl, body.v-unico form .d.forse .ppl { color: var(--bg); }
+body.v-unico form .d .n { margin-top: 0; }
+body.v-unico form .d.con-m .n { margin-top: -10px; }
+/* V10 gruppo "No" nel pannello: nomi (default) | solo numero */
+body.v-no-solo-numero .gr.no .chips { display: none; }
+/* V8 passi numerati: si (default) | no */
+body.v-passi-no .passo .num { display: none; }
+
+/* =====================================================================
+   PROTOTIPO (non copiare): selettore degli stati e vetrina icone
+   ===================================================================== */
+.aspetto { margin-top: 14px; padding: 12px; border-radius: 12px; background: #1f2937; }
+.aspetto fieldset { margin-top: 10px; }
+.aspetto legend { font-weight: 700; color: #fde047; }
+.aspetto label { display: inline-flex; align-items: center; min-height: 36px; margin-right: 12px; }
+.aspetto input { margin-right: 5px; }
+.proto { background: #111827; color: #fff; padding: 14px 0 24px; font-size: 15px; margin-top: 0; }
+.proto a { color: #fde047; margin-right: 12px; display: inline-block; padding: 6px 0; }
+.icone { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.icone div { background: var(--card); color: var(--ink); border-radius: 10px; padding: 10px 4px; text-align: center; font-size: 12px; }
+.icone .ico { display: block; margin: 0 auto 4px; width: 28px; height: 28px; color: var(--blu); }
+</style>
+</head>
+<body>
+
+<!-- ====== SET DI ICONE: copiare questo <svg> una volta in cima al <body> ======
+     Uso: <svg class="ico" aria-hidden="true"><use href="#i-sole" xlink:href="#i-sole"></use></svg>
+     (href + xlink:href per iOS 12). Da sola l'icona va accompagnata da testo .sr o aria-label. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<!-- AVATAR: 48x48, ciascuno con il proprio cerchio di fondo. Contorno #1e293b 2px, colori piatti. -->
+<symbol id="a-jeans" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#bfdbfe"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M13.5 8h21l3 32h-9.5L24 27l-4 13h-9.5z" fill="#2563eb"/><path d="M13.2 13h21.6" fill="none"/><path d="M24 13v8" fill="none" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="2 2"/></g><circle cx="19" cy="18.5" r="2.3" fill="#fff"/><circle cx="29" cy="18.5" r="2.3" fill="#fff"/><circle cx="19.4" cy="19" r="1.1" fill="#1e293b"/><circle cx="29.4" cy="19" r="1.1" fill="#1e293b"/><path d="M21 23.5q3 2.6 6 0" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="24" cy="10.5" r="1.4" fill="#facc15"/></symbol>
+<symbol id="a-gpt" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#10a37f"/><g fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"><g id="a-gpt-l"><path d="M21 11.5a7 7 0 0 1 12 4.9v9.3"/></g><use href="#a-gpt-l" xlink:href="#a-gpt-l" transform="rotate(60 24 24)"/><use href="#a-gpt-l" xlink:href="#a-gpt-l" transform="rotate(120 24 24)"/><use href="#a-gpt-l" xlink:href="#a-gpt-l" transform="rotate(180 24 24)"/><use href="#a-gpt-l" xlink:href="#a-gpt-l" transform="rotate(240 24 24)"/><use href="#a-gpt-l" xlink:href="#a-gpt-l" transform="rotate(300 24 24)"/></g></symbol>
+<symbol id="a-claude" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#f5f0e8"/><g stroke="#d97757" stroke-width="3.4" stroke-linecap="round"><path d="M24 24V8.5M24 24l7.8-13.2M24 24l12.9-7.6M24 24h15M24 24l13.4 7.2M24 24l7 12.6M24 24v15.5M24 24l-7.6 13.4M24 24l-13 7.4M24 24H9M24 24l-12.6-7.2M24 24l-7.2-13"/></g><circle cx="24" cy="24" r="3" fill="#d97757"/></symbol>
+<symbol id="a-razzo" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#1e293b"/><circle cx="11" cy="13" r="1" fill="#fff"/><circle cx="37" cy="10" r="1.2" fill="#fff"/><circle cx="38" cy="33" r="1" fill="#fff"/><g stroke="#0f172a" stroke-width="2" stroke-linejoin="round"><path d="M24 40l-3.5-6h7z" fill="#fb923c"/><path d="M18.5 28l-5 6v-7l5-4zM29.5 28l5 6v-7l-5-4z" fill="#ef4444"/><path d="M24 7c5 4 6.5 10 6 21h-12c-.5-11 1-17 6-21z" fill="#f8fafc"/><circle cx="24" cy="18" r="3.2" fill="#38bdf8"/></g></symbol>
+<symbol id="a-medico" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#ccfbf1"/><g fill="none" stroke="#1e293b" stroke-width="2.6" stroke-linecap="round"><path d="M15 9v9a7 7 0 0 0 14 0V9"/><path d="M22 25v5a7 7 0 0 0 14 0v-3"/></g><circle cx="15" cy="9" r="2" fill="#1e293b"/><circle cx="29" cy="9" r="2" fill="#1e293b"/><circle cx="36" cy="24" r="4.5" fill="#94a3b8" stroke="#1e293b" stroke-width="2"/><path d="M8.5 31h7M12 27.5v7" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/></symbol>
+<symbol id="a-soldi" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#bbf7d0"/><g stroke="#1e293b" stroke-width="2"><rect x="8" y="15" width="25" height="15" rx="2" fill="#22c55e" transform="rotate(-10 20 22)"/><circle cx="20" cy="22.5" r="4" fill="#bbf7d0" transform="rotate(-10 20 22)"/><circle cx="31" cy="30" r="9" fill="#facc15"/></g><path d="M34.2 26.2a4.6 4.6 0 1 0 0 7.6M26.5 28.8h5.5M26.5 31.4h5.5" fill="none" stroke="#a16207" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="a-computer" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#e0e7ff"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><rect x="11" y="12" width="26" height="18" rx="2" fill="#1e293b"/><rect x="13.5" y="14.5" width="21" height="13" rx="1" fill="#60a5fa"/><path d="M7 33h34l-3 4H10z" fill="#cbd5e1"/></g><path d="M17 19l-2 2 2 2M31 19l2 2-2 2M26 18l-4 7" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="a-gatto" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#fed7aa"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><path d="M11 13l3 10M37 13l-3 10" fill="none"/><path d="M11 12l9 6h8l9-6 1 14c0 7-6 12-14 12S10 33 10 26z" fill="#fb923c"/></g><path d="M10.5 13.5l4 6M37.5 13.5l-4 6" stroke="#fdba74" stroke-width="2"/><circle cx="18.5" cy="25" r="2" fill="#1e293b"/><circle cx="29.5" cy="25" r="2" fill="#1e293b"/><path d="M22.5 29h3l-1.5 2z" fill="#be123c" stroke="#be123c" stroke-linejoin="round"/><path d="M24 31v1.5m0 0q-2 2-4 .5m4-.5q2 2 4 .5M8 28l7 1M8 32l7-1M40 28l-7 1M40 32l-7-1" fill="none" stroke="#1e293b" stroke-width="1.4" stroke-linecap="round"/></symbol>
+<symbol id="a-cane" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#fde68a"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><path d="M14 13c4-3 16-3 20 0 3 4 3 18-1 22-4 4-14 4-18 0-4-4-4-18-1-22z" fill="#d6a46b"/><path d="M14 12c-5 0-7 6-6 13 2 2 4 1 6-1zM34 12c5 0 7 6 6 13-2 2-4 1-6-1z" fill="#92400e"/><ellipse cx="24" cy="31" rx="6" ry="5" fill="#fef3c7"/></g><circle cx="19" cy="23" r="2" fill="#1e293b"/><circle cx="29" cy="23" r="2" fill="#1e293b"/><ellipse cx="24" cy="29" rx="2.6" ry="1.9" fill="#1e293b"/><path d="M24 31v2.5M24 33.5q2.5 3 4 0" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/><path d="M26.5 34.5q.5 3 2.5 2" fill="#f43f5e"/></symbol>
+<symbol id="a-pizza" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#fee2e2"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><path d="M9 13c10-5 20-5 30 0L24 41z" fill="#fcd34d"/><path d="M9 13c10-5 20-5 30 0l-2 4c-9-4-17-4-26 0z" fill="#d97706"/><circle cx="20" cy="22" r="3" fill="#dc2626"/><circle cx="28" cy="21" r="2.6" fill="#dc2626"/><circle cx="24" cy="30" r="2.6" fill="#dc2626"/></g><circle cx="29" cy="27" r="1.2" fill="#16a34a"/><circle cx="18" cy="17.5" r="1.1" fill="#16a34a"/></symbol>
+<symbol id="a-palla" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#86efac"/><circle cx="24" cy="24" r="14" fill="#fff" stroke="#1e293b" stroke-width="2"/><path d="M24 17.5l6.2 4.5-2.4 7.3h-7.6L17.8 22z" fill="#1e293b"/><path d="M24 17.5V10.5M30.2 22l6.6-2.2M27.8 29.3l4.1 5.8M20.2 29.3l-4.1 5.8M17.8 22l-6.6-2.2" stroke="#1e293b" stroke-width="2"/><path d="M19 11.5l5 -1 5 1M35 16l2 4.5-1 5M34 33l-4 3.5h-5M14 33l4 3.5h5M13 16l-2 4.5 1 5" fill="none" stroke="#1e293b" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="a-chitarra" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#fde68a"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><path d="M28 9l6-3 3 3-3 6-3 0z" fill="#78350f"/><path d="M30 16L22 24" stroke-width="4.5" stroke="#1e293b"/><path d="M30 16L22 24" stroke-width="2.2" stroke="#92400e"/><path d="M22 20c-2-4-9-4-10 1-1 3 1 4-1 6-4 3-2 11 4 12 5 1 7-2 9-6 2-2 3 0 6-1 4-2 4-9-1-10-3-1-5 0-7-2z" fill="#f97316"/><circle cx="20.5" cy="28" r="3" fill="#78350f"/></g><path d="M18 33l4-4" stroke="#1e293b" stroke-width="2.4" stroke-linecap="round"/></symbol>
+<symbol id="a-caffe" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#e7e5e4"/><path d="M18 9q-2 3 0 5t0 5M24 8q-2 3 0 5t0 5M30 9q-2 3 0 5t0 5" fill="none" stroke="#78716c" stroke-width="2" stroke-linecap="round"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><path d="M33 24h3a4 4 0 0 1 0 8h-4" fill="none"/><path d="M12 22h22l-2 13a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="#fff"/><path d="M12.3 24h21.4" fill="none"/><ellipse cx="23" cy="22" rx="11" ry="2" fill="#78350f"/><path d="M8 39h30" fill="none"/></g></symbol>
+<symbol id="a-fiore" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#fce7f3"/><path d="M24 30v12M24 37q-6-1-8-6 6 0 8 6" fill="#22c55e" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><g fill="#ec4899" stroke="#1e293b" stroke-width="2"><circle cx="24" cy="12" r="5.5"/><circle cx="32.6" cy="18" r="5.5"/><circle cx="29.3" cy="27.5" r="5.5"/><circle cx="18.7" cy="27.5" r="5.5"/><circle cx="15.4" cy="18" r="5.5"/></g><circle cx="24" cy="20.5" r="5" fill="#facc15" stroke="#1e293b" stroke-width="2"/></symbol>
+<symbol id="a-sole" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#bae6fd"/><path d="M24 5v6M24 37v6M5 24h6M37 24h6M10.6 10.6l4.2 4.2M33.2 33.2l4.2 4.2M10.6 37.4l4.2-4.2M33.2 14.8l4.2-4.2" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="10" fill="#facc15" stroke="#1e293b" stroke-width="2"/><circle cx="20.5" cy="22" r="1.5" fill="#1e293b"/><circle cx="27.5" cy="22" r="1.5" fill="#1e293b"/><path d="M20 26.5q4 3.5 8 0" fill="none" stroke="#1e293b" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="a-gufo" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#ddd6fe"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><path d="M12 10l6 4h12l6-4 1 16c0 9-6 14-13 14S11 35 11 26z" fill="#8b5cf6"/><ellipse cx="24" cy="31" rx="7" ry="7" fill="#c4b5fd"/><circle cx="18" cy="20" r="5" fill="#fff"/><circle cx="30" cy="20" r="5" fill="#fff"/><path d="M22 24l2 3 2-3z" fill="#f59e0b"/></g><circle cx="18.5" cy="20.5" r="2.2" fill="#1e293b"/><circle cx="29.5" cy="20.5" r="2.2" fill="#1e293b"/><path d="M21 30l1.5 1.5 1.5-1.5 1.5 1.5 1.5-1.5M21 34l1.5 1.5 1.5-1.5 1.5 1.5 1.5-1.5" fill="none" stroke="#7c3aed" stroke-width="1.4"/></symbol>
+<symbol id="a-cappello" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#dbeafe"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><path d="M14 23v8c0 3 4.5 5 10 5s10-2 10-5v-8" fill="#1e293b"/><path d="M5 18l19-9 19 9-19 9z" fill="#334155"/></g><path d="M24 18l12 4v9" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round"/><path d="M34.5 31h3l1 5h-5z" fill="#facc15" stroke="#a16207" stroke-width="1.2" stroke-linejoin="round"/><circle cx="24" cy="18" r="1.6" fill="#facc15"/></symbol>
+<symbol id="a-brindisi" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#fef3c7"/><path d="M21 8l1 4M27 8l-1 4M17 10l2.5 3M31 10l-2.5 3" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><g transform="rotate(-14 16 28)"><rect x="9" y="17" width="13" height="21" rx="2" fill="#fbbf24"/><path d="M22 21h3a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-3" fill="none"/><path d="M8 18c0-3 3-4 5-3 1-2 5-2 6 0 2-1 4 0 4 3z" fill="#fff"/></g><g transform="rotate(14 32 28)"><rect x="26" y="17" width="13" height="21" rx="2" fill="#fbbf24"/><path d="M26 21h-3a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h3" fill="none"/><path d="M25 18c0-3 3-4 5-3 1-2 5-2 6 0 2-1 4 0 4 3z" fill="#fff"/></g></g></symbol>
+<symbol id="a-libro" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#fecaca"/><g stroke="#1e293b" stroke-width="2" stroke-linejoin="round"><path d="M24 15c-4-3-10-3-15-2v22c5-1 11-1 15 2 4-3 10-3 15-2V13c-5-1-11-1-15 2z" fill="#fff"/><path d="M24 15v22" fill="none"/></g><path d="M12 18q5-1 9 1M12 22q5-1 9 1M12 26q5-1 9 1M27 19q4-2 9-1M27 23q4-2 9-1M27 27q4-2 9-1" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><path d="M33 12v9l2-1.5 2 1.5v-9.5" fill="#dc2626" stroke="#1e293b" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cappello" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 9v6"/></symbol>
+  <symbol id="i-sole" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></symbol>
+  <symbol id="i-luna" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 7 7 0 0 0 20 14.5z"/></symbol>
+  <symbol id="i-forse" viewBox="0 0 24 24"><path d="M8.5 9a3.5 3.5 0 1 1 5.2 3.1c-1 .6-1.7 1.4-1.7 2.6v.3"/><path d="M12 19.5v.01"/></symbol>
+  <symbol id="i-stella" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol>
+  <symbol id="i-persona" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  <symbol id="i-gruppo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.8 3.1-6 7-6s7 2.2 7 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.4.6 4 2.5 4 5.7"/></symbol>
+  <symbol id="i-spunta" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></symbol>
+  <symbol id="i-croce" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-matita" viewBox="0 0 24 24"><path d="M4 20l1-4.5L16 4.5l3.5 3.5-11 11z"/><path d="M13.5 7l3.5 3.5"/></symbol>
+  <symbol id="i-cestino" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4h5v3M6 7l1 13h10l1-13"/><path d="M10 11v5M14 11v5"/></symbol>
+  <symbol id="i-nuvola" viewBox="0 0 24 24"><path d="M4 5h16v11h-9l-5 4v-4H4z"/></symbol>
+  <symbol id="i-riprova" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-avviso" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></symbol>
+  <symbol id="i-lucchetto" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-chiave" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5l3 3M14 9l2.5 2.5"/></symbol>
+  <symbol id="i-chiave-via" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5l3 3"/><path d="M3 3l18 18"/></symbol>
+  <symbol id="i-indietro" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+  <symbol id="i-cambia" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.8 3.1-6 7-6 1.3 0 2.5.3 3.5.7"/><path d="M15 15h7M19 12l3 3-3 3"/></symbol>
+  <symbol id="i-orologio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-occhio" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-copia" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+  <symbol id="i-condividi" viewBox="0 0 24 24"><path d="M12 15V3M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol>
+  <symbol id="i-calendario" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></symbol>
+  <symbol id="i-alloro" viewBox="0 0 32 64"><path d="M25 61C11 52 6 34 13 4"/><g><ellipse cx="16" cy="55" rx="3" ry="7" transform="rotate(-62 16 55)"/><ellipse cx="10" cy="46" rx="3" ry="7" transform="rotate(-48 10 46)"/><ellipse cx="6.5" cy="36" rx="3" ry="7" transform="rotate(-28 6.5 36)"/><ellipse cx="6" cy="25" rx="3" ry="6.5" transform="rotate(-12 6 25)"/><ellipse cx="8" cy="14" rx="2.8" ry="6" transform="rotate(8 8 14)"/><ellipse cx="22" cy="49" rx="2.6" ry="6" transform="rotate(30 22 49)"/><ellipse cx="17" cy="38" rx="2.6" ry="6" transform="rotate(20 17 38)"/><ellipse cx="15" cy="27" rx="2.5" ry="5.5" transform="rotate(12 15 27)"/><ellipse cx="15.5" cy="16" rx="2.3" ry="5" transform="rotate(18 15.5 16)"/></g></symbol>
+  <symbol id="i-giu" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-invia" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+</svg>
+
+<div id="adminbar" class="adminbar" hidden><div class="wrap"><span>Admin</span><button class="link" type="button">Esci</button></div></div>
+
+<header class="testa">
+  <div class="wrap">
+    <svg class="ico" aria-hidden="true"><use href="#i-cappello" xlink:href="#i-cappello"></use></svg>
+    <div><h1>Festa di laurea di Gilberto</h1><p>San Bonifacio</p>
+      <div class="testa-info">
+        <span class="facce" role="img" aria-label="12 persone hanno già risposto"><i><svg aria-hidden="true"><use href="#a-jeans" xlink:href="#a-jeans"></use></svg></i><i><svg aria-hidden="true"><use href="#a-gpt" xlink:href="#a-gpt"></use></svg></i><i><svg aria-hidden="true"><use href="#a-claude" xlink:href="#a-claude"></use></svg></i><i><svg aria-hidden="true"><use href="#a-fiore" xlink:href="#a-fiore"></use></svg></i><b><svg class="ico xs" aria-hidden="true"><use href="#i-persona" xlink:href="#i-persona"></use></svg>12</b></span>
+        <span class="scad" role="img" aria-label="Si decide il 1 novembre"><svg class="ico s" aria-hidden="true"><use href="#i-orologio" xlink:href="#i-orologio"></use></svg>1 nov<span class="tempo"><i style="width:35%"></i></span></span>
+      </div></div>
+  </div>
+</header>
+
+<main class="wrap" id="parte-mia"></main>
+<section class="tutti" aria-labelledby="ris-t"><div class="wrap" id="parte-tutti"></div></section>
+<section class="tutti" id="adm" hidden style="background:#fff"><div class="wrap" id="parte-admin"></div></section>
+
+<nav class="proto"><div class="wrap">
+  <b>Stati del prototipo:</b><br>
+  <a href="#s=voto">1 Primo voto</a><a href="#s=nome">1b Suggerimenti nome</a><a href="#s=scelte">2 Scelte non inviate</a><a href="#s=giorno">2b Orario di un giorno</a><a href="#s=commento">2c Commento</a><a href="#s=invio">3 Invio + errore</a>
+  <a href="#s=grazie">4 Dopo invio</a><a href="#s=modifica">5 Modifica</a><a href="#s=chiave">5b Chiave</a><a href="#s=protetto">5c Voto protetto</a><a href="#s=sbagliata">5d Chiave sbagliata</a><a href="#s=invio2">3b Invio in corso</a><a href="#s=demo">0 DEMO con ritardi</a><a href="#s=avatar">1d Scelta avatar</a><a href="#s=passati">1c Giorni passati + oggi + nuovi</a><a href="#s=decisa">10 Data scelta</a><a href="#s=invio1">3a Invio in corso</a><a href="#s=grazie0">4a Grazie senza toast</a><a href="#s=ritirato">4d Voto ritirato</a><a href="#s=admin">6 Admin</a><a href="#s=giorni">6c Chiudi giorno + annulla</a><a href="#s=elimina">6b Elimina + annulla</a><a href="#s=nonsei">4b Non sei Anna + annulla</a><a href="#s=annullamod">4c Annulla modifica</a>
+  <a href="#s=carica">7 Caricamento</a><a href="#s=vuoto">8 Nessun voto</a><a href="#s=errore">9 Errore rete</a>
+  <div class="aspetto" id="aspetto"><b>Aspetto (varianti)</b></div>
+  <div class="icone" id="vetrina"></div>
+</div></nav>
+
+<script>
+// ---------- dati finti (stessa forma del server v2: {nome, giorni:{iso:"fascia|prob"}, commento}) ----------
+var DAL = '2026-10-19', AL = '2026-11-29', CHIUSI = ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-07'];
+var VOTI = [
+  { nome: 'Gilberto', giorni: { '2026-11-13': 'tutto|si', '2026-11-14': 'tutto|si', '2026-11-21': 'tutto|si' }, commento: '' },
+  { nome: 'Mamma', giorni: { '2026-11-13': 'tutto|si', '2026-11-14': 'tutto|si', '2026-11-15': 'tutto|si', '2026-11-21': 'tutto|si' }, commento: '' },
+  { nome: 'Papà', giorni: { '2026-11-14': 'tutto|si', '2026-11-15': 'pom|si', '2026-11-21': 'tutto|si' }, commento: 'Il regalo lo prendo io, non dirlo a nessuno', pubblico: false },
+  { nome: 'Nonna Lina', giorni: { '2026-11-14': 'pom|si', '2026-11-15': 'pom|si' }, commento: 'La sera non guido, il pomeriggio sì', pubblico: true },
+  { nome: 'Marco', giorni: { '2026-11-13': 'sera|si', '2026-11-14': 'sera|si', '2026-11-20': 'sera|forse' }, commento: '' },
+  { nome: 'Giulia B.', giorni: { '2026-11-14': 'tutto|si', '2026-11-21': 'tutto|forse', '2026-11-28': 'tutto|si' }, commento: 'Il 21 forse ho un matrimonio', pubblico: true, protetto: true },
+  { nome: 'Luca', giorni: { '2026-11-14': 'sera|si', '2026-11-21': 'sera|si', '2026-11-22': 'sera|si' }, commento: '' },
+  { nome: 'Zia Paola', giorni: { '2026-11-15': 'tutto|si', '2026-11-22': 'pom|forse' }, commento: '' },
+  { nome: 'Sara', giorni: { '2026-11-06': 'tutto|forse', '2026-11-14': 'tutto|forse', '2026-11-21': 'tutto|si' }, commento: '' },
+  { nome: 'Davide', giorni: { '2026-10-24': 'tutto|si', '2026-11-14': 'sera|si', '2026-11-21': 'sera|si' }, commento: '' },
+  { nome: 'Elena', giorni: { '2026-11-08': 'pom|si', '2026-11-14': 'tutto|si' }, commento: 'Porto io la torta!', pubblico: true },
+  { nome: 'Matteo', giorni: { '2026-11-28': 'sera|si', '2026-11-29': 'tutto|forse' }, commento: '' }
+];
+var INVITATI = ['Gilberto', 'Mamma', 'Papà', 'Nonna Lina', 'Marco', 'Giulia B.', 'Giulia Ferri', 'Giorgio', 'Gianni', 'Luca', 'Zia Paola', 'Sara', 'Davide', 'Elena', 'Matteo', 'Anna Rossi', 'Zio Gino', 'Chiara', 'Filippo'];
+var IO = 'Anna Rossi', TU = false;
+var MIO = { '2026-11-14': 'tutto|si', '2026-11-15': 'pom|si', '2026-11-21': 'sera|forse' };
+
+// ---------- utilita' ----------
+function $(id) { return document.getElementById(id); }
+var AVATAR = { 'Gilberto': 'jeans', 'Marco': 'gpt', 'Luca': 'claude', 'Elena': 'fiore', 'Davide': 'razzo', 'Sara': 'gatto', 'Matteo': 'palla', 'Papà': 'brindisi', 'Nonna Lina': 'caffe', 'Giulia B.': 'libro', 'Zia Paola': 'cane' };
+var AVATARI = ['jeans', 'gpt', 'claude', 'razzo', 'medico', 'soldi', 'computer', 'gatto', 'cane', 'pizza', 'palla', 'chitarra', 'caffe', 'fiore', 'sole', 'gufo', 'cappello', 'brindisi', 'libro'];
+// avatar: disegno scelto oppure iniziale su uno di 6 colori (stesso nome -> stesso colore)
+function av(nome, scelto) {
+  var a = scelto || AVATAR[nome], e = document.createElement('span');
+  e.setAttribute('aria-hidden', 'true');
+  if (a) { e.className = 'av disegno'; var NS = 'http://www.w3.org/2000/svg', sv = document.createElementNS(NS, 'svg'), u = document.createElementNS(NS, 'use'); u.setAttribute('href', '#a-' + a); u.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#a-' + a); sv.appendChild(u); e.appendChild(sv); }
+  else { var h = 0; for (var i = 0; i < nome.length; i++) h = (h * 31 + nome.charCodeAt(i)) % 997; e.className = 'av c' + (h % 6); e.textContent = nome.charAt(0).toUpperCase(); }
+  return e;
+}
+function el(tag, cls, testo) { var e = document.createElement(tag); if (cls) e.className = cls; if (testo != null) e.textContent = testo; return e; }
+function ico(nome, cls, label) {
+  var NS = 'http://www.w3.org/2000/svg', s = document.createElementNS(NS, 'svg'), u = document.createElementNS(NS, 'use');
+  s.setAttribute('class', 'ico' + (cls ? ' ' + cls : ''));
+  if (label) { s.setAttribute('role', 'img'); s.setAttribute('aria-label', label); } else s.setAttribute('aria-hidden', 'true');
+  s.setAttribute('focusable', 'false');
+  u.setAttribute('href', '#i-' + nome); u.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#i-' + nome);
+  s.appendChild(u); return s;
+}
+function it(iso, o) { var x = { timeZone: 'UTC' }; for (var k in o) x[k] = o[k]; return new Date(iso + 'T00:00:00Z').toLocaleDateString('it-IT', x); }
+function breve(iso) { return it(iso, { weekday: 'short', day: 'numeric', month: 'short' }); }
+var TUTTI = [];
+for (var d = new Date(DAL + 'T00:00:00Z'); d <= new Date(AL + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + 1)) TUTTI.push(d.toISOString().slice(0, 10));
+var APERTI = TUTTI.filter(function (g) { return CHIUSI.indexOf(g) < 0; });
+function parti(v) { var p = (v || '').split('|'); return { f: p[0], si: p[1] === 'si' }; }
+
+// segni di un giorno scelto: sole / luna / ?
+function segni(v, cls) {
+  var m = el('span', 'm'), p = parti(v);
+  if (p.f === 'pom') m.appendChild(ico('sole', cls));
+  if (p.f === 'sera') m.appendChild(ico('luna', cls));
+  if (!p.si) m.appendChild(ico('forse', cls));
+  return m;
+}
+function descr(v) { var p = parti(v); return (p.f === 'pom' ? ', pomeriggio' : p.f === 'sera' ? ', sera' : '') + (p.si ? '' : ', forse'); }
+// mini piastrella giorno (riepilogo, riga "piu' preciso", admin)
+function mini(iso, v) {
+  var p = parti(v), m = el('div', 'mini' + (p.si ? '' : ' forse'));
+  m.appendChild(el('span', '', it(iso, { weekday: 'short' })));
+  m.appendChild(el('b', '', String(+iso.slice(8))));
+  if (v && (p.f !== 'tutto' || !p.si)) m.appendChild(segni(v, 'xs'));
+  m.setAttribute('aria-label', it(iso, { weekday: 'long', day: 'numeric', month: 'long' }) + descr(v));
+  return m;
+}
+
+// ---------- calendario ----------
+function calendario(modo, sel) {
+  var box = el('div');
+  var conta = {};
+  APERTI.forEach(function (g) {
+    conta[g] = { si: [], forse: [] };
+    VOTI.forEach(function (v) { var x = v.giorni[g]; if (x) (parti(x).si ? conta[g].si : conta[g].forse).push(v); });
+  });
+  var max = Math.max.apply(null, APERTI.map(function (g) { return conta[g].si.length; }));
+  for (var m = new Date(DAL.slice(0, 8) + '01T00:00:00Z'); m <= new Date(AL + 'T00:00:00Z'); m.setUTCMonth(m.getUTCMonth() + 1)) {
+    box.appendChild(el('h3', 'mese', m.toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })));
+    var cal = el('div', 'cal');
+    ['L', 'M', 'M', 'G', 'V', 'S', 'D'].forEach(function (w) { var s = el('div', 'wd', w); s.setAttribute('aria-hidden', 'true'); cal.appendChild(s); });
+    var celle = [];
+    for (var i = 0; i < (m.getUTCDay() + 6) % 7; i++) celle.push(el('div'));
+    var n = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 0)).getUTCDate();
+    for (var g = 1; g <= n; g++) {
+      var iso = m.toISOString().slice(0, 8) + (g < 10 ? '0' : '') + g;
+      if (modo === 'giorni' && TUTTI.indexOf(iso) >= 0) {
+        var aperto = CHIUSI_ADM.indexOf(iso) < 0, nv = VOTI.filter(function (v) { return v.giorni[iso]; }).length;
+        var lg = el('label', 'd ' + (aperto ? 'on' : 'chiuso')), ig = el('input'); ig.type = 'checkbox'; ig.checked = aperto;
+        ig.setAttribute('aria-label', it(iso, { weekday: 'long', day: 'numeric', month: 'long' }) + (aperto ? ', aperto' : ', chiuso') + (nv ? ', ' + nv + ' voti conservati' : ''));
+        lg.appendChild(ig); lg.appendChild(el('span', 'n', String(g)));
+        if (nv) { var bv = el('span', 'ppl'); bv.setAttribute('aria-hidden', 'true'); bv.appendChild(ico('persona', 'xs')); bv.appendChild(document.createTextNode(nv)); lg.appendChild(bv); }
+        celle.push(lg); continue;
+      }
+      if (APERTI.indexOf(iso) >= 0 && iso < OGGI) { var xp = el('div', 'x passato', String(g)); xp.setAttribute('aria-hidden', 'true'); celle.push(xp); continue; }
+      if (APERTI.indexOf(iso) < 0) { var x = el('div', 'x', String(g)); x.setAttribute('aria-hidden', 'true'); celle.push(x); continue; }
+      var k = conta[iso], altri = k.si.length, c;
+      if (modo === 'voto') {
+        var v = sel[iso], p = parti(v);
+        c = el('label', 'd' + (v ? (p.si ? ' on' : ' forse') : '') + (v && (p.f !== 'tutto' || !p.si) ? ' con-m' : ''));
+        var inp = document.createElement('input'); inp.type = 'checkbox'; inp.checked = !!v; inp.value = iso;
+        inp.setAttribute('aria-label', it(iso, { weekday: 'long', day: 'numeric', month: 'long' }) + (v ? descr(v) : '') + (altri ? ', già ' + altri + (altri === 1 ? ' persona' : ' persone') : ''));
+        c.appendChild(inp);
+        c.appendChild(el('span', 'n', String(g)));
+        if (CARICA) { var sk = el('span', 'ppl sk-ppl'); sk.setAttribute('aria-hidden', 'true'); c.appendChild(sk); }
+        else if (altri) { var b = el('span', 'ppl'); b.setAttribute('aria-hidden', 'true'); b.appendChild(ico('persona', 'xs')); b.appendChild(document.createTextNode(altri)); c.appendChild(b); }
+        if (v && (p.f !== 'tutto' || !p.si)) c.appendChild(segni(v, 's'));
+      } else {
+        var f = k.forse.length;
+        c = el('button', 't ' + (altri ? 'h' + Math.max(1, Math.ceil(4 * altri / max)) : (f ? 'solo-forse' : 'h0')) + (iso === sel ? ' sel' : ''));
+        c.type = 'button';
+        c.setAttribute('aria-pressed', iso === sel ? 'true' : 'false');
+        c.setAttribute('aria-label', it(iso, { weekday: 'long', day: 'numeric', month: 'long' }) + ': ' + altri + (altri === 1 ? ' persona' : ' persone') + (f ? ', ' + f + ' forse' : '') + (altri === max ? ', giorno migliore' : ''));
+        c.appendChild(el('span', '', String(g)));
+        if (altri || f) { var b2 = el('span', 'ppl'); b2.setAttribute('aria-hidden', 'true'); if (altri) { b2.appendChild(ico('persona', 'xs')); b2.appendChild(document.createTextNode(altri)); } else b2.appendChild(ico('forse', 'xs')); c.appendChild(b2); }
+        if (max && altri === max) { var st = el('span', 'stella-b'); st.setAttribute('aria-hidden', 'true'); st.appendChild(ico('stella', 'xs pieno')); c.appendChild(st); }
+      }
+      if (iso === OGGI) { c.className += ' oggi'; c.setAttribute('aria-label', (c.getAttribute('aria-label') || '') + ', oggi'); }
+      if (NUOVI.indexOf(iso) >= 0 && modo === 'voto') c.className += ' nuovo';
+      celle.push(c);
+    }
+    for (i = 0; i < celle.length; i += 7) {
+      var sett = celle.slice(i, i + 7);
+      if (sett.some(function (c) { return /\b(d|t)\b/.test(c.className); })) sett.forEach(function (c) { cal.appendChild(c); });
+    }
+    if (cal.querySelector('.d, .t')) box.appendChild(cal); else box.removeChild(box.lastChild); // mese tutto passato: via anche il titolo
+  }
+  return { box: box, conta: conta, max: max };
+}
+
+// ---------- parte "mia": nome, giorni, precisione, commento, bottone ----------
+function form(o) {
+  var f = el('form', o.invio ? 'in-corso' : ''); f.noValidate = true;
+  if (o.admin) { var mm = el('div', 'modifichi'); mm.appendChild(ico('matita')); mm.appendChild(document.createTextNode('Modifichi: ' + o.nome)); f.appendChild(mm); }
+  var h1 = el('h2', 'passo' + (o.nome ? ' fatto' : '')); h1.appendChild(el('span', 'num', '1')); h1.appendChild(el('label', '', 'Il tuo nome')); h1.lastChild.htmlFor = 'nome'; h1.appendChild(ico('occhio', 'occhio', 'Il nome lo vedono gli invitati'));
+  f.appendChild(h1);
+  var inp = el('input'); inp.type = 'text'; inp.id = 'nome'; inp.placeholder = 'es. Anna Rossi'; inp.value = o.nome || ''; inp.autocomplete = 'name';
+  var nr = el('div', 'nome-riga'), ab = el('button', 'av-btn'); ab.type = 'button';
+  ab.setAttribute('aria-label', 'Scegli il tuo avatar'); ab.setAttribute('aria-expanded', o.griglia ? 'true' : 'false');
+  if (o.nome) ab.appendChild(av(o.nome, o.avatar)); else { var va = el('span', 'vuoto-av'); va.appendChild(ico('persona')); ab.appendChild(va); }
+  var mt0 = el('span', 'mat'); mt0.appendChild(ico('matita')); ab.appendChild(mt0);
+  nr.appendChild(ab); nr.appendChild(inp); f.appendChild(nr);
+  if (o.griglia) {
+    var gfs = el('fieldset', 'griglia-av'); gfs.appendChild(el('legend', 'sr', 'Avatar'));
+    [''].concat(AVATARI).forEach(function (a) {
+      var ia = el('input'); ia.type = 'radio'; ia.name = 'avatar'; ia.id = 'av-' + (a || 'iniziale'); ia.checked = (o.avatar || '') === a;
+      var la = el('label'); la.htmlFor = ia.id; la.appendChild(av(o.nome, a)); la.appendChild(el('span', 'sr', a || 'iniziale'));
+      gfs.appendChild(ia); gfs.appendChild(la);
+    });
+    f.appendChild(gfs);
+  }
+  if (o.sugg) {
+    // suggerimenti: <ul role="listbox"> con bottoni; chi ha gia' votato ha avatar verde + spunta
+    inp.className = 'con-sugg'; inp.setAttribute('aria-expanded', 'true'); inp.setAttribute('aria-controls', 'sugg');
+    var ul = el('ul', 'sugg aperto'); ul.id = 'sugg';
+    INVITATI.filter(function (n) { return n.toLowerCase().indexOf(o.nome.toLowerCase()) === 0 || n.toLowerCase().indexOf(' ' + o.nome.toLowerCase()) > 0; }).slice(0, 5).forEach(function (n) {
+      var votato = VOTI.some(function (v) { return v.nome === n; });
+      var li = el('li', votato ? 'votato' : ''), b = el('button'); b.type = 'button';
+      b.setAttribute('aria-label', n + (votato ? ', ha già votato: modifica' : ''));
+      b.appendChild(av(n));
+      var i0 = n.toLowerCase().indexOf(o.nome.toLowerCase()), t = el('span');
+      t.appendChild(document.createTextNode(n.slice(0, i0))); t.appendChild(el('mark', '', n.substr(i0, o.nome.length))); t.appendChild(document.createTextNode(n.slice(i0 + o.nome.length)));
+      b.appendChild(t);
+      var prot = VOTI.some(function (v) { return v.nome === n && v.protetto; });
+      if (prot) { b.setAttribute('aria-label', n + ', ha già votato, protetto da chiave'); b.appendChild(ico('lucchetto', 'prot')); }
+      if (votato) { var g = el('span', 'gia'); g.appendChild(ico('spunta')); b.appendChild(g); }
+      li.appendChild(b); ul.appendChild(li);
+    });
+    f.appendChild(ul);
+  }
+  if (o.giaVotato) { var nn = el('p', 'nota-nome'); nn.appendChild(ico(o.protetto ? 'lucchetto' : 'matita')); nn.appendChild(document.createTextNode('Hai già votato: cambia e salva')); f.appendChild(nn); }
+  if (!o.admin && !o.serveChiave) {
+    var kt = el('button', 'chiave-t'); kt.type = 'button'; kt.setAttribute('aria-expanded', o.chiaveAperta ? 'true' : 'false'); kt.setAttribute('aria-controls', 'chiave-box');
+    kt.appendChild(ico('chiave')); kt.appendChild(document.createTextNode('Chiave')); kt.appendChild(ico('giu', 'giu')); f.appendChild(kt);
+    if (o.chiaveAperta) {
+      var kb = el('div', 'chiave-box'); kb.id = 'chiave-box';
+      var ki = el('input'); ki.type = 'text'; ki.id = 'chiave'; ki.autocomplete = 'off'; ki.setAttribute('autocapitalize', 'off'); ki.placeholder = 'es. 1234';
+      ki.setAttribute('aria-label', 'Chiave per proteggere il voto'); ki.setAttribute('aria-describedby', 'chiave-h'); ki.value = o.chiaveVal || '';
+      var kh = el('small'); kh.id = 'chiave-h'; kh.appendChild(ico('avviso')); kh.appendChild(document.createTextNode('Non è una password vera'));
+      kb.appendChild(ki); kb.appendChild(kh); f.appendChild(kb);
+    }
+  }
+
+  var fs = el('fieldset'); var lg = el('legend', 'passo' + (Object.keys(o.scelte).length ? ' fatto' : ''));
+  lg.appendChild(el('span', 'num', '2')); lg.appendChild(document.createTextNode('Quando ci sei?'));
+  fs.appendChild(lg); fs.appendChild(calendario('voto', o.scelte).box); f.appendChild(fs);
+
+  var giorni = Object.keys(o.scelte).sort();
+  // ---- barra fissa in basso: [foglio che sale] [striscia giorni scelti] [nuvoletta | Invia] ----
+  var bar = el('div', 'barra' + (giorni.length ? ' pronta' : '') + (o.errore ? ' errore' : ''));
+  if (o.foglio === 'commento') {
+    var fc = el('div', 'foglio'); fc.setAttribute('role', 'dialog'); fc.setAttribute('aria-labelledby', 'fc-t');
+    var ft = el('div', 'foglio-t'); ft.id = 'fc-t'; ft.appendChild(ico('nuvola')); ft.appendChild(document.createTextNode('Commento'));
+    var xb = el('button', 'chiudi'); xb.type = 'button'; xb.appendChild(ico('croce', '', 'Chiudi')); ft.appendChild(xb); fc.appendChild(ft);
+    var ta = el('textarea'); ta.id = 'commento'; ta.rows = 2; ta.maxLength = 300; ta.placeholder = 'es. il 5 ho un esame, arrivo tardi'; ta.value = o.commento || ''; ta.setAttribute('aria-labelledby', 'fc-t');
+    fc.appendChild(ta);
+    // chi lo legge: due segmenti radio, default "Gilberto" (privato)
+    var cl = el('fieldset', 'segm prob chi-legge'); cl.appendChild(el('legend', 'sr', 'Chi lo legge'));
+    [['priv', 'Solo Gilberto', 'lucchetto'], ['pub', 'Tutti', 'gruppo']].forEach(function (op) {
+      var i3 = el('input'); i3.type = 'radio'; i3.name = 'chi'; i3.id = 'chi-' + op[0]; i3.checked = op[0] === (o.pubblico ? 'pub' : 'priv');
+      var l3 = el('label'); l3.htmlFor = i3.id; l3.appendChild(ico(op[2])); l3.appendChild(document.createTextNode(op[1]));
+      cl.appendChild(i3); cl.appendChild(l3);
+    });
+    fc.appendChild(cl); bar.appendChild(fc);
+  }
+  giorni.forEach(function (g) {
+    if (o.foglio !== g) return;
+    var p = parti(o.scelte[g]), r = el('div', 'foglio'); r.setAttribute('role', 'dialog'); r.setAttribute('aria-labelledby', 'fg-t');
+    var ft2 = el('div', 'foglio-t'); ft2.id = 'fg-t'; var mn = mini(g, o.scelte[g]); mn.removeAttribute('aria-label'); mn.setAttribute('aria-hidden', 'true'); ft2.appendChild(mn);
+    ft2.appendChild(el('span', 'sr', it(g, { weekday: 'long', day: 'numeric', month: 'long' })));
+    var xb2 = el('button', 'chiudi'); xb2.type = 'button'; xb2.appendChild(ico('spunta', '', 'Fatto')); ft2.appendChild(xb2); r.appendChild(ft2);
+    var sb = el('div', 'segm-box');
+    function gruppo(nome, cls, opzioni, val) {
+      var fs2 = el('fieldset', 'segm ' + cls); var lg2 = el('legend', 'sr', nome + ' ' + breve(g)); fs2.appendChild(lg2);
+      opzioni.forEach(function (op) {
+        var id = cls + g + op[0], i2 = el('input'); i2.type = 'radio'; i2.name = cls + g; i2.id = id; i2.checked = op[0] === val;
+        var l = el('label', op[3] || ''); l.htmlFor = id; op[2].forEach(function (n) { l.appendChild(ico(n)); }); l.appendChild(cls === 'chi-l' ? document.createTextNode(op[1]) : el('span', 'sr', op[1]));
+        fs2.appendChild(i2); fs2.appendChild(l);
+      });
+      return fs2;
+    }
+    sb.appendChild(gruppo('Orario', 'fascia', [['tutto', 'Tutto', []], ['pom', 'Pomeriggio', ['sole']], ['sera', 'Sera', ['luna']]], p.f));
+    sb.appendChild(gruppo('Sicuro', 'prob', [['si', 'Sì', ['spunta']], ['forse', 'Forse', ['forse'], 'l-forse']], p.si ? 'si' : 'forse'));
+    // "Tutto": doppia icona sole+luna piccola
+    sb.firstChild.className += ' solo-ico'; sb.lastChild.className += ' solo-ico';
+    var lt = sb.querySelector('.fascia label'); lt.insertBefore(el('span', 'doppia'), lt.firstChild);
+    lt.firstChild.appendChild(ico('sole')); lt.firstChild.appendChild(ico('luna'));
+    r.appendChild(sb); bar.appendChild(r);
+  });
+  // striscia dei giorni scelti: ogni piastrella mostra sempre la fascia (sole+luna = tutto) e si tocca per regolarla
+  if (giorni.length) {
+    var str = el('div', 'striscia'); str.setAttribute('role', 'group'); str.setAttribute('aria-label', 'Giorni scelti');
+    giorni.forEach(function (g) {
+      var p = parti(o.scelte[g]), bt = el('button', 'mini' + (p.si ? '' : ' forse') + (o.foglio === g ? ' attivo' : '')); bt.type = 'button';
+      bt.setAttribute('aria-label', it(g, { weekday: 'long', day: 'numeric', month: 'long' }) + (p.f === 'tutto' ? ', tutto il giorno' : descr(o.scelte[g]).replace(', forse', '')) + (p.si ? '' : ', forse') + ': cambia orario');
+      bt.setAttribute('aria-expanded', o.foglio === g ? 'true' : 'false');
+      bt.appendChild(el('span', '', it(g, { weekday: 'short' }))); bt.appendChild(el('b', '', String(+g.slice(8))));
+      var m = el('span', 'm');
+      if (p.f !== 'sera') m.appendChild(ico('sole', 'xs'));
+      if (p.f !== 'pom') m.appendChild(ico('luna', 'xs'));
+      if (!p.si) m.appendChild(ico('forse', 'xs'));
+      bt.appendChild(m); str.appendChild(bt);
+    });
+    bar.appendChild(str);
+  }
+  if (o.serveChiave) {
+    var cb = el('div', 'chiave-bar' + (o.serveChiave === 'sbagliata' ? ' sbagliata' : ''));
+    var cc = el('div', 'campo'); cc.appendChild(ico('lucchetto'));
+    var ci = el('input'); ci.type = 'text'; ci.id = 'chiave-s'; ci.autocomplete = 'off'; ci.setAttribute('autocapitalize', 'off'); ci.placeholder = 'Chiave';
+    ci.setAttribute('aria-label', 'Chiave del voto'); ci.value = o.serveChiave === 'sbagliata' ? '1243' : '';
+    cc.appendChild(ci); cb.appendChild(cc);
+    if (o.serveChiave === 'sbagliata') { ci.setAttribute('aria-invalid', 'true'); ci.setAttribute('aria-describedby', 'chiave-e'); var ce = el('small'); ce.id = 'chiave-e'; ce.setAttribute('role', 'alert'); ce.appendChild(ico('croce')); ce.appendChild(document.createTextNode('Chiave sbagliata')); cb.appendChild(ce); }
+    bar.appendChild(cb);
+  }
+  var riga = el('div', 'riga-b');
+  var nb = el('button', 'tondo-b' + (o.foglio === 'commento' ? ' attivo' : '')); nb.type = 'button';
+  nb.setAttribute('aria-label', 'Commento' + (o.commento ? ' (scritto)' : '')); nb.setAttribute('aria-expanded', o.foglio === 'commento' ? 'true' : 'false');
+  nb.appendChild(ico('nuvola')); nb.appendChild(el('span', 'etich', 'Commento')); if (o.commento) nb.appendChild(el('span', 'pallino'));
+  riga.appendChild(nb);
+  var b = el('button', 'btn'); b.type = 'submit';
+  if (o.invio) { b.disabled = true; b.className = 'btn lavora'; b.setAttribute('aria-busy', 'true'); b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(o.giaVotato ? 'Salvo…' : 'Invio…')); }
+  else {
+    b.appendChild(ico(o.giaVotato || o.admin ? 'spunta' : 'invia'));
+    b.appendChild(document.createTextNode(o.admin || o.giaVotato ? 'Salva' : 'Invia'));
+    if (giorni.length) { var ct0 = el('span', 'conta', String(giorni.length)); b.appendChild(ct0); b.appendChild(el('span', 'sr', giorni.length === 1 ? ' giorno' : ' giorni')); }
+  }
+  riga.appendChild(b); bar.appendChild(riga);
+  if (o.errore) { var e = el('p', 'err'); e.setAttribute('role', 'alert'); e.appendChild(ico('avviso')); e.appendChild(document.createTextNode(o.errore)); bar.appendChild(e); }
+  if (o.lento) { var pg = el('div', 'progresso'); pg.setAttribute('aria-hidden', 'true'); pg.appendChild(el('i')); bar.appendChild(pg); var le = el('p', 'sr', 'Ancora un attimo'); le.setAttribute('role', 'status'); bar.appendChild(le); }
+  if (o.giaVotato || o.admin) bar.appendChild(el('button', 'link', 'Annulla'));
+  f.appendChild(bar);
+  return f;
+}
+
+function decisa() {
+  var d = el('section', 'decisa'); d.setAttribute('aria-labelledby', 'dec-t');
+  var fe = el('div', 'festa'); fe.appendChild(ico('alloro', 'alloro'));
+  var g = el('div', 'grande'); g.setAttribute('aria-hidden', 'true'); g.appendChild(el('span', '', 'sab')); g.appendChild(el('b', '', '14')); g.appendChild(el('span', '', 'nov'));
+  fe.appendChild(g); fe.appendChild(ico('alloro', 'alloro dx')); d.appendChild(fe);
+  var h = el('h2', 'sr', 'Sabato 14 novembre'); h.id = 'dec-t'; d.appendChild(h);
+  var c = el('p', 'chiusi'); c.appendChild(ico('lucchetto', 's')); c.appendChild(document.createTextNode('Voti chiusi')); d.appendChild(c);
+  var b = el('button', 'btn sec'); b.type = 'button'; b.appendChild(ico('calendario')); b.appendChild(document.createTextNode('Aggiungi al calendario')); d.appendChild(b);
+  return d;
+}
+function grazie() {
+  var s = el('section', 'grazie');
+  var fe = el('div', 'festa'); fe.appendChild(ico('alloro', 'alloro'));
+  var io = el('span', 'io'); io.appendChild(av(IO, 'gufo')); var ok = el('span', 'ok-b'); ok.appendChild(ico('spunta')); io.appendChild(ok);
+  fe.appendChild(io); fe.appendChild(ico('alloro', 'alloro dx')); s.appendChild(fe);
+  s.appendChild(el('h2', 'sr', 'Voto di Anna salvato'));
+  var m = el('div', 'miei'); Object.keys(MIO).sort().forEach(function (g) { m.appendChild(mini(g, MIO[g])); }); s.appendChild(m);
+  var c = el('p', 'citaz privato'); c.appendChild(ico('lucchetto', '', 'Solo per Gilberto')); c.appendChild(document.createTextNode('Il 21 arrivo dopo cena')); s.appendChild(c);
+  var b = el('button', 'btn sec'); b.type = 'button'; b.appendChild(ico('matita')); b.appendChild(document.createTextNode('Cambia i miei giorni')); s.appendChild(b);
+  var ns = el('button', 'link'); ns.type = 'button'; ns.appendChild(ico('cambia')); ns.appendChild(document.createTextNode('Non sei Anna?')); s.appendChild(ns);
+  var rt = el('button', 'link discreto'); rt.type = 'button'; rt.appendChild(ico('cestino')); rt.appendChild(document.createTextNode('Ritira il mio voto')); s.appendChild(rt);
+  return s;
+}
+
+// ---------- parte "tutti": mappa di calore, giorno toccato, commenti ----------
+function tutti(stato) {
+  var box = $('parte-tutti');
+  var h = el('h2', 'tit'); h.id = 'ris-t'; h.appendChild(document.createTextNode('Chi c\'è'));
+  if (stato !== 'carica' && stato !== 'errore') { var pl = el('span', 'pill'); pl.appendChild(ico('gruppo', 's')); pl.appendChild(document.createTextNode(stato === 'vuoto' ? 0 : VOTI.length)); pl.setAttribute('aria-label', (stato === 'vuoto' ? 0 : VOTI.length) + ' persone'); h.appendChild(pl); }
+  box.appendChild(h);
+  if (stato === 'carica') {
+    var sb0 = el('div', 'sk-riga'); sb0.setAttribute('aria-hidden', 'true'); box.appendChild(sb0);
+    var g = el('div', 'cal'); g.setAttribute('aria-label', 'Caricamento'); g.setAttribute('role', 'img'); g.style.marginTop = '16px';
+    for (var i = 0; i < 28; i++) g.appendChild(el('div', 'sk'));
+    box.appendChild(g);
+    [0, 1].forEach(function (i) { var r0 = el('div', 'sk-riga' + (i ? ' corta' : '')); r0.setAttribute('aria-hidden', 'true'); box.appendChild(r0); });
+    return;
+  }
+  if (stato === 'errore') {
+    var e = el('p', 'err'); e.appendChild(ico('avviso')); e.appendChild(document.createTextNode('Non vedo i voti degli altri')); box.appendChild(e);
+    var b = el('button', 'btn sec'); b.type = 'button'; b.appendChild(ico('riprova')); b.appendChild(document.createTextNode('Riprova')); box.appendChild(b); return;
+  }
+  if (stato === 'vuoto') { var tutti0 = VOTI; VOTI = []; var r0 = calendario('ris', ''); VOTI = tutti0; box.appendChild(r0.box); return; }
+  var sel = '2026-11-14', r = calendario('ris', sel);
+  if (DECISA) { var tsc = r.box.querySelector('.t.sel'); if (tsc) tsc.className = tsc.className.replace(' sel', ' scelto'); }
+  var best = APERTI.filter(function (g) { return r.conta[g].si.length === r.max; });
+  var top = el('div', 'top'); var sb = el('span', 'stella-b'); sb.appendChild(ico('stella', 's pieno')); top.appendChild(sb);
+  top.appendChild(document.createTextNode(best.map(breve).join(', ')));
+  var pp = el('span', 'ppl2'); pp.appendChild(ico('persona', 's')); pp.appendChild(document.createTextNode(r.max)); pp.setAttribute('aria-label', r.max + ' persone'); top.appendChild(pp);
+  box.appendChild(top);
+  var sc = el('p', 'scala'); sc.setAttribute('aria-label', 'Colore: da 0 a ' + r.max + ' persone');
+  sc.appendChild(el('b', '', '0')); sc.appendChild(el('i', 'barra-g')); var mx = el('b'); mx.appendChild(ico('persona', 's')); mx.appendChild(document.createTextNode(r.max)); sc.appendChild(mx);
+  box.appendChild(sc);
+  r.box.className = 'mappa'; box.appendChild(r.box);
+  var cl = el('ol', 'classifica'); cl.setAttribute('aria-label', 'Giorni dal più scelto');
+  APERTI.slice().sort(function (a, b) { return (r.conta[b].si.length - r.conta[a].si.length) || (r.conta[b].forse.length - r.conta[a].forse.length) || (a < b ? -1 : 1); }).slice(0, 6).forEach(function (g, i) {
+    var k0 = r.conta[g], li = el('li'), bt = el('button', g === sel ? 'sel' : ''); bt.type = 'button';
+    bt.setAttribute('aria-label', it(g, { weekday: 'long', day: 'numeric', month: 'long' }) + ': ' + k0.si.length + ' persone' + (k0.forse.length ? ', ' + k0.forse.length + ' forse' : ''));
+    var m0 = mini(g, 'tutto|si'); m0.removeAttribute('aria-label'); m0.setAttribute('aria-hidden', 'true'); bt.appendChild(m0);
+    var tr = el('span', 'pista'); tr.setAttribute('aria-hidden', 'true');
+    var fsi = el('i', 'si'); fsi.style.width = (100 * k0.si.length / Math.max(1, r.max + 2)) + '%'; tr.appendChild(fsi);
+    var ffo = el('i', 'fo'); ffo.style.width = (100 * k0.forse.length / Math.max(1, r.max + 2)) + '%'; tr.appendChild(ffo);
+    bt.appendChild(tr);
+    var nn = el('span', 'nn'); nn.setAttribute('aria-hidden', 'true'); if (i === 0) nn.appendChild(ico('stella', 's pieno')); nn.appendChild(ico('persona', 's')); nn.appendChild(document.createTextNode(k0.si.length)); bt.appendChild(nn);
+    li.appendChild(bt); cl.appendChild(li);
+  });
+  box.appendChild(cl);
+
+  // pannello del giorno toccato
+  var k = r.conta[sel], gi = el('div', 'giorno'); gi.setAttribute('aria-live', 'polite');
+  var gt = el('div', 'giorno-t');
+  gt.appendChild(document.createTextNode(it(sel, { weekday: 'long', day: 'numeric', month: 'long' }))); gi.appendChild(gt);
+  function gruppo(nomeIco, titolo, si, forse, cls) {
+    var d = el('div', 'gr' + (cls ? ' ' + cls : '')), t = el('div', 'gr-t');
+    t.appendChild(ico(nomeIco)); t.appendChild(el('span', 'sr', titolo + ': ')); t.appendChild(el('span', 'n', String(si.length)));
+    d.appendChild(t);
+    var ch = el('div', 'chips');
+    si.forEach(function (v) { var c0 = el('span', 'chip' + (cls ? ' ' + cls : '') + (v.nome === IO && TU ? ' tu' : '')); c0.appendChild(av(v.nome)); c0.appendChild(document.createTextNode(v.nome)); ch.appendChild(c0); });
+    forse.forEach(function (v) { var c = el('span', 'chip forse'); c.appendChild(av(v.nome)); c.appendChild(document.createTextNode(v.nome)); c.appendChild(ico('forse', 's', 'forse')); ch.appendChild(c); });
+    d.appendChild(ch); return d;
+  }
+  function f(lista, no) { return lista.filter(function (v) { return parti(v.giorni[sel]).f !== no; }); }
+  gi.appendChild(gruppo('sole', 'Pomeriggio', f(k.si, 'sera'), f(k.forse, 'sera')));
+  gi.appendChild(gruppo('luna', 'Sera', f(k.si, 'pom'), f(k.forse, 'pom')));
+  gi.appendChild(gruppo('croce', 'No', VOTI.filter(function (v) { return !v.giorni[sel]; }), [], 'no'));
+  if (s === 'admin' && !DECISA) { var sd = el('button', 'btn'); sd.type = 'button'; sd.appendChild(ico('stella')); sd.appendChild(document.createTextNode('Scegli questa data')); gi.appendChild(sd); }
+  box.appendChild(gi);
+
+  // commenti
+  var cm = el('div', 'comm'); var ch = el('h3'); ch.appendChild(ico('nuvola')); ch.appendChild(el('span', 'sr', 'Commenti: ')); ch.appendChild(document.createTextNode(VOTI.filter(function (v) { return v.commento && v.pubblico; }).length)); cm.appendChild(ch);
+  var ul = el('ul');
+  VOTI.filter(function (v) { return v.commento && v.pubblico; }).reverse().forEach(function (v) {
+    var li = el('li'); li.appendChild(av(v.nome));
+    var b = el('p', 'bolla'); b.appendChild(el('b', '', v.nome)); b.appendChild(document.createTextNode(v.commento)); li.appendChild(b); ul.appendChild(li);
+  });
+  cm.appendChild(ul); box.appendChild(cm);
+}
+
+var OGGI = '2026-10-18', NUOVI = [], DECISA = false;
+var ELIMINATO = '', CARICA = false, CHIUSI_ADM = CHIUSI.concat('2026-11-13');
+var CESTINO = [{ nome: 'Zio Gino', giorni: { '2026-11-21': 'tutto|si' } }];
+function toast(icona, testo, bott) {
+  var t = el('div', 'toast'); t.setAttribute('role', 'status'); t.appendChild(ico(icona)); t.appendChild(el('span', '', testo));
+  var b = el('button'); b.type = 'button'; b.appendChild(ico('indietro')); b.appendChild(document.createTextNode(bott)); t.appendChild(b);
+  var barra = document.querySelector('.barra');
+  (barra || document.body).insertBefore(t, barra ? barra.firstChild : null);
+}
+function admin() {
+  $('adminbar').hidden = false; $('adm').hidden = false;
+  var box = $('parte-admin');
+  var h = el('h2', 'tit', 'Persone'); var pl = el('span', 'pill'); pl.appendChild(ico('gruppo', 's')); pl.appendChild(document.createTextNode(VOTI.length)); h.appendChild(pl); box.appendChild(h);
+  var az = el('div', 'admin-az');
+  [['copia', 'Riepilogo'], ['condividi', 'Condividi']].forEach(function (x) { var b = el('button', 'btn sec'); b.type = 'button'; b.appendChild(ico(x[0])); b.appendChild(document.createTextNode(x[1])); az.appendChild(b); });
+  box.appendChild(az);
+  var ul = el('ul', 'persone');
+  VOTI.slice(0, 3).concat(VOTI[5]).forEach(function (v) {
+    var li = el('li', ELIMINATO === v.nome ? 'uscita' : (v.nome === 'Giulia B.' ? 'nuovo' : '')); var c = el('div', 'chi'); c.appendChild(av(v.nome)); c.appendChild(document.createTextNode(v.nome)); if (v.protetto) c.appendChild(ico('lucchetto', 'prot', 'protetto da chiave')); if (v.nome === 'Giulia B.') { var np = el('span', 'nuovo-p'); np.setAttribute('role', 'img'); np.setAttribute('aria-label', 'nuovo'); c.appendChild(np); } li.appendChild(c);
+    var m = el('div', 'miei'); Object.keys(v.giorni).sort().forEach(function (g) { m.appendChild(mini(g, v.giorni[g])); }); li.appendChild(m);
+    if (v.commento) { var q = el('p', 'citaz' + (v.pubblico ? '' : ' privato')); q.appendChild(ico(v.pubblico ? 'nuvola' : 'lucchetto', '', v.pubblico ? 'Commento per tutti' : 'Commento solo per Gilberto')); q.appendChild(document.createTextNode(v.commento)); li.appendChild(q); }
+    var a = el('div', 'azioni');
+    var b1 = el('button', 'btn sec'); b1.type = 'button'; b1.appendChild(ico('matita')); b1.appendChild(document.createTextNode('Modifica')); b1.setAttribute('aria-label', 'Modifica il voto di ' + v.nome);
+    var b2 = el('button', 'btn sec del'); b2.type = 'button'; b2.appendChild(ico('cestino')); b2.appendChild(document.createTextNode('Elimina')); b2.setAttribute('aria-label', 'Elimina il voto di ' + v.nome);
+    a.appendChild(b1); a.appendChild(b2);
+    if (v.protetto) { var b3 = el('button', 'btn sec icona'); b3.type = 'button'; b3.appendChild(ico('chiave-via')); b3.setAttribute('aria-label', 'Togli la chiave di ' + v.nome); a.appendChild(b3); }
+    li.appendChild(a); ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  var manc = INVITATI.filter(function (n) { return !VOTI.some(function (v) { return v.nome === n; }); });
+  var md = el('div', 'mancano'), mt = el('div', 'gr-t'); mt.appendChild(ico('persona')); mt.appendChild(document.createTextNode('Mancano')); mt.appendChild(el('span', 'n', String(manc.length)));
+  md.appendChild(mt); var mc = el('div', 'chips'); manc.forEach(function (n) { mc.appendChild(el('span', 'chip manca', n)); }); md.appendChild(mc);
+  var pr = el('button', 'btn sec'); pr.type = 'button'; pr.appendChild(ico('copia')); pr.appendChild(document.createTextNode('Copia promemoria')); md.appendChild(pr); box.appendChild(md);
+  // cestino: voti eliminati (da admin o ritirati), tocco = ripristina
+  var ce = el('div', 'cestino'), ct = el('div', 'gr-t'); ct.appendChild(ico('cestino')); ct.appendChild(el('span', 'sr', 'Cestino')); ct.appendChild(el('span', 'n', String(CESTINO.length)));
+  ce.appendChild(ct); var cu = el('ul');
+  CESTINO.forEach(function (v) {
+    var li = el('li'); li.appendChild(el('span', 'chi', v.nome));
+    var rb = el('button', 'btn sec'); rb.type = 'button'; rb.appendChild(ico('indietro')); rb.appendChild(document.createTextNode('Ripristina')); rb.setAttribute('aria-label', 'Ripristina il voto di ' + v.nome);
+    li.appendChild(rb); cu.appendChild(li);
+  });
+  ce.appendChild(cu); box.appendChild(ce);
+  if (s === 'giorni') {
+    var hg = el('h2', 'tit', 'Giorni aperti'); hg.id = 'giorni-t'; hg.style.marginTop = '28px'; box.appendChild(hg);
+    box.appendChild(calendario('giorni', {}).box);
+    var sg = el('button', 'btn'); sg.type = 'button'; sg.appendChild(ico('spunta')); sg.appendChild(document.createTextNode('Salva giorni')); box.appendChild(sg);
+    box.appendChild(el('button', 'link', 'Annulla'));
+  } else { var b = el('button', 'btn sec'); b.type = 'button'; b.appendChild(ico('matita')); b.appendChild(document.createTextNode('Apri o chiudi giorni')); box.appendChild(b); }
+}
+
+// ---------- vetrina icone (solo prototipo) ----------
+['cappello', 'sole', 'luna', 'forse', 'stella', 'persona', 'gruppo', 'spunta', 'croce', 'matita', 'cestino', 'nuvola', 'riprova', 'avviso', 'giu', 'invia', 'lucchetto', 'chiave', 'chiave-via', 'indietro', 'cambia', 'orologio', 'occhio', 'copia', 'condividi', 'calendario'].forEach(function (n) {
+  var d = el('div'); d.appendChild(ico(n)); d.appendChild(document.createTextNode(n)); $('vetrina').appendChild(d);
+});
+
+// ---------- stato dal #hash ----------
+var HASH = location.hash || '#s=voto', s = HASH.replace('#s=', '').replace('#', '').split('&')[0], mia = $('parte-mia');
+// varianti: dal hash (&v=v-mappa-verde,v-cal-compatto) e dal pannello "Aspetto"
+var VAR = [
+  ['Weekend', [['', 'Grandi'], ['v-weekend-uguale', 'Uguali'], ['v-weekend-solo-mappa', 'Grandi solo nella mappa']]],
+  ['Mappa', [['', 'Blu'], ['v-mappa-verde', 'Verde'], ['v-mappa-caldo', 'Caldo']]],
+  ['Commento', [['', 'Nuvoletta'], ['v-commento-parola', 'Nuvoletta + parola']]],
+  ['Avatar', [['', 'Ovunque'], ['v-avatar-no-etichette', 'Non nei giorni'], ['v-avatar-no', 'Nessuno']]],
+  ['Calendario', [['', 'Comodo 48'], ['v-cal-compatto', 'Compatto 40'], ['v-cal-ampio', 'Ampio 56']]],
+  ['Bottone fisso', [['', 'Barra'], ['v-barra-galleggiante', 'Galleggiante']]],
+  ['Forse', [['', 'Tratteggio'], ['v-forse-righe', 'Righe']]],
+  ['Passi 1 2', [['', 'Sì'], ['v-passi-no', 'No']]],
+  ['Risultati', [['', 'Mappa separata'], ['v-ris-classifica', 'Classifica a barre'], ['v-unico', 'Calendario unico']]],
+  ['Chi non c\'è', [['', 'Nomi'], ['v-no-solo-numero', 'Solo numero']]]
+];
+var VH = (HASH.match(/v=([^&]+)/) || [])[1]; if (VH) VH.split(',').forEach(function (c) { document.body.classList.add(c); });
+VAR.forEach(function (g, gi) {
+  var fs = el('fieldset'); fs.appendChild(el('legend', '', g[0]));
+  g[1].forEach(function (o) {
+    var l = el('label'), i = el('input'); i.type = 'radio'; i.name = 'var' + gi; i.checked = o[0] ? document.body.classList.contains(o[0]) : !g[1].some(function (x) { return x[0] && document.body.classList.contains(x[0]); });
+    i.addEventListener('change', function () { g[1].forEach(function (x) { if (x[0]) document.body.classList.remove(x[0]); }); if (o[0]) document.body.classList.add(o[0]); });
+    l.appendChild(i); l.appendChild(document.createTextNode(o[1])); fs.appendChild(l);
+  });
+  $('aspetto').appendChild(fs);
+});
+if (s === 'grazie' || s === 'grazie0' || s === 'nonsei' || s === 'annullamod') VOTI.push({ nome: IO, giorni: MIO, commento: '' });
+if (s === 'carica') CARICA = true;
+if (s === 'grazie') { mia.appendChild(grazie()); toast('spunta', 'Voto inviato', 'Annulla'); }
+else if (s === 'grazie0') mia.appendChild(grazie());
+else if (s === 'invio1') mia.appendChild(form({ nome: IO, scelte: MIO, invio: true }));
+else if (s === 'ritirato') { mia.appendChild(form({ nome: '', scelte: {} })); toast('cestino', 'Voto ritirato', 'Annulla'); }
+else if (s === 'giorni') { mia.appendChild(form({ nome: '', scelte: {} })); }
+else if (s === 'demo') demo();
+else if (s === 'avatar') mia.appendChild(form({ nome: IO, avatar: 'gufo', griglia: true, scelte: {} }));
+else if (s === 'passati') { OGGI = '2026-11-04'; NUOVI = ['2026-11-28', '2026-11-29']; mia.appendChild(form({ nome: IO, scelte: { '2026-11-14': 'tutto|si' } })); }
+else if (s === 'decisa') { DECISA = true; mia.appendChild(decisa()); }
+else if (s === 'scelte') mia.appendChild(form({ nome: IO, scelte: MIO, commento: '' }));
+else if (s === 'giorno') mia.appendChild(form({ nome: IO, scelte: MIO, foglio: '2026-11-15' }));
+else if (s === 'commento') mia.appendChild(form({ nome: IO, scelte: MIO, foglio: 'commento', commento: 'Il 21 arrivo dopo cena' }));
+else if (s === 'invio') mia.appendChild(form({ nome: IO, scelte: MIO, errore: 'Non salvato: niente connessione. Riprova.' }));
+else if (s === 'nome') mia.appendChild(form({ nome: 'Gi', sugg: true, scelte: {} }));
+else if (s === 'chiave') mia.appendChild(form({ nome: IO, scelte: {}, chiaveAperta: true, chiaveVal: 'gatto' }));
+else if (s === 'protetto') mia.appendChild(form({ nome: 'Giulia B.', giaVotato: true, protetto: true, serveChiave: 'vuota', scelte: VOTI[5].giorni }));
+else if (s === 'sbagliata') mia.appendChild(form({ nome: 'Giulia B.', giaVotato: true, protetto: true, serveChiave: 'sbagliata', scelte: VOTI[5].giorni }));
+else if (s === 'invio2') mia.appendChild(form({ nome: IO, scelte: MIO, invio: true, lento: true }));
+else if (s === 'nonsei') { mia.appendChild(form({ nome: '', scelte: {} })); toast('spunta', 'Voto di Anna salvato', 'Anna'); }
+else if (s === 'annullamod') { mia.appendChild(grazie()); toast('spunta', 'Modifiche tolte', 'Riprendi'); }
+else if (s === 'elimina') { ELIMINATO = 'Papà'; mia.appendChild(form({ nome: '', scelte: {} })); toast('cestino', 'Papà eliminato', 'Annulla'); }
+else if (s === 'modifica') mia.appendChild(form({ nome: 'Giulia B.', giaVotato: true, scelte: VOTI[5].giorni, commento: VOTI[5].commento }));
+else if (s === 'admin') mia.appendChild(form({ nome: 'Papà', admin: true, scelte: VOTI[2].giorni }));
+else mia.appendChild(form({ nome: '', scelte: {} }));
+if (s === 'nonsei') TU = true;
+tutti(s === 'carica' || s === 'errore' || s === 'vuoto' ? s : 'ok');
+if (s === 'nonsei') TU = true;
+if (s === 'admin' || s === 'elimina' || s === 'giorni') admin();
+if (s === 'giorni') { $('giorni-t').scrollIntoView(); var t0 = el('div', 'toast'); t0.setAttribute('role', 'status'); t0.appendChild(ico('spunta')); t0.appendChild(el('span', '', 'ven 13 nov chiuso')); var u0 = el('button'); u0.type = 'button'; u0.appendChild(ico('indietro')); u0.appendChild(document.createTextNode('Riapri')); t0.appendChild(u0); document.body.appendChild(t0); }
+window.addEventListener('hashchange', function () { location.reload(); });
+
+// ---------- demo con ritardi veri (setTimeout): tocchi locali immediati, invio 2-7 s ----------
+function demo() {
+  var o = { nome: IO, scelte: { '2026-11-14': 'tutto|si' } };
+  function disegna() { while (mia.firstChild) mia.removeChild(mia.firstChild); mia.appendChild(form(o)); }
+  mia.addEventListener('change', function (e) {
+    var c = e.target; if (c.type !== 'checkbox' || o.invio) return;
+    if (c.checked) o.scelte[c.value] = 'tutto|si'; else delete o.scelte[c.value];
+    disegna();
+    var n = mia.querySelector('.conta'); if (n) n.className = 'conta bump';
+  });
+  mia.addEventListener('submit', function (e) {
+    e.preventDefault(); if (o.invio) return;
+    o.invio = true; disegna();                                    // < 100 ms: stato "in corso"
+    setTimeout(function () { o.lento = true; disegna(); }, 4000);  // > 4 s: barra che avanza
+    setTimeout(function () {                                       // conferma server: SOLO ora "grazie"
+      MIO = o.scelte; VOTI.push({ nome: IO, giorni: MIO, commento: '' });
+      while (mia.firstChild) mia.removeChild(mia.firstChild);
+      mia.appendChild(grazie()); toast('spunta', 'Voto inviato', 'Annulla'); window.scrollTo(0, 0);
+    }, 7000);
+  });
+  disegna();
+}
+</script>
+</body>
+</html>
