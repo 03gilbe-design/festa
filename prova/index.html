@@ -356,6 +356,17 @@ body .g .o.uno::before{opacity:.7}
 .q-n{margin-top:4px;font-size:14px;font-weight:700;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.q-p.forse .av{opacity:.55}
 .q-c{margin-top:2px;font-size:12px;line-height:1.2;color:var(--mut);max-width:96px;word-break:break-word}
 .g{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.quadro{padding:0 0 6px}.q-s{margin:8px 0 10px;padding:10px 12px;border:2px solid var(--line);border-radius:16px;background:var(--fill)}
+.q-si{border-color:#7fc59d;background:#eaf7ef}.q-fo{border-color:#f2c48a;background:#fdf3e3}.q-co{border-color:#b9c4dc;background:var(--bg)}
+.q-h{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px;font-size:16px}.q-h b{min-width:28px;padding:1px 9px;border-radius:11px;background:#fff;text-align:center;font-size:15px}
+.q-g{display:flex;flex-wrap:wrap;gap:6px 6px}.q-p{display:inline-flex;align-items:center;padding:3px 9px 3px 3px;border-radius:20px;background:#fff;font-size:13.5px;font-weight:700;color:var(--ink)}
+.q-p .av{width:26px;height:26px;margin-right:6px;font-size:13px}.q-o{margin-left:5px;padding:0 6px;border-radius:8px;background:#e4defa;color:#4c3a8a;font-size:11px;font-weight:700}.q-v{color:var(--mut);font-weight:700}
+.q-r{display:flex;align-items:flex-start;margin:8px 0}.q-r .av{width:34px;height:34px;flex:none;margin-right:10px;font-size:15px}.q-rt{display:flex;flex-direction:column;min-width:0;font-size:14px;line-height:1.25}.q-rt b{font-size:13px;color:var(--mut)}.q-rt span{word-break:break-word}
+.q-g .q-p{display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:center;white-space:nowrap}
+.q-g .q-p .av{display:flex;flex:none}
+.q-g .q-o{display:inline-block}
+.q-g .q-p{width:auto;max-width:none;text-align:left}
+.q-g .q-p .av{width:26px;height:26px;margin-right:6px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -680,18 +691,26 @@ function chipsChiViene(iso, tutti, max) { // chi ha detto di esserci quel giorno
   if (max && ch.childNodes.length > max) { var tot = ch.childNodes.length; while (ch.childNodes.length > max) ch.removeChild(ch.lastChild); var pi = el('span', 'chip'); pi.appendChild(document.createTextNode('+' + (tot - max))); ch.appendChild(pi); }
   return ch;
 }
-function quadroGiorno(iso, tutti) { // scheda grande: gli avatar di chi viene divisi per orario, con nome e commento pubblico
+function quadroGiorno(iso, tutti) { // a colpo d'occhio: CI SONO / FORSE (avatar piccoli con nome e orario) e sotto i COMMENTI del giorno
   var vv = tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso), box = el('div', 'quadro');
-  var gr = { tutto: [], pom: [], sera: [] };
-  vv.forEach(function (v) { var q = parti(v.giorni[iso]); gr[q.f].push({ v: v, si: q.si }); });
-  [['tutto', 'Tutto il giorno'], ['pom', 'Pomeriggio'], ['sera', 'Sera']].forEach(function (k) {
-    var l = gr[k[0]]; if (!l.length) return;
-    var sez = el('section', 'q-s q-' + k[0]), h = el('h3', 'q-h'); h.appendChild(document.createTextNode(k[1])); h.appendChild(el('b', '', String(l.length))); sez.appendChild(h);
-    l.sort(function (x, y) { return (y.si ? 1 : 0) - (x.si ? 1 : 0) || x.v.nome.localeCompare(y.v.nome, 'it'); });
+  var si = [], fo = [], com = [];
+  vv.forEach(function (v) { var q = parti(v.giorni[iso]), x = { v: v, f: q.f, si: q.si, nt: notaDi(v.commento, iso) }; (q.si ? si : fo).push(x); if (x.nt) com.push(x); });
+  function ord(l) { l.sort(function (x, y) { return x.v.nome.localeCompare(y.v.nome, 'it'); }); }
+  ord(si); ord(fo);
+  function blocco(cls, titolo, l) {
+    var sez = el('section', 'q-s ' + cls), h = el('h3', 'q-h'); h.appendChild(document.createTextNode(titolo)); h.appendChild(el('b', '', String(l.length))); sez.appendChild(h);
     var gg = el('div', 'q-g');
-    l.forEach(function (x) { var c = el('div', 'q-p' + (x.si ? '' : ' forse')); c.appendChild(av(x.v.nome)); var t = el('span', 'q-n', x.v.nome.split(' ')[0] + (x.si ? '' : ' ?')); c.appendChild(t); var nt = notaDi(x.v.commento, iso); if (nt) { var n2 = el('span', 'q-c', nt); c.appendChild(n2); } gg.appendChild(c); });
-    sez.appendChild(gg); box.appendChild(sez);
-  });
+    l.forEach(function (x) { var c = el('span', 'q-p'); c.appendChild(av(x.v.nome)); c.appendChild(document.createTextNode(x.v.nome.split(' ')[0])); if (x.f !== 'tutto') c.appendChild(el('small', 'q-o', x.f === 'pom' ? 'pom' : 'sera')); gg.appendChild(c); });
+    if (!l.length) gg.appendChild(el('span', 'q-v', '—'));
+    sez.appendChild(gg); return sez;
+  }
+  box.appendChild(blocco('q-si', 'Ci sono', si));
+  box.appendChild(blocco('q-fo', 'Forse', fo));
+  if (com.length) {
+    var sc = el('section', 'q-s q-co'), hc = el('h3', 'q-h'); hc.appendChild(document.createTextNode('Commenti')); hc.appendChild(el('b', '', String(com.length))); sc.appendChild(hc);
+    com.forEach(function (x) { var r = el('div', 'q-r'); r.appendChild(av(x.v.nome)); var t = el('div', 'q-rt'); t.appendChild(el('b', '', x.v.nome.split(' ')[0] + (x.si ? '' : ' (forse)'))); t.appendChild(el('span', '', x.nt)); r.appendChild(t); sc.appendChild(r); });
+    box.appendChild(sc);
+  }
   if (!vv.length) box.appendChild(el('p', 'hint', 'Nessuno ancora'));
   return box;
 }
