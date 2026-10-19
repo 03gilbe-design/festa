@@ -405,6 +405,7 @@ body .g .o.uno::before{opacity:.7}
 .quadro .q-f .q-riga{color:inherit}
 .quadro .q-cm{padding:8px 10px 9px;isolation:isolate}.quadro .q-cm .q-c{display:block;margin:6px 2px 0;padding:0;background:none!important;border:0;color:#2a3042;font-size:13.5px;font-weight:600;line-height:1.3}
 .quadro .q-cm .q-riga{align-self:flex-start}
+.quadro .q-cm{padding:10px 12px 11px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -750,7 +751,7 @@ function contornoMano(e, col, sp, r, amp, seme, riempi) { // contorno disegnato 
 function disegnaQuadro(box) { // blocco = forma piena a mano libera senza contorno; ogni persona col colore del suo orario; il commento e' un riquadro bianco che contiene anche chi l'ha scritto
   var fill = { tutto: '#d6efdc', pom: '#fbdcb6', sera: '#f5e8b4' }, z = 0;
   Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { contornoMano(cl, 'none', 0, 24, 5.2, 7 + (z += 3), '#eef7f0'); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-cm'), function (cl) { contornoMano(cl, '#3a4256', 1.1, 16, 1.2, 5 + (z += 7), '#ffffff'); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-cm'), function (cl) { contornoMano(cl, 'none', 0, 18, 4, 5 + (z += 7), '#ffffff'); });
   Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { var m = /q-o-(tutto|pom|sera)/.exec(cl.className), c = m ? m[1] : 'tutto'; contornoMano(cl, 'none', 0, 11, 1.4, 11 + (z += 5), fill[c]); });
   Array.prototype.forEach.call(box.querySelectorAll('.q-lg'), function (cl) { var m = /q-o-(tutto|pom|sera)/.exec(cl.className), c = m ? m[1] : 'tutto'; contornoMano(cl, 'none', 0, 10, 1.2, 3 + (z += 4), fill[c]); });
 }
