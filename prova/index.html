@@ -611,12 +611,12 @@ for (var d0 = new Date(DAL + 'T00:00:00Z'); d0 <= new Date(AL + 'T00:00:00Z'); d
 var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
-var ENTRATI = [], MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var ENTRATI = [], SRV_ENT = false, MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
 (function () { var m = /[?&]cnt=([abc])/.exec(location.search); document.body.classList.add('cnt-' + (m ? m[1] : 'a')); })();
 var T_AVVIO = Date.now(), CARICO = !/[?&]admin=/.test(location.search); // niente animazione per l'admin; // CARICO: animazione di caricamento a ogni apertura, anche con i dati in cache
 var cachePagina = store.get('cachePagina');
 if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.quando < 43200000 && Array.isArray(cachePagina.voti) && Array.isArray(cachePagina.aperti) && Array.isArray(cachePagina.tutti)) {
-  VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; ENTRATI = cachePagina.entrati || []; OGGI = cachePagina.oggi || OGGI;
+  VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; ENTRATI = cachePagina.entrati || []; SRV_ENT = Array.isArray(cachePagina.entrati); OGGI = cachePagina.oggi || OGGI;
   DECISA = cachePagina.chiuso ? cachePagina.dataScelta : ''; SCAD = cachePagina.scadenza || ''; aspettoSalvato = cachePagina.aspetto || {};
 }
 var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
@@ -1064,7 +1064,7 @@ function renderName() {
 var attesaNome;
 function controllaNome() {
   if (S.adminEdit || (S.voted && !S.edit)) return;
-  if (!ADMIN) { // chi sceglie il proprio nome da invitato ma non ha votato: si ricorda (nella lista invitati compare l'occhio)
+  if (!ADMIN && SRV_ENT) { // chi sceglie il proprio nome da invitato ma non ha votato: si ricorda (nella lista invitati compare l'occhio)
     var kn = norm(S.nome), inv = INVITATI.filter(function (n) { return norm(n) === kn; })[0];
     if (inv && !votoDi(inv) && !MANDATI[kn] && ENTRATI.indexOf(inv) < 0) { MANDATI[kn] = 1; chiama({ azione: 'entrato', nome: inv }).then(function (r) { if (r && r.ok) ENTRATI.push(inv); else delete MANDATI[kn]; }, function () { delete MANDATI[kn]; }); }
   }
@@ -1647,9 +1647,9 @@ function carica() {
     var nuovaFirmaCalendario = JSON.stringify([res.voti, res.aperti, res.tutti, res.oggi, res.chiuso, res.dataScelta]);
     var calendarioCambiato = nuovaFirmaCalendario !== firmaCalendario;
     firmaCalendario = nuovaFirmaCalendario;
-    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; ENTRATI = res.entrati || []; OGGI = res.oggi || OGGI;
+    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; ENTRATI = res.entrati || []; SRV_ENT = Array.isArray(res.entrati); // server vecchio: niente 'entrati', niente invio OGGI = res.oggi || OGGI;
     DECISA = res.chiuso ? res.dataScelta : ''; SCAD = res.scadenza || ''; S.letturaKo = false;
-    store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], entrati: res.entrati || [], oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
+    store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], entrati: res.entrati, oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
     aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
     var passo2 = ADMIN ? chiama({ azione: 'verifica' }).then(function (v) {
       if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; } else { ADMIN = ''; adminOk = false; }
