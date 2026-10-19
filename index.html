@@ -958,13 +958,14 @@ function sheetChiave() {
 }
 
 // ---------- fila dei votanti (sotto il titolo): un cerchietto per chi ha votato + "N/M"; tocco = elenco di tutti gli invitati ----------
+function unSoloGiorno(v) { return Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length <= 1; } // chi ha votato un giorno solo e' quasi sempre entrato per sbaglio: va in fondo
 function renderFila() {
   var f = $('fila'); if (!f) return;
   var voti = VOTI || [];
   f.hidden = !voti.length;
   clear(f); if (!voti.length) return;
   var io = norm(S.nome) && votoDi(S.nome) ? norm(S.nome) : norm(mio());
-  var ord = voti.slice().sort(function (a, b) { return (norm(b.nome) === io) - (norm(a.nome) === io) || (b.agg || 0) - (a.agg || 0); });
+  var ord = voti.slice().sort(function (a, b) { return (norm(b.nome) === io) - (norm(a.nome) === io) || unSoloGiorno(a) - unSoloGiorno(b) || (b.agg || 0) - (a.agg || 0); });
   var riga = f.parentNode, larg = (riga.clientWidth || 320) - ($('loc').offsetWidth || 110) - 16 - 56, k = Math.max(3, Math.floor(larg / 24)), mostra = ord.length > k ? ord.slice(0, k - 1) : ord;
   var bt = el('button', 'fila-b'); bt.type = 'button'; bt.id = 'fila-b';
   var tot = INVITATI.length ? Math.max(INVITATI.length, voti.length) : 0;
@@ -986,7 +987,7 @@ function sheetInvitati() { // tutti gli invitati: chi ha votato in evidenza (ava
     var voti = VOTI || [], visti = Object.create(null), righe = [];
     INVITATI.forEach(function (n) { if (!visti[norm(n)]) { visti[norm(n)] = true; var v = votoDi(n); righe.push({ nome: v ? v.nome : n, v: v }); } });
     voti.forEach(function (v) { if (!visti[norm(v.nome)]) { visti[norm(v.nome)] = true; righe.push({ nome: v.nome, v: v }); } });
-    righe.sort(function (a, b) { return (!!b.v - !!a.v) || a.nome.localeCompare(b.nome, 'it'); });
+    righe.sort(function (a, b) { return (!!b.v - !!a.v) || ((a.v && unSoloGiorno(a.v)) ? 1 : 0) - ((b.v && unSoloGiorno(b.v)) ? 1 : 0) || a.nome.localeCompare(b.nome, 'it'); });
     var ul = el('ul', 'lista'); ul.id = 'elenco-invitati';
     righe.forEach(function (r) {
       var li = el('li', 'inv' + (r.v ? ' votato' : ' manca')), d = el('div', 'pers'); d.appendChild(av(r.nome, r.v ? r.v.avatar || '' : ''));
