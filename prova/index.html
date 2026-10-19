@@ -421,6 +421,11 @@ body .g .o.uno::before{opacity:.7}
 @-webkit-keyframes svanisci{to{opacity:0;-webkit-transform:translateY(-12px)}}@keyframes svanisci{to{opacity:0;transform:translateY(-12px)}}
 .qmini .qm-r{display:flex;flex-wrap:wrap;align-items:center;gap:4px 5px;margin:2px 0}.qmini .qm-lab{min-width:42px;font-size:12px;font-weight:800}.qmini .qm-lab.si{color:#1d6b43}.qmini .qm-lab.fo{color:#9a5a12}
 .qmini .q-riga{padding:1px 8px 1px 1px;font-size:12.5px}.qmini .q-riga .av{width:20px;height:20px;margin-right:5px;font-size:11px}
+.qmini .qm-vp{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.qmini .qm-t{display:flex;flex-wrap:nowrap;gap:5px;width:max-content}.qmini .qm-t .q-riga{flex:none}
+.qmini .qm-t.scorre{-webkit-animation:marcia 20s linear infinite;animation:marcia 20s linear infinite}
+@-webkit-keyframes marcia{to{-webkit-transform:translateX(calc(var(--w) * -1))}}@keyframes marcia{to{transform:translateX(calc(var(--w) * -1))}}
+@media (prefers-reduced-motion:reduce){.qmini .qm-t.scorre{-webkit-animation:none;animation:none}.qmini .qm-vp{overflow-x:auto}}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1096,22 +1101,22 @@ function renderCal() {
     if (tot) { c.appendChild(h); c.appendChild(cal); }
   });
 }
-function quadroMini(iso) { // pochi votanti: righe "Si" / "Forse" con avatar e nome; tanti: solo avatar con anello del colore dell'orario (forse sbiaditi)
+function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome; se sono tante scorrono lentamente di lato (come la fila dei votanti in alto) invece di andare a capo
   var vv = altri(iso), box = el('div', 'quadro qmini'), ordine = { tutto: 0, pom: 1, sera: 2 };
   var l = vv.map(function (v) { var q = parti(v.giorni[iso]); return { v: v, f: q.f, si: q.si }; });
   l.sort(function (x, y) { return ordine[x.f] - ordine[y.f] || x.v.nome.localeCompare(y.v.nome, 'it'); });
-  if (l.length <= 8) {
-    [[true, 'Sì'], [false, 'Forse']].forEach(function (k) {
-      var m = l.filter(function (x) { return x.si === k[0]; }); if (!m.length) return;
-      var r = el('div', 'qm-r'); r.appendChild(el('span', 'qm-lab ' + (k[0] ? 'si' : 'fo'), k[1]));
-      m.forEach(function (x) { var p = el('span', 'q-riga q-o-' + x.f); p.appendChild(av(x.v.nome)); p.appendChild(document.createTextNode(x.v.nome.split(' ')[0] + (x.f === 'pom' ? ' · pom' : x.f === 'sera' ? ' · sera' : ''))); r.appendChild(p); });
-      box.appendChild(r);
-    });
-    setTimeout(function () { disegnaQuadro(box); }, 60); setTimeout(function () { disegnaQuadro(box); }, 450);
-  } else {
-    l.sort(function (x, y) { return (y.si ? 1 : 0) - (x.si ? 1 : 0) || ordine[x.f] - ordine[y.f] || x.v.nome.localeCompare(y.v.nome, 'it'); });
-    var g = el('div', 'qm-g'); l.forEach(function (x) { var a = av(x.v.nome); a.className += ' qm-a qm-' + x.f + (x.si ? '' : ' qm-forse'); g.appendChild(a); }); box.appendChild(g);
-  }
+  [[true, 'Sì'], [false, 'Forse']].forEach(function (k) {
+    var m = l.filter(function (x) { return x.si === k[0]; }); if (!m.length) return;
+    var r = el('div', 'qm-r'), vp = el('div', 'qm-vp'), tr = el('div', 'qm-t');
+    r.appendChild(el('span', 'qm-lab ' + (k[0] ? 'si' : 'fo'), k[1]));
+    function pillole(dove) { m.forEach(function (x) { var p = el('span', 'q-riga q-o-' + x.f); p.appendChild(av(x.v.nome)); p.appendChild(document.createTextNode(x.v.nome.split(' ')[0] + (x.f === 'pom' ? ' · pom' : x.f === 'sera' ? ' · sera' : ''))); dove.appendChild(p); }); }
+    pillole(tr); vp.appendChild(tr); r.appendChild(vp); box.appendChild(r);
+    setTimeout(function () { // misura: se non ci sta, si duplica la fila e la si fa scorrere in loop
+      if (tr.scrollWidth > vp.clientWidth + 2) { var w = tr.scrollWidth + 5; var d2 = el('div', 'qm-t'); pillole(d2); while (d2.firstChild) tr.appendChild(d2.firstChild); tr.style.setProperty('--w', w + 'px'); var sec = Math.max(8, Math.round(w / 26)); tr.style.webkitAnimationDuration = tr.style.animationDuration = sec + 's'; tr.className += ' scorre'; }
+      disegnaQuadro(box);
+    }, 40);
+  });
+  setTimeout(function () { disegnaQuadro(box); }, 450);
   return box;
 }
 var topQ = null;
@@ -1122,7 +1127,7 @@ function mostraTop(iso) { // a ogni tocco su un giorno: quadro di chi viene in A
   if (!topQ) { topQ = el('div', 'topq'); topQ.id = 'top-q'; topQ.setAttribute('role', 'region'); var pb = document.querySelector('body > div[style*="position:fixed"]'); if (pb) topQ.style.top = '30px'; document.body.appendChild(topQ); }
   clear(topQ); topQ.setAttribute('aria-label', 'Chi viene ' + lungo(iso));
   topQ.appendChild(quadroMini(iso));
-  topQ.className = 'topq'; clearTimeout(topT); topT = setTimeout(function () { chiudiTop(false); }, 4800); // notifica volante: dopo qualche secondo sparisce da sola
+  topQ.className = 'topq'; clearTimeout(topT); topT = setTimeout(function () { chiudiTop(false); }, 3000); // notifica volante: dopo qualche secondo sparisce da sola
 }
 document.addEventListener('click', function (e) { if (!topQ) return; if (topQ.contains(e.target)) return; if (e.target.closest && e.target.closest('[data-g]')) return; chiudiTop(); }, true);
 function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito il quadro grande di chi viene; tenendo premuto: solo la scelta, con il tasto piccolo sopra Invia
