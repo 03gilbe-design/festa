@@ -409,6 +409,13 @@ body .g .o.uno::before{opacity:.7}
 .topq{position:fixed;top:0;left:0;right:0;z-index:8;max-width:480px;margin:0 auto;max-height:46%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 14px 12px;background:var(--bg);border-radius:0 0 22px 22px;box-shadow:0 8px 24px rgba(20,30,60,.22);-webkit-animation:scendi .18s ease-out;animation:scendi .18s ease-out}
 .topq-t{margin:0 0 2px;font-size:17px;text-transform:capitalize}
 @-webkit-keyframes scendi{from{-webkit-transform:translateY(-14px);opacity:0}to{-webkit-transform:none;opacity:1}}@keyframes scendi{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+.topq{max-height:34%;padding:6px 12px 8px;border-radius:0 0 16px 16px;box-shadow:0 4px 14px rgba(20,30,60,.18)}
+.qmini .mini-h{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 4px;font-size:13px;color:var(--mut)}.qmini .mini-h b{font-size:15px;color:var(--ink);text-transform:capitalize}
+.qmini .q-g{gap:4px 4px}.qmini .q-riga{padding:1px 7px 1px 1px;font-size:11.5px}.qmini .q-riga .av{width:18px;height:18px;margin-right:4px;font-size:10px}.qmini .q-forse{opacity:.6}
+.qmini .mini-c{margin-top:3px;font-size:12px;line-height:1.25;color:#2a3042}.qmini .mini-c b{color:var(--mut)}
+.topq{max-height:24%;padding:6px 10px 8px}
+.qmini .qm-g{display:flex;flex-wrap:wrap;gap:5px}.qmini .qm-a{width:30px;height:30px;font-size:13px;box-shadow:0 0 0 2.5px #6dbf8b}
+.qmini .qm-pom{box-shadow:0 0 0 2.5px #eaa24c}.qmini .qm-sera{box-shadow:0 0 0 2.5px #e6c63e}.qmini .qm-forse{opacity:.45}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1084,13 +1091,20 @@ function renderCal() {
     if (tot) { c.appendChild(h); c.appendChild(cal); }
   });
 }
+function quadroMini(iso) { // minimo: solo gli avatar di chi viene (il giorno lo sai, l'hai appena toccato); anello del colore dell'orario, i "forse" sbiaditi
+  var vv = altri(iso), box = el('div', 'quadro qmini'), ordine = { tutto: 0, pom: 1, sera: 2 };
+  var l = vv.map(function (v) { var q = parti(v.giorni[iso]); return { v: v, f: q.f, si: q.si }; });
+  l.sort(function (x, y) { return (y.si ? 1 : 0) - (x.si ? 1 : 0) || ordine[x.f] - ordine[y.f] || x.v.nome.localeCompare(y.v.nome, 'it'); });
+  var g = el('div', 'qm-g'); l.forEach(function (x) { var a = av(x.v.nome); a.className += ' qm-a qm-' + x.f + (x.si ? '' : ' qm-forse'); a.setAttribute('title', x.v.nome); g.appendChild(a); }); box.appendChild(g);
+  return box;
+}
 var topQ = null;
 function chiudiTop() { if (topQ && topQ.parentNode) topQ.parentNode.removeChild(topQ); topQ = null; }
 function mostraTop(iso) { // a ogni tocco su un giorno: quadro di chi viene in ALTO sopra i primi giorni; si chiude con Invia o toccando fuori
   var vv = altri(iso); if (!vv.length) { chiudiTop(); return; }
-  if (!topQ) { topQ = el('div', 'topq'); topQ.id = 'top-q'; topQ.setAttribute('role', 'region'); var pb = document.querySelector('body > div[style*="position:fixed"]'); if (pb) topQ.style.paddingTop = '30px'; document.body.appendChild(topQ); }
+  if (!topQ) { topQ = el('div', 'topq'); topQ.id = 'top-q'; topQ.setAttribute('role', 'region'); var pb = document.querySelector('body > div[style*="position:fixed"]'); if (pb) topQ.style.paddingTop = '24px'; document.body.appendChild(topQ); }
   clear(topQ); topQ.setAttribute('aria-label', 'Chi viene ' + lungo(iso));
-  topQ.appendChild(el('h3', 'topq-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }))); topQ.appendChild(quadroGiorno(iso, false));
+  topQ.appendChild(quadroMini(iso));
 }
 document.addEventListener('click', function (e) { if (!topQ) return; if (topQ.contains(e.target)) return; if (e.target.closest && e.target.closest('[data-g]')) return; chiudiTop(); }, true);
 function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito il quadro grande di chi viene; tenendo premuto: solo la scelta, con il tasto piccolo sopra Invia
