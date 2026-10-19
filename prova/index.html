@@ -457,6 +457,19 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .g.t6,body .g.t6{background:#86a6e8;color:#0f1f4d}
 .g.t7,body .g.t7{background:#6c91e0;color:#0f1f4d}
 @media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1f2c45;color:#eaf1ff}.g.t2,body .g.t2{background:#27395b;color:#eaf1ff}.g.t3,body .g.t3{background:#304771;color:#eaf1ff}.g.t4,body .g.t4{background:#395688;color:#eaf1ff}.g.t5,body .g.t5{background:#43659f;color:#eaf1ff}.g.t6,body .g.t6{background:#4d75b7;color:#eaf1ff}.g.t7,body .g.t7{background:#5885d0;color:#eaf1ff}}
+.quadro .q-f{margin:0 0 8px;padding:8px 10px 10px}.quadro .q-f-tutto,.quadro .q-f-pom,.quadro .q-f-sera{background:none!important}
+.toast .toast-x{margin-left:6px;min-width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:22px;line-height:1}
+.g.t1,body .g.t1{background:#eaf1fd;color:#0f1f4d}
+.g.t2,body .g.t2{background:#d8e3f8;color:#0f1f4d}
+.g.t3,body .g.t3{background:#c6d5f2;color:#0f1f4d}
+.g.t4,body .g.t4{background:#b5c7ed;color:#0f1f4d}
+.g.t5,body .g.t5{background:#a3b9e7;color:#0f1f4d}
+.g.t6,body .g.t6{background:#91ace2;color:#0f1f4d}
+.g.t7,body .g.t7{background:#7f9edc;color:#ffffff}
+.g.t8,body .g.t8{background:#6e90d7;color:#ffffff}
+.g.t9,body .g.t9{background:#5c82d1;color:#ffffff}
+.g.t10,body .g.t10{background:#4a74cc;color:#ffffff}
+@media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1d2a43;color:#eaf1ff}.g.t2,body .g.t2{background:#263654;color:#eaf1ff}.g.t3,body .g.t3{background:#2e4266;color:#eaf1ff}.g.t4,body .g.t4{background:#374e77;color:#eaf1ff}.g.t5,body .g.t5{background:#3f5a89;color:#eaf1ff}.g.t6,body .g.t6{background:#48659a;color:#eaf1ff}.g.t7,body .g.t7{background:#5071ac;color:#eaf1ff}.g.t8,body .g.t8{background:#597dbd;color:#eaf1ff}.g.t9,body .g.t9{background:#6189cf;color:#eaf1ff}.g.t10,body .g.t10{background:#6a95e0;color:#eaf1ff}}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -536,7 +549,7 @@ var VERSIONE = 2;                 // se il server dice paginaMinima > VERSIONE l
 var DAL = '2026-10-19', AL = '2026-11-29', CHIUSI0 = ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-07']; // come Code.gs: si disegna subito, poi il server conferma
 var TOCCO = 'tutto|si';
 var VALIDO = /^(tutto|pom|sera)\|(si|forse)$/;
-var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 6000, RICARICA_MS = 60000, AGGIORNA_LIVE_MS = 30000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
+var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 5000, RICARICA_MS = 60000, AGGIORNA_LIVE_MS = 30000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
 var AVATARI = ['jeans', 'claude', 'gpt', 'spirale', 'fascia', 'cubo', 'occhio', 'fungo', 'boom', 'bocca', 'sessantasette', 'busta', 'pcretino', 'stellag', 'spine', 'riccio', 'cuorefuoco', 'cuorefascia', 'cubofacce', 'eminem', 'lgbt', 'gatto2', 'birra', 'razzo', 'medico', 'soldi', 'computer', 'gatto', 'cane', 'chitarra', 'caffe', 'cappello', 'brindisi', 'libro', 'fotocamera', 'ironman', 'drink', 'hennessy', 'jack', 'gemini', 'sigaretta', 'gattino', 'gufo', 'fiore', 'palla', 'pizza', 'sole'];   // elenco generato da assembla_v3.py dagli id a-... dello sprite (i nuovi in fondo)
 // Aspetto (admin): UGUALE a ASPETTO_OPZIONI in Code.gs, prima opzione = predefinita. Classe su <body> per l'opzione non predefinita.
 var ASPETTO_OPZIONI = { stile: ['pulito', 'mano'], colore: ['blu', 'verde'], weekend: ['grande', 'uguale'] };
@@ -632,7 +645,7 @@ function preparaSenzaFondo() { // copia di ogni avatar senza la macchia di fondo
     var n = sy.cloneNode(true); n.id = 'n-' + sy.id.slice(2); var p = n.querySelector('path'); if (p) n.removeChild(p); sy.parentNode.appendChild(n);
   });
 }
-function avMini(v) { preparaSenzaFondo(); var k = v.avatar; if (k && AVATARI.indexOf(k) >= 0) { var a = el('span', 'av nb'); a.appendChild(use('n-' + k, '')); return a; } var a2 = av(v.nome); a2.className += ' ini2'; return a2; }
+function avMini(v) { return av(v.nome); }
 var FILTRO = {}; // admin: persone selezionate (norm(nome) -> true); vuoto = tutte
 function filtroAttivo() { return adminOk && Object.keys(FILTRO).length > 0; }
 function altri(iso) { // gli ALTRI che ci sono: il voto che sto toccando non conta
@@ -707,6 +720,7 @@ function toast(txt, undo) {
       Promise.resolve().then(undo).then(function () { var t2 = $('toast'); if (t2 && /^Un attimo/.test(t2.textContent)) toast('Annullato'); carica(); }, function (e) { toast('Non annullato: ' + umano(e)); });
     });
     t.appendChild(u);
+    var xx = el('button', 'toast-x', '×'); xx.type = 'button'; xx.id = 'toast-x'; xx.setAttribute('aria-label', 'Chiudi'); xx.addEventListener('click', chiudiToast); t.appendChild(xx);
   }
   var b = $('bar');
   if (b.hidden) { t.className += ' fisso'; document.body.appendChild(t); } else b.insertBefore(t, b.firstChild);
@@ -809,11 +823,11 @@ function contornoMano(e, col, sp, r, amp, seme, riempi) { // contorno disegnato 
   pa.setAttribute('d', d + 'Z'); pa.setAttribute('fill', riempi || 'none'); pa.setAttribute('stroke', col); pa.setAttribute('stroke-width', sp); pa.setAttribute('stroke-linecap', 'round'); pa.setAttribute('stroke-linejoin', 'round');
   sv.appendChild(pa); var vecchio = e.querySelector('svg.mano'); if (vecchio && vecchio.parentNode === e) e.removeChild(vecchio); e.style.position = 'relative'; e.insertBefore(sv, e.firstChild);
 }
-function disegnaQuadro(box) { // blocco = forma piena a mano libera senza contorno; ogni persona col colore del suo orario; il commento e' un riquadro bianco che contiene anche chi l'ha scritto
+function disegnaQuadro(box) { // zone = forme piene a mano libera senza contorno (verde/arancione/giallo per orario); dentro, le persone in bianco; il commento e' un riquadro bianco
   var fill = { tutto: '#d6efdc', pom: '#fbdcb6', sera: '#f5e8b4' }, z = 0;
-  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { contornoMano(cl, 'none', 0, 24, 5.2, 7 + (z += 3), '#eef7f0'); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-cm'), function (cl) { contornoMano(cl, 'none', 0, 18, 4, 5 + (z += 7), '#ffffff'); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { var m = /q-o-(tutto|pom|sera)/.exec(cl.className), c = m ? m[1] : 'tutto'; contornoMano(cl, 'none', 0, 11, 1.4, 11 + (z += 5), fill[c]); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { var t = /q-f-(tutto|pom|sera)/.exec(cl.className), c = t ? t[1] : 'tutto'; contornoMano(cl, 'none', 0, 24, 4.6, 7 + (z += 3), fill[c]); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-cm'), function (cl) { contornoMano(cl, 'none', 0, 18, 3, 5 + (z += 7), '#ffffff'); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { var m = /q-o-(tutto|pom|sera)/.exec(cl.className), c = m ? m[1] : 'tutto', dentro = cl.closest && cl.closest('.q-f'); contornoMano(cl, 'none', 0, 11, 1.2, 11 + (z += 5), dentro ? '#ffffff' : fill[c]); });
   Array.prototype.forEach.call(box.querySelectorAll('.q-lg'), function (cl) { var m = /q-o-(tutto|pom|sera)/.exec(cl.className), c = m ? m[1] : 'tutto'; contornoMano(cl, 'none', 0, 10, 1.2, 3 + (z += 4), fill[c]); });
 }
 function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri: CI SONO / FORSE, ognuno con avatar, nome, orario e (se c'e') il commento in rosa
@@ -822,16 +836,21 @@ function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri:
   vv.forEach(function (v) { var q = parti(v.giorni[iso]), pr = adminOk && !v.commento ? notaDi(privati[norm(v.nome)], iso) : '', x = { v: v, f: q.f, si: q.si, nt: notaDi(v.commento, iso) || (pr ? pr + ' (solo admin)' : '') }; (q.si ? si : fo).push(x); });
   function ord(l) { l.sort(function (x, y) { return (y.nt ? 1 : 0) - (x.nt ? 1 : 0) || x.v.nome.localeCompare(y.v.nome, 'it'); }); }
   ord(si); ord(fo);
-  function gruppo(cls, titolo, l) { // un solo blocco per gruppo: tutti insieme, ognuno col colore del suo orario (verde tutto il giorno, arancione pomeriggio, giallo sera)
+  function gruppo(cls, titolo, l) { // dentro Ci sono / Forse: una zona per orario (verde tutto il giorno, arancione pomeriggio, gialla sera), con o senza commento
     var sez = el('section', 'q-s ' + cls), h = el('h3', 'q-h'); h.appendChild(document.createTextNode(titolo)); h.appendChild(el('b', '', String(l.length))); sez.appendChild(h);
-    var cl = el('div', 'q-f q-f-tutto'), gg = el('div', 'q-g');
     var ordine = { tutto: 0, pom: 1, sera: 2 };
-    l.slice().sort(function (x, y) { return ordine[x.f] - ordine[y.f] || (y.nt ? 1 : 0) - (x.nt ? 1 : 0) || x.v.nome.localeCompare(y.v.nome, 'it'); }).forEach(function (x) {
-      var c = el('div', 'q-p' + (x.nt ? ' q-con q-cm' : '')), riga = el('span', 'q-riga q-o-' + x.f); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
-      c.appendChild(riga); if (x.nt) c.appendChild(el('span', 'q-c', x.nt)); gg.appendChild(c);
+    ['tutto', 'pom', 'sera'].forEach(function (k) {
+      var m = l.filter(function (x) { return x.f === k; }); if (!m.length) return;
+      m.sort(function (x, y) { return (y.nt ? 1 : 0) - (x.nt ? 1 : 0) || x.v.nome.localeCompare(y.v.nome, 'it'); });
+      var cl = el('div', 'q-f q-f-' + k), gg = el('div', 'q-g');
+      m.forEach(function (x) {
+        var c = el('div', 'q-p' + (x.nt ? ' q-con q-cm' : '')), riga = el('span', 'q-riga q-o-' + x.f); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
+        c.appendChild(riga); if (x.nt) c.appendChild(el('span', 'q-c', x.nt)); gg.appendChild(c);
+      });
+      cl.appendChild(gg); sez.appendChild(cl);
     });
-    if (!l.length) gg.appendChild(el('span', 'q-v', '—'));
-    cl.appendChild(gg); sez.appendChild(cl); return sez;
+    if (!l.length) { var gv = el('div', 'q-g'); gv.appendChild(el('span', 'q-v', '—')); sez.appendChild(gv); }
+    return sez;
   }
   var lg = el('div', 'q-leg'); [['tutto', 'Tutto il giorno'], ['pom', 'Pomeriggio'], ['sera', 'Sera']].forEach(function (k) { var i = el('span', 'q-lg q-o-' + k[0], k[1]); lg.appendChild(i); }); box.appendChild(lg);
   box.appendChild(gruppo('q-si', 'Ci sono', si));
@@ -1103,8 +1122,7 @@ function renderCal() {
   c.setAttribute('aria-busy', CARICO ? 'true' : 'false');
   if (CARICO) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
-  var LIV = {}, vals = []; TUTTI.forEach(function (g) { if (conta[g] && vals.indexOf(conta[g]) < 0) vals.push(conta[g]); }); vals.sort(function (a, b) { return a - b; });
-  vals.forEach(function (v, i) { LIV[v] = vals.length < 2 ? 4 : 1 + Math.round(i * 6 / (vals.length - 1)); });
+  var LIV = {}; TUTTI.forEach(function (g) { var n = conta[g]; if (n) LIV[n] = n <= 8 ? n : 8 + Math.min(2, Math.round((n - 8) * 2 / Math.max(1, max - 8))); }); // 1..8 persone = un colore ciascuno, 9+ = ultimi due
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
     var giorni = mesi[mk], y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, first = new Date(Date.UTC(y, mm, 1)), n = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
@@ -1114,7 +1132,7 @@ function renderCal() {
       if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += ' sk-r'; var hh = ((d * 37 + (mm + 1) * 101 + y) * 2654435761) % 4294967296, dl = hh % 2600, du = 2200 + (hh >> 5) % 1500; b.style.webkitAnimationDelay = b.style.animationDelay = (-dl) + 'ms'; b.style.webkitAnimationDuration = b.style.animationDuration = du + 'ms'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + LIV[nn];
-      if ((!editable() || adminOk) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 5).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd'; } }
+      if ((!editable() || adminOk) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 4).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd'; } }
       if (nn) { var o = el('i', 'o' + (nn === 1 ? ' uno' : ''), String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
