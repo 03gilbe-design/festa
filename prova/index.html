@@ -821,7 +821,6 @@ function sheetOpzioni() {
         b.addEventListener('click', function () { S.pubblico = o[0]; S.commToccato = true; S.dirty = true; salvaBozza(); Array.prototype.forEach.call(document.querySelectorAll('.sheet [data-vis]'), function (x) { x.setAttribute('aria-pressed', (x.getAttribute('data-vis') === '1') === o[0] ? 'true' : 'false'); }); }); s3.appendChild(b);
       });
       cbox.appendChild(s3);
-      if (altri(iso).length) box.appendChild(chipsChiViene(iso, false, 6));
       return box;
     }
     if (gs.length) {
@@ -1096,7 +1095,6 @@ function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito 
   else togliGiorno(iso); // secondo tocco = toglie (i dettagli stanno nel foglio del pulsante accanto a Invia)
   renderCal(); renderBar();
   var q = $('cal').querySelector('[data-g="' + iso + '"]'); if (q) q.focus({ preventScroll: true });
-  if (nuovo && !piccolo && altri(iso).length) sheet(dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }), function (sh) { sh.appendChild(quadroGiorno(iso, false)); });
 }
 function tenutoPremuto(b) { // 0,5 s di pressione: stessa scelta del giorno ma senza il quadro grande
   var t = null, pos = null;
@@ -1140,7 +1138,6 @@ function renderBar() {
     ki.addEventListener('focus', function () { kbSeAperta(); setTimeout(function () { try { ki.scrollIntoView({ block: 'center' }); } catch (e) {} }, 300); }); ki.addEventListener('blur', function () { document.body.classList.remove('kb'); });
     cr.appendChild(ki); if (S.keyErr) { ki.setAttribute('aria-invalid', 'true'); var em = el('span', 'em', 'Chiave sbagliata'); em.id = 'serve-e'; em.setAttribute('role', 'alert'); cr.appendChild(em); } bar.appendChild(cr);
   }
-  if (S.focus && S.scelte[S.focus] && editable() && altri(S.focus).length) { var gi = S.focus, qb = el('button', 'btn sec chi-btn'); qb.type = 'button'; qb.id = 'chi-viene'; qb.appendChild(ico('gruppo')); qb.appendChild(document.createTextNode('Chi viene ' + dl(gi, { day: 'numeric', month: 'short' }) + ' · ' + altri(gi).length)); qb.addEventListener('click', function () { var g0 = gi; sheet(dl(g0, { weekday: 'long', day: 'numeric', month: 'long' }), function (sh) { sh.appendChild(quadroGiorno(g0, false)); }); }); bar.appendChild(qb); }
   var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
   {
     var nb = el('button', 'ib hint'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) r.appendChild(nb); // la matita compare solo dopo aver scelto un giorno
