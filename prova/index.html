@@ -476,6 +476,7 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 body .bar .riga{align-items:center}body .bar .ib{margin:0 0 0 8px;width:116px;height:56px;min-height:56px;border-radius:14px}body .bar .invia{height:56px;min-height:56px}body .bar .ib .ico{width:32px;height:32px}body .bar .ib .pt{top:11px;right:11px}body .bar .ib:first-child{margin-left:0}
 .g.foc{box-shadow:none}.g:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--ink)}body .g{padding-top:10px}body.cnt-a .g .o{top:3px;font-size:11.5px}
 .inv.visite .pers{justify-content:flex-start;padding-left:10px}.inv.visite .pers .gia{margin:0 10px 0 0;width:26px;height:26px}.inv.visite .pers .q{margin:0}
+body .g .dots{gap:0}body .g .dots .av{width:9px;height:9px;margin:0 -2.5px!important;border-width:1.2px;font-size:5px}body .g .dots .av:first-child{margin-left:0!important}body .g .dots .av.ini2{width:9px;height:9px;line-height:9px;font-size:5px}body .g.hd{padding-bottom:12px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -557,7 +558,7 @@ var DAL = '2026-10-19', AL = '2026-11-29', CHIUSI0 = ['2026-10-30', '2026-10-31'
 var TOCCO = 'tutto|si';
 var VALIDO = /^(tutto|pom|sera)\|(si|forse)$/;
 var MAX_COMMENTO = 300, ANNULLA_MS = window.ANNULLA_MS || 5000, RICARICA_MS = 60000, AGGIORNA_LIVE_MS = 30000, MAX_SUGG = 5; // ANNULLA_MS: i test lo allungano
-var AVATARI = ['jeans', 'claude', 'gpt', 'rana', 'zucca', 'accendino', 'lunateschio', 'maiale', 'gattoteschio', 'pesce', 'tazzaman', 'spirale', 'fascia', 'cubo', 'occhio', 'fungo', 'boom', 'bocca', 'sessantasette', 'busta', 'stellag', 'spine', 'riccio', 'cuorefuoco', 'cuorefascia', 'cubofacce', 'eminem', 'lgbt', 'gatto2', 'birra', 'razzo', 'medico', 'soldi', 'computer', 'gatto', 'cane', 'chitarra', 'caffe', 'cappello', 'brindisi', 'libro', 'fotocamera', 'ironman', 'drink', 'hennessy', 'jack', 'gemini', 'sigaretta', 'gattino', 'gufo', 'fiore', 'palla', 'pizza', 'sole'];   // elenco generato da assembla_v3.py dagli id a-... dello sprite (i nuovi in fondo)
+var AVATARI = ['jeans', 'claude', 'gpt', 'rana', 'razzo', 'zucca', 'medico', 'accendino', 'soldi', 'lunateschio', 'computer', 'maiale', 'gatto', 'gattoteschio', 'cane', 'pesce', 'chitarra', 'tazzaman', 'caffe', 'spirale', 'cappello', 'fascia', 'brindisi', 'cubo', 'libro', 'occhio', 'fotocamera', 'fungo', 'ironman', 'boom', 'drink', 'bocca', 'hennessy', 'sessantasette', 'jack', 'busta', 'gemini', 'stellag', 'sigaretta', 'spine', 'gattino', 'riccio', 'gufo', 'cuorefuoco', 'fiore', 'cuorefascia', 'palla', 'cubofacce', 'pizza', 'eminem', 'sole', 'lgbt', 'gatto2', 'birra'];   // elenco generato da assembla_v3.py dagli id a-... dello sprite (i nuovi in fondo)
 // Aspetto (admin): UGUALE a ASPETTO_OPZIONI in Code.gs, prima opzione = predefinita. Classe su <body> per l'opzione non predefinita.
 var ASPETTO_OPZIONI = { stile: ['pulito', 'mano'], colore: ['blu', 'verde'], weekend: ['grande', 'uguale'] };
 var ASPETTO_CLASSE = { 'stile:mano': 'mano', 'colore:verde': 'verde', 'weekend:uguale': 'pesi' };
@@ -968,13 +969,14 @@ function sheetChiave() {
 }
 
 // ---------- fila dei votanti (sotto il titolo): un cerchietto per chi ha votato + "N/M"; tocco = elenco di tutti gli invitati ----------
+function unSoloGiorno(v) { return Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length <= 1; } // chi ha votato un giorno solo e' quasi sempre entrato per sbaglio: va in fondo
 function renderFila() {
   var f = $('fila'); if (!f) return;
   var voti = VOTI || [];
   f.hidden = !voti.length;
   clear(f); if (!voti.length) return;
   var io = norm(S.nome) && votoDi(S.nome) ? norm(S.nome) : norm(mio());
-  var ord = voti.slice().sort(function (a, b) { return (norm(b.nome) === io) - (norm(a.nome) === io) || (b.agg || 0) - (a.agg || 0); });
+  var ord = voti.slice().sort(function (a, b) { return (norm(b.nome) === io) - (norm(a.nome) === io) || unSoloGiorno(a) - unSoloGiorno(b) || (b.agg || 0) - (a.agg || 0); });
   var riga = f.parentNode, larg = (riga.clientWidth || 320) - ($('loc').offsetWidth || 110) - 16 - 56, k = Math.max(3, Math.floor(larg / 24)), mostra = ord.length > k ? ord.slice(0, k - 1) : ord;
   var bt = el('button', 'fila-b'); bt.type = 'button'; bt.id = 'fila-b';
   var tot = INVITATI.length ? Math.max(INVITATI.length, voti.length) : 0;
@@ -996,7 +998,7 @@ function sheetInvitati() { // tutti gli invitati: chi ha votato in evidenza (ava
     var voti = VOTI || [], visti = Object.create(null), righe = [];
     INVITATI.forEach(function (n) { if (!visti[norm(n)]) { visti[norm(n)] = true; var v = votoDi(n); righe.push({ nome: v ? v.nome : n, v: v }); } });
     voti.forEach(function (v) { if (!visti[norm(v.nome)]) { visti[norm(v.nome)] = true; righe.push({ nome: v.nome, v: v }); } });
-    righe.sort(function (a, b) { return (!!b.v - !!a.v) || a.nome.localeCompare(b.nome, 'it'); });
+    righe.sort(function (a, b) { return (!!b.v - !!a.v) || ((a.v && unSoloGiorno(a.v)) ? 1 : 0) - ((b.v && unSoloGiorno(b.v)) ? 1 : 0) || a.nome.localeCompare(b.nome, 'it'); });
     var ul = el('ul', 'lista'); ul.id = 'elenco-invitati';
     righe.forEach(function (r) {
       var li = el('li', 'inv' + (r.v ? ' votato' : ' manca')), d = el('div', 'pers'); d.appendChild(av(r.nome, r.v ? r.v.avatar || '' : ''));
@@ -1150,7 +1152,7 @@ function renderCal() {
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + LIV[nn];
       var fantasma = editable() && !adminOk, nascosti = fantasma && Object.keys(S.scelte).length > 0; // appena entri: cerchi quasi trasparenti; al primo tocco spariscono; dopo Invia tornano pieni
-      if ((!editable() || adminOk || fantasma) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 3).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd' + (fantasma ? ' gh' : '') + (nascosti ? ' gx' : ''); } }
+      if ((!editable() || adminOk || fantasma) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, [5, 6, 0].indexOf(new Date(iso + 'T12:00:00Z').getUTCDay()) >= 0 ? 7 : 4).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd' + (fantasma ? ' gh' : '') + (nascosti ? ' gx' : ''); } }
       if (nn) { var o = el('i', 'o' + (nn === 1 ? ' uno' : ''), String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
@@ -1205,7 +1207,7 @@ function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome;
     var m = k[2];
     var r = el('div', 'qm-r'), vp = el('div', 'qm-vp'), tr = el('div', 'qm-t');
     r.appendChild(el('span', 'qm-lab ' + (k[0] ? 'si' : 'fo'), k[3] ? k[1] : ''));
-    function pillole(dove) { m.forEach(function (x) { var p = el('span', 'q-riga q-o-' + x.f); p.appendChild(av(x.v.nome)); p.appendChild(document.createTextNode(x.v.nome.split(' ')[0] + (unico ? '' : x.f === 'pom' ? ' · pom' : x.f === 'sera' ? ' · sera' : ''))); dove.appendChild(p); }); }
+    function pillole(dove) { m.forEach(function (x) { var p = el('span', 'q-riga q-o-' + x.f); p.appendChild(av(x.v.nome)); p.appendChild(document.createTextNode(x.v.nome.split(' ')[0] + '')); dove.appendChild(p); }); }
     pillole(tr); vp.appendChild(tr); r.appendChild(vp); box.appendChild(r);
     setTimeout(function () { // misura: se non ci sta, si duplica la fila e la si fa scorrere in loop
       if (tr.scrollWidth > vp.clientWidth + 2) { var w = tr.scrollWidth + 5; var d2 = el('div', 'qm-t'); pillole(d2); while (d2.firstChild) tr.appendChild(d2.firstChild); tr.style.setProperty('--w', w + 'px'); var sec = Math.max(8, Math.round(w / 26)); tr.style.webkitAnimationDuration = tr.style.animationDuration = sec + 's'; tr.className += ' scorre'; }
