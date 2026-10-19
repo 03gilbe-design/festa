@@ -410,6 +410,7 @@ body .g .o.uno::before{opacity:.7}
 .miei{margin:0 0 12px}.miei-t{margin:0 0 6px;font-size:13px;font-weight:800;color:var(--mut)}
 .miei-g{display:flex;flex-wrap:wrap;gap:5px}.miei-p{padding:3px 9px;border-radius:12px;background:#d6efdc;font-size:12.5px;font-weight:700}
 .miei-p.q-o-pom{background:#fbdcb6}.miei-p.q-o-sera{background:#f5e8b4}
+.lista .pers .q{margin-left:auto;margin-right:8px;min-width:24px;height:24px;padding:0;box-sizing:border-box;border-radius:50%;background:#dfe9e2;color:#3f5a49;font-size:12.5px;font-weight:700;line-height:24px;text-align:center;display:inline-block}
 </style>
 </head>
 <body>
@@ -919,7 +920,7 @@ function sheetInvitati() { // tutti gli invitati: chi ha votato in evidenza (ava
     righe.forEach(function (r) {
       var li = el('li', 'inv' + (r.v ? ' votato' : ' manca')), d = el('div', 'pers'); d.appendChild(av(r.nome, r.v ? r.v.avatar || '' : ''));
       d.appendChild(el('b', '', r.nome));
-      if (r.v) { d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato'); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
+      if (r.v) { var ngv = Object.keys(r.v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length; d.appendChild(el('span', 'q', String(ngv))); d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato ' + ngv + (ngv === 1 ? ' giorno' : ' giorni')); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
       li.appendChild(d); ul.appendChild(li);
     });
     s.appendChild(ul);
@@ -1092,7 +1093,6 @@ function renderCal() {
     }
     if (tot) { c.appendChild(h); c.appendChild(cal); }
   });
-  setTimeout(contornoGiorni, 0);
 }
 function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito il quadro grande di chi viene; tenendo premuto: solo la scelta, con il tasto piccolo sopra Invia
   var cel = e.currentTarget;
