@@ -446,6 +446,9 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .adm-fb{flex:none;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:none;opacity:.5;position:relative}.adm-fb .av{width:38px;height:38px}
 .adm-fb.on{opacity:1;box-shadow:0 0 0 3px #2563eb;border-radius:50%}.adm-rz{opacity:1;background:#e8ecf5;color:#2a3042;font-size:22px;font-weight:700;width:40px}
 .g.hd .fq{display:none}
+.g .dots .av.nb{background:none;border:0;width:15px;height:15px;margin:0 -3px;box-sizing:border-box}.g .dots .av.nb svg{width:100%;height:100%;display:block}
+.g .dots .av.ini2{background:#dde3f0;color:#3f4a66;width:13px;height:13px;margin:0 -2px;font-size:7.5px;font-weight:800;line-height:13px;border:1.5px solid #fff;box-sizing:content-box}
+.g .dots{bottom:2px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -614,6 +617,14 @@ function ngiorni() { return giorniScelti().length; }
 function editable() { return !S.voted || S.edit; }
 function canSend() { return pulisciNome(S.nome) && ngiorni(); }
 function esiste() { return votoDi(S.vecchio || S.nome); }
+var SENZA_FONDO = false;
+function preparaSenzaFondo() { // copia di ogni avatar senza la macchia di fondo (la prima forma): solo il soggetto, cosi' ne entrano di piu' nel giorno
+  if (SENZA_FONDO) return; SENZA_FONDO = true;
+  Array.prototype.forEach.call(document.querySelectorAll('symbol[id^="a-"]'), function (sy) {
+    var n = sy.cloneNode(true); n.id = 'n-' + sy.id.slice(2); var p = n.querySelector('path'); if (p) n.removeChild(p); sy.parentNode.appendChild(n);
+  });
+}
+function avMini(v) { preparaSenzaFondo(); var k = v.avatar; if (k && AVATARI.indexOf(k) >= 0) { var a = el('span', 'av nb'); a.appendChild(use('n-' + k, '')); return a; } var a2 = av(v.nome); a2.className += ' ini2'; return a2; }
 var FILTRO = {}; // admin: persone selezionate (norm(nome) -> true); vuoto = tutte
 function filtroAttivo() { return adminOk && Object.keys(FILTRO).length > 0; }
 function altri(iso) { // gli ALTRI che ci sono: il voto che sto toccando non conta
@@ -1083,15 +1094,6 @@ function renderCal() {
   if (c.classList) c.classList[CARICO ? 'add' : 'remove']('carico'); // finche' i voti non arrivano: tessere con la luce che scorre (come YouTube)
   c.setAttribute('aria-busy', CARICO ? 'true' : 'false');
   if (CARICO) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
-  if (adminOk && VOTI && VOTI.length) { // admin: tutti i votanti come avatar; si toccano per vedere solo quelle persone
-    var fr = el('div', 'adm-f'); fr.setAttribute('role', 'group'); fr.setAttribute('aria-label', 'Filtra per persona');
-    VOTI.slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) {
-      var bb = el('button', 'adm-fb' + (FILTRO[norm(v.nome)] ? ' on' : '')); bb.type = 'button'; bb.setAttribute('aria-pressed', FILTRO[norm(v.nome)] ? 'true' : 'false'); bb.setAttribute('aria-label', v.nome); bb.title = v.nome;
-      bb.appendChild(av(v.nome)); bb.addEventListener('click', function () { if (FILTRO[norm(v.nome)]) delete FILTRO[norm(v.nome)]; else FILTRO[norm(v.nome)] = true; renderCal(); }); fr.appendChild(bb);
-    });
-    if (filtroAttivo()) { var rz = el('button', 'adm-fb adm-rz'); rz.type = 'button'; rz.setAttribute('aria-label', 'Mostra tutti'); rz.textContent = '×'; rz.addEventListener('click', function () { FILTRO = {}; renderCal(); }); fr.insertBefore(rz, fr.firstChild); }
-    c.appendChild(fr);
-  }
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
@@ -1102,7 +1104,7 @@ function renderCal() {
       if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += ' sk-r'; var hh = ((d * 37 + (mm + 1) * 101 + y) * 2654435761) % 4294967296, dl = hh % 2600, du = 2200 + (hh >> 5) % 1500; b.style.webkitAnimationDelay = b.style.animationDelay = (-dl) + 'ms'; b.style.webkitAnimationDuration = b.style.animationDuration = du + 'ms'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
-      if ((!editable() || adminOk) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 3).forEach(function (v) { ds.appendChild(av(v.nome)); }); b.appendChild(ds); b.className += ' hd'; } }
+      if ((!editable() || adminOk) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 5).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd'; } }
       if (nn) { var o = el('i', 'o' + (nn === 1 ? ' uno' : ''), String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
