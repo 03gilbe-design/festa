@@ -475,6 +475,11 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .g.hd{padding-bottom:14px}
 .g .dots{gap:2px}
 .g .dots .av{width:11px;height:11px;border:1.5px solid #fff;font-size:6px}
+.quadro .q-f{position:relative;padding-bottom:26px}
+.quadro .q-zl{position:absolute;right:14px;bottom:7px;font-size:11.5px;font-weight:800;letter-spacing:.01em;z-index:2}
+.quadro .q-f-tutto .q-zl{color:#1d5e3a}.quadro .q-f-pom .q-zl{color:#8a4a0e}.quadro .q-f-sera .q-zl{color:#7a5a08}
+.quadro .q-f > .q-zl{position:absolute!important;right:16px;left:auto;bottom:8px}
+.quadro .q-f{padding-bottom:30px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -852,12 +857,11 @@ function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri:
         var c = el('div', 'q-p' + (x.nt ? ' q-con q-cm' : '')), riga = el('span', 'q-riga q-o-' + x.f); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
         c.appendChild(riga); if (x.nt) c.appendChild(el('span', 'q-c', x.nt)); gg.appendChild(c);
       });
-      cl.appendChild(gg); sez.appendChild(cl);
+      cl.appendChild(gg); cl.appendChild(el('span', 'q-zl', { tutto: 'Tutto il giorno', pom: 'Pomeriggio', sera: 'Sera' }[k])); sez.appendChild(cl);
     });
     if (!l.length) { var gv = el('div', 'q-g'); gv.appendChild(el('span', 'q-v', '—')); sez.appendChild(gv); }
     return sez;
   }
-  var lg = el('div', 'q-leg'); [['tutto', 'Tutto il giorno'], ['pom', 'Pomeriggio'], ['sera', 'Sera']].forEach(function (k) { var i = el('span', 'q-lg q-o-' + k[0], k[1]); lg.appendChild(i); }); box.appendChild(lg);
   box.appendChild(gruppo('q-si', 'Ci sono', si));
   box.appendChild(gruppo('q-fo', 'Forse', fo));
   if (!vv.length) box.appendChild(el('p', 'hint', 'Nessuno ancora'));
