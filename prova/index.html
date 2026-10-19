@@ -738,11 +738,11 @@ function contornoMano(e, col, sp, r, amp, seme, riempi) { // contorno disegnato 
   pa.setAttribute('d', d + 'Z'); pa.setAttribute('fill', riempi || 'none'); pa.setAttribute('stroke', col); pa.setAttribute('stroke-width', sp); pa.setAttribute('stroke-linecap', 'round'); pa.setAttribute('stroke-linejoin', 'round');
   sv.appendChild(pa); var vecchio = e.querySelector('svg.mano'); if (vecchio && vecchio.parentNode === e) e.removeChild(vecchio); e.style.position = 'relative'; e.insertBefore(sv, e.firstChild);
 }
-function disegnaQuadro(box) {
-  var cols = { tutto: '#6f93de', pom: '#e3a24f', sera: '#9a86dc' }, fill = { tutto: '#eaf0fd', pom: '#fdf1de', sera: '#eeeafb' }, z = 0;
-  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { var t = /q-f-(tutto|pom|sera)/.exec(cl.className), c = t ? t[1] : 'tutto'; contornoMano(cl, cols[c], 3, 22, 2.2, 7 + (z += 3), fill[c]); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { var t = cl.closest ? cl.closest('.q-f') : null, m = t && /q-f-(tutto|pom|sera)/.exec(t.className), c = m ? m[1] : 'tutto'; contornoMano(cl, cols[c], 1.8, 15, .9, 11 + (z += 5), '#ffffff'); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-c'), function (cl) { contornoMano(cl, '#e48aa8', 1.8, 13, 1, 5 + (z += 7), '#fde4ec'); });
+function disegnaQuadro(box) { // contorni scuri, a mano libera e ben irregolari (amp alta); riempimento del colore dell'orario
+  var fill = { tutto: '#eaf0fd', pom: '#fdf1de', sera: '#eeeafb' }, INK = '#2a3042', z = 0;
+  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { var t = /q-f-(tutto|pom|sera)/.exec(cl.className), c = t ? t[1] : 'tutto'; contornoMano(cl, INK, 2.6, 20, 4.2, 7 + (z += 3), fill[c]); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { contornoMano(cl, INK, 1.9, 14, 2.1, 11 + (z += 5), '#ffffff'); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-c'), function (cl) { contornoMano(cl, INK, 1.9, 12, 2.2, 5 + (z += 7), '#fde4ec'); });
 }
 function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri: CI SONO / FORSE, ognuno con avatar, nome, orario e (se c'e') il commento in rosa
   var vv = tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso), box = el('div', 'quadro');
