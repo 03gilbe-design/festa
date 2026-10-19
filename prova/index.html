@@ -727,9 +727,9 @@ function contornoMano(e, col, sp, r, amp, seme, riempi) { // contorno disegnato 
   var k = seme || 1; function rnd() { k = (k * 16807) % 2147483647; return (k / 2147483647 - .5) * 2 * amp; }
   r = Math.min(r, h / 2 - 1, w / 2 - 1); var P = [], i, j, t = sp / 2 + 1;
   var cx = [w - r - t + 1, w - r - t + 1, r + t - 1, r + t - 1], cy = [r + t - 1, h - r - t + 1, h - r - t + 1, r + t - 1], a0 = [-90, 0, 90, 180];
-  function lato(x1, y1, x2, y2) { var L = Math.hypot(x2 - x1, y2 - y1), q = Math.max(1, Math.round(L / 34)); for (var z = 1; z < q; z++) P.push([x1 + (x2 - x1) * z / q, y1 + (y2 - y1) * z / q]); }
+  function lato(x1, y1, x2, y2) { var L = Math.hypot(x2 - x1, y2 - y1), q = Math.max(1, Math.round(L / 52)); for (var z = 1; z < q; z++) P.push([x1 + (x2 - x1) * z / q, y1 + (y2 - y1) * z / q]); }
   for (i = 0; i < 4; i++) {
-    for (j = 0; j <= 4; j++) { var an = (a0[i] + 90 * j / 4) * Math.PI / 180; P.push([cx[i] + (r - 0) * Math.cos(an), cy[i] + (r - 0) * Math.sin(an)]); }
+    for (j = 0; j <= 3; j++) { var an = (a0[i] + 90 * j / 3) * Math.PI / 180; P.push([cx[i] + (r - 0) * Math.cos(an), cy[i] + (r - 0) * Math.sin(an)]); }
     var n2 = (i + 1) % 4; lato(cx[i] + r * Math.cos((a0[i] + 90) * Math.PI / 180), cy[i] + r * Math.sin((a0[i] + 90) * Math.PI / 180), cx[n2] + r * Math.cos(a0[n2] * Math.PI / 180), cy[n2] + r * Math.sin(a0[n2] * Math.PI / 180));
   }
   P = P.map(function (p) { return [Math.max(t, Math.min(w - t, p[0] + rnd())), Math.max(t, Math.min(h - t, p[1] + rnd()))]; });
@@ -742,9 +742,9 @@ function contornoMano(e, col, sp, r, amp, seme, riempi) { // contorno disegnato 
 }
 function disegnaQuadro(box) { // blocchi: forma piena a mano libera SENZA contorno (come gli avatar); persone e commento: contorno sottile
   var fill = { tutto: '#dbe6fb', pom: '#fbe6c6', sera: '#e3dcf8' }, INK = '#3a4256', z = 0;
-  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { var t = /q-f-(tutto|pom|sera)/.exec(cl.className), c = t ? t[1] : 'tutto'; contornoMano(cl, 'none', 0, 24, 4.6, 7 + (z += 3), fill[c]); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { contornoMano(cl, INK, 1.2, 11, 2, 11 + (z += 5), '#ffffff'); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-c'), function (cl) { contornoMano(cl, INK, 1.2, 10, 2, 5 + (z += 7), '#fde4ec'); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { var t = /q-f-(tutto|pom|sera)/.exec(cl.className), c = t ? t[1] : 'tutto'; contornoMano(cl, 'none', 0, 24, 2.6, 7 + (z += 3), fill[c]); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { contornoMano(cl, INK, 1.2, 11, .7, 11 + (z += 5), '#ffffff'); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-c'), function (cl) { contornoMano(cl, INK, 1.2, 10, .8, 5 + (z += 7), '#fde4ec'); });
 }
 function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri: CI SONO / FORSE, ognuno con avatar, nome, orario e (se c'e') il commento in rosa
   var vv = tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso), box = el('div', 'quadro');
