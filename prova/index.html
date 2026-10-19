@@ -430,6 +430,12 @@ body .g .o.uno::before{opacity:.7}
 .miei{margin:0 0 12px}.miei-t{margin:0 0 6px;font-size:13px;font-weight:800;color:var(--mut)}
 .miei-g{display:flex;flex-wrap:wrap;gap:5px}.miei-p{padding:3px 9px;border-radius:12px;background:#d6efdc;font-size:12.5px;font-weight:700}
 .miei-p.q-o-pom{background:#fbdcb6}.miei-p.q-o-sera{background:#f5e8b4}
+body .g .o:not(.sk){position:absolute;top:-6px;right:-5px;left:auto;bottom:auto;-webkit-transform:none;transform:none;min-width:19px;height:19px;padding:0 4px;box-sizing:border-box;border-radius:10px;background:#2563eb;color:#fff;font-size:11.5px;font-weight:800;line-height:15px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);z-index:3;opacity:1}
+body .g .o:not(.sk)::before{display:none}
+body .g .o.uno:not(.sk){background:#8fa8e8;color:#fff}
+body .g.m .o:not(.sk){background:#fff;color:#1d4ed8;border-color:#1d4ed8}
+.pers .q{padding:2px 10px;border-radius:12px;background:#d6efdc;color:#1d5e3a;font-size:13px;font-weight:800;margin-left:8px;white-space:nowrap}
+.lista .pers .q{margin-left:auto;margin-right:8px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -939,7 +945,7 @@ function sheetInvitati() { // tutti gli invitati: chi ha votato in evidenza (ava
     righe.forEach(function (r) {
       var li = el('li', 'inv' + (r.v ? ' votato' : ' manca')), d = el('div', 'pers'); d.appendChild(av(r.nome, r.v ? r.v.avatar || '' : ''));
       d.appendChild(el('b', '', r.nome));
-      if (r.v) { d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato'); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
+      if (r.v) { var ngv = Object.keys(r.v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length; d.appendChild(el('span', 'q', ngv + (ngv === 1 ? ' giorno' : ' giorni'))); d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato ' + ngv + (ngv === 1 ? ' giorno' : ' giorni')); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
       li.appendChild(d); ul.appendChild(li);
     });
     s.appendChild(ul);
@@ -1055,9 +1061,9 @@ function sugg() {
 }
 
 var SPILL = {};
-function contornoGiorni() { // contorno leggero a mano libera attorno a ogni giorno scegliibile
+function contornoGiorni() { // ogni giorno ha una forma a mano libera nello STESSO colore del giorno (niente linea di colore diverso)
   var c = $('cal'); if (!c || CARICO) return;
-  Array.prototype.forEach.call(c.querySelectorAll('.g[data-g]'), function (b, i) { contornoMano(b, 'rgba(42,52,90,.42)', 1.3, 12, .9, 3 + i * 7, 'none'); });
+  Array.prototype.forEach.call(c.querySelectorAll('.g[data-g]'), function (b, i) { var col = getComputedStyle(b).backgroundColor; if (!col || col === 'rgba(0, 0, 0, 0)') return; b.style.background = 'transparent'; contornoMano(b, col, 1.2, 13, 2.1, 3 + i * 7, col); });
 }
 function renderCal() {
   SPILL = {};
@@ -1368,7 +1374,7 @@ function renderAdmin() {
 function persona(v, aperta, vai) {
   var li = el('li'), b = el('button', 'pers'); b.type = 'button'; b.setAttribute('aria-expanded', aperta ? 'true' : 'false'); b.setAttribute('aria-label', v.nome);
   b.appendChild(av(v.nome)); b.appendChild(el('b', '', v.nome)); if (v.protetto) b.appendChild(ico('lucchetto', 's'));
-  b.appendChild(el('span', 'q', String(Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length))); b.addEventListener('click', vai); li.appendChild(b);
+  var ng_ = Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length; b.appendChild(el('span', 'q', ng_ + (ng_ === 1 ? ' giorno' : ' giorni'))); b.addEventListener('click', vai); li.appendChild(b);
   if (aperta) {
     var d = el('div', 'dett');
     Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).sort().forEach(function (g) {
