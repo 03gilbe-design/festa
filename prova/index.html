@@ -470,6 +470,11 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .g.t9,body .g.t9{background:#5c82d1;color:#ffffff}
 .g.t10,body .g.t10{background:#4a74cc;color:#ffffff}
 @media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1d2a43;color:#eaf1ff}.g.t2,body .g.t2{background:#263654;color:#eaf1ff}.g.t3,body .g.t3{background:#2e4266;color:#eaf1ff}.g.t4,body .g.t4{background:#374e77;color:#eaf1ff}.g.t5,body .g.t5{background:#3f5a89;color:#eaf1ff}.g.t6,body .g.t6{background:#48659a;color:#eaf1ff}.g.t7,body .g.t7{background:#5071ac;color:#eaf1ff}.g.t8,body .g.t8{background:#597dbd;color:#eaf1ff}.g.t9,body .g.t9{background:#6189cf;color:#eaf1ff}.g.t10,body .g.t10{background:#6a95e0;color:#eaf1ff}}
+.g .dots{bottom:3px;gap:3px}
+.g .dots .av{width:13px;height:13px;margin:0;border:1.5px solid #fff;box-sizing:content-box;font-size:7px}
+.g.hd{padding-bottom:14px}
+.g .dots{gap:2px}
+.g .dots .av{width:11px;height:11px;border:1.5px solid #fff;font-size:6px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1132,7 +1137,7 @@ function renderCal() {
       if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += ' sk-r'; var hh = ((d * 37 + (mm + 1) * 101 + y) * 2654435761) % 4294967296, dl = hh % 2600, du = 2200 + (hh >> 5) % 1500; b.style.webkitAnimationDelay = b.style.animationDelay = (-dl) + 'ms'; b.style.webkitAnimationDuration = b.style.animationDuration = du + 'ms'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + LIV[nn];
-      if ((!editable() || adminOk) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 4).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd'; } }
+      if ((!editable() || adminOk) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 3).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd'; } }
       if (nn) { var o = el('i', 'o' + (nn === 1 ? ' uno' : ''), String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
@@ -1177,7 +1182,7 @@ function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome;
   var l = vv.map(function (v) { var q = parti(v.giorni[iso]); return { v: v, f: q.f, si: q.si }; });
   l.sort(function (x, y) { return ordine[x.f] - ordine[y.f] || x.v.nome.localeCompare(y.v.nome, 'it'); });
   var gr = [[true, 'Sì'], [false, 'Forse']].map(function (k) { return [k[0], k[1], l.filter(function (x) { return x.si === k[0]; }), true]; }).filter(function (g) { return g[2].length; });
-  if (gr.length === 1 && gr[0][2].length > 6) { var h2 = Math.ceil(gr[0][2].length / 2); gr = [[gr[0][0], gr[0][1], gr[0][2].slice(0, h2), true], [gr[0][0], gr[0][1], gr[0][2].slice(h2), false]]; } // tutti sullo stesso lato e tanti: due righe
+  if (gr.length === 1 && gr[0][2].length >= 3) { var h2 = Math.ceil(gr[0][2].length / 2); gr = [[gr[0][0], gr[0][1], gr[0][2].slice(0, h2), true], [gr[0][0], gr[0][1], gr[0][2].slice(h2), false]]; } // tutti sullo stesso lato e tanti: due righe
   gr.forEach(function (k) {
     var m = k[2];
     var r = el('div', 'qm-r'), vp = el('div', 'qm-vp'), tr = el('div', 'qm-t');
