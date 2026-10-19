@@ -398,6 +398,8 @@ body .g .o.uno::before{opacity:.7}
 .quadro .q-f,.quadro .q-riga,.quadro .q-c{isolation:isolate}.quadro svg.mano{z-index:-1}
 .quadro .q-riga{padding:2px 8px 2px 2px;font-size:12px;border-radius:0}.quadro .q-riga .av{width:21px;height:21px;margin-right:5px;font-size:11px}
 .quadro .q-g{gap:6px 5px}.quadro .q-c{font-size:12px;padding:3px 8px;margin:2px 0 1px 14px}
+.quadro .q-f-tutto .q-fl,.quadro .q-f-tutto .q-riga{color:#1d5e3a}.quadro .q-f-pom .q-fl,.quadro .q-f-pom .q-riga{color:#8a4a0e}.quadro .q-f-sera .q-fl,.quadro .q-f-sera .q-riga{color:#7a5a08}
+.quadro .q-f-tutto,.quadro .q-f-pom,.quadro .q-f-sera{background:none!important}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -741,9 +743,9 @@ function contornoMano(e, col, sp, r, amp, seme, riempi) { // contorno disegnato 
   sv.appendChild(pa); var vecchio = e.querySelector('svg.mano'); if (vecchio && vecchio.parentNode === e) e.removeChild(vecchio); e.style.position = 'relative'; e.insertBefore(sv, e.firstChild);
 }
 function disegnaQuadro(box) { // blocchi: forma piena a mano libera SENZA contorno (come gli avatar); persone e commento: contorno sottile
-  var fill = { tutto: '#dbe6fb', pom: '#fbe6c6', sera: '#e3dcf8' }, INK = '#3a4256', z = 0;
-  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { var t = /q-f-(tutto|pom|sera)/.exec(cl.className), c = t ? t[1] : 'tutto'; contornoMano(cl, 'none', 0, 24, 2.6, 7 + (z += 3), fill[c]); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { contornoMano(cl, INK, 1.2, 11, .7, 11 + (z += 5), '#ffffff'); });
+  var fill = { tutto: '#d6efdc', pom: '#fbdcb6', sera: '#f5e8b4' }, INK = '#3a4256', z = 0;
+  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { var t = /q-f-(tutto|pom|sera)/.exec(cl.className), c = t ? t[1] : 'tutto'; contornoMano(cl, 'none', 0, 24, 5.2, 7 + (z += 3), fill[c]); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { contornoMano(cl, 'none', 0, 11, 1.4, 11 + (z += 5), '#ffffff'); });
   Array.prototype.forEach.call(box.querySelectorAll('.q-c'), function (cl) { contornoMano(cl, INK, 1.2, 10, .8, 5 + (z += 7), '#fde4ec'); });
 }
 function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri: CI SONO / FORSE, ognuno con avatar, nome, orario e (se c'e') il commento in rosa
