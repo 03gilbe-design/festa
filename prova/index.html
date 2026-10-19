@@ -480,6 +480,7 @@ body .g .dots{gap:0}body .g .dots .av{width:9px;height:9px;margin:0 -2.5px!impor
 body .g .dots .av,body .g .dots .av.ini2{border-width:.6px}body .g .dots .av.nb{border:0}
 body .g{padding-bottom:12px}
 .quadro .q-c,.quadro .q-p,.quadro .q-g,.quadro .q-f,.quadro .q-riga,.chips .ct,.chips .cb,.chips .chip{overflow-wrap:anywhere;word-break:break-word;min-width:0;max-width:100%}.quadro .q-p.q-con,.quadro .q-c{display:block;white-space:normal}
+.gf{display:flex;align-items:flex-end;gap:4px;overflow-x:auto;padding:6px 0 6px;-webkit-overflow-scrolling:touch}.gf-c{flex:1 0 26px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;background:none;border:0;padding:4px 0 3px;border-radius:10px;font:inherit;color:inherit;min-height:200px}.gf-c.sel{background:#e7eefc;box-shadow:inset 0 0 0 1.5px #9db4ea}.gf-n{font-size:11px;font-weight:800}.gf-b{width:68%;max-width:24px;display:flex;flex-direction:column-reverse;border-radius:6px;overflow:hidden}.gf-b i{display:block;width:100%}.gf-t{background:#6fbf8a}.gf-p{background:#f0a96b}.gf-s{background:#e3c24a}.gf-f{opacity:.38}.gf-d{font-size:10px;line-height:1.15;text-align:center;color:var(--mut);text-transform:uppercase}.gf-d b{display:block;font-size:12px;color:var(--ink)}.gf-leg{display:flex;gap:10px;align-items:center;margin:2px 0 4px}.gf-lg{width:20px;height:20px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center}.gf-lg .ico{width:13px;height:13px;color:#fff}.gf-rw{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:10px 0}.gf-rw>.ico{width:22px;height:22px;margin-right:2px;flex:none}.gf-rw .av{width:28px;height:28px}.gf-fo .av{opacity:.6}.gf-no .av{opacity:.28;filter:grayscale(1)}.gf-si>.ico{color:#2e8a54}.gf-fo>.ico{color:#d98a2b}.gf-no>.ico{color:#9aa3b5}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -498,7 +499,7 @@ body .g{padding-bottom:12px}
   <symbol id="i-puntini" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="19" cy="12" r="1.7" fill="currentColor"/></symbol>
   <symbol id="i-calendario" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
   <symbol id="i-scambia" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.8 3.1-6 7-6 1.3 0 2.5.3 3.5.7"/><path d="M15 15h7M19 12l3 3-3 3"/></symbol>
-  <symbol id="i-occhio" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/></symbol><symbol id="i-orologio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-occhio" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/></symbol><symbol id="i-grafico" viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></symbol><symbol id="i-orologio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 </svg>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
 <!-- 28 avatar mano libera (motore mano.js, seme 11): macchie pastello piene, senza contorno. GROSSA ~26 unita', PICCOLA ~7. Id a-<nome>. -->
@@ -1467,9 +1468,57 @@ function renderAdmin() {
   var i = clear($('admin-in'));
   function bt(cls, icon, txt, fn, label, id) { var b = el('button', cls || ''); b.type = 'button'; if (id) b.id = id; if (icon) b.appendChild(ico(icon)); b.appendChild(document.createTextNode(txt)); if (label) b.setAttribute('aria-label', label); b.addEventListener('click', fn); i.appendChild(b); }
   bt('', 'gruppo', String(VOTI ? VOTI.length : 0), function () { sheetPersone(''); }, 'Persone', 'adm-persone');
+  bt('', 'grafico', '', sheetGrafico, 'Grafico dei giorni', 'adm-grafico');
   bt('', 'calendario', 'Giorni', sheetGiorni, null, 'adm-giorni');
   bt('', 'puntini', 'Altro', sheetAdminAltro, 'Altro', 'adm-altro');
   bt('ee', null, 'Esci', function () { location.href = location.pathname; }, null, 'esci');
+}
+function sheetGrafico() { // solo per l'admin: barre per giorno (verde tutto il giorno, arancio pomeriggio, giallo sera; tenue = forse) e, toccando una barra, chi viene / forse / chi manca
+  sheet('Grafico', function (s) {
+    var voti = VOTI || [];
+    var righe = aperti.map(function (g) {
+      var c = { g: g, si: { tutto: 0, pom: 0, sera: 0 }, fo: { tutto: 0, pom: 0, sera: 0 }, ns: 0, nf: 0 };
+      voti.forEach(function (v) { if (!v.giorni[g]) return; var p = parti(v.giorni[g]); if (p.si) { c.si[p.f]++; c.ns++; } else { c.fo[p.f]++; c.nf++; } });
+      return c;
+    });
+    var maxS = Math.max.apply(null, righe.map(function (r) { return r.ns; }).concat([1]));
+    var peso = function (r) { return r.ns + r.nf * 0.5; };
+    var scelti = righe.filter(function (r) { return r.ns >= Math.max(2, Math.round(maxS * 0.5)); });
+    if (scelti.length < 6) scelti = righe.slice().sort(function (a, b) { return peso(b) - peso(a); }).slice(0, 6);
+    scelti = scelti.sort(function (a, b) { return peso(b) - peso(a); }).slice(0, 16).sort(function (a, b) { return a.g < b.g ? -1 : 1; });
+    var migliore = scelti.slice().sort(function (a, b) { return peso(b) - peso(a); })[0];
+    var H = 150, maxT = Math.max.apply(null, scelti.map(function (r) { return r.ns + r.nf; }).concat([1]));
+    var leg = el('div', 'gf-leg'); leg.setAttribute('aria-hidden', 'true');
+    [['gf-t', 'persona'], ['gf-p', 'sole'], ['gf-s', 'luna']].forEach(function (x) { var d = el('span', 'gf-lg ' + x[0]); d.appendChild(ico(x[1])); leg.appendChild(d); });
+    var tenue = el('span', 'gf-lg gf-t gf-f'); leg.appendChild(tenue);
+    s.appendChild(leg);
+    var wrap = el('div', 'gf'), sotto = el('div', 'gf-sotto'), cols = {};
+    function barra(r) {
+      var b = el('div', 'gf-b');
+      [['si', 'tutto', 'gf-t'], ['si', 'pom', 'gf-p'], ['si', 'sera', 'gf-s'], ['fo', 'tutto', 'gf-t gf-f'], ['fo', 'pom', 'gf-p gf-f'], ['fo', 'sera', 'gf-s gf-f']].forEach(function (k) {
+        var n = r[k[0]][k[1]]; if (!n) return; var i = el('i', k[2]); i.style.height = Math.max(3, Math.round(n / maxT * H)) + 'px'; b.appendChild(i);
+      });
+      return b;
+    }
+    function mostra(r) {
+      Object.keys(cols).forEach(function (g) { cols[g].className = 'gf-c' + (g === r.g ? ' sel' : ''); cols[g].setAttribute('aria-pressed', g === r.g ? 'true' : 'false'); });
+      clear(sotto);
+      var si = [], fo = [], no = [];
+      voti.slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); }).forEach(function (v) { var x = v.giorni[r.g]; if (!x) no.push(v); else if (parti(x).si) si.push(v); else fo.push(v); });
+      function riga(cls, icona, l) { if (!l.length) return; var d = el('div', 'gf-rw ' + cls); d.appendChild(ico(icona)); l.forEach(function (v) { var a = av(v.nome, v.avatar || ''); a.setAttribute('aria-label', v.nome); d.appendChild(a); }); sotto.appendChild(d); }
+      riga('gf-si', 'spunta', si); riga('gf-fo', 'orologio', fo); riga('gf-no', 'persona', no);
+    }
+    scelti.forEach(function (r) {
+      var c = el('button', 'gf-c'); c.type = 'button'; c.setAttribute('aria-label', lungo(r.g) + ': ' + r.ns + (r.nf ? ' + ' + r.nf + ' forse' : ''));
+      c.appendChild(el('span', 'gf-n', String(r.ns)));
+      c.appendChild(barra(r));
+      var d = el('span', 'gf-d'); d.appendChild(document.createTextNode(dl(r.g, { weekday: 'narrow' }))); d.appendChild(el('b', '', String(+r.g.slice(8)))); c.appendChild(d);
+      c.addEventListener('click', function () { mostra(r); });
+      cols[r.g] = c; wrap.appendChild(c);
+    });
+    s.appendChild(wrap); s.appendChild(sotto);
+    mostra(migliore);
+  }, true);
 }
 function persona(v, aperta, vai) {
   var li = el('li'), b = el('button', 'pers'); b.type = 'button'; b.setAttribute('aria-expanded', aperta ? 'true' : 'false'); b.setAttribute('aria-label', v.nome);
