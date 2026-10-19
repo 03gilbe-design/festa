@@ -403,6 +403,8 @@ body .g .o.uno::before{opacity:.7}
 .quadro .q-leg{display:flex;gap:6px;margin:6px 0 2px}.quadro .q-lg{padding:2px 9px;font-size:11.5px;font-weight:700;color:#4a4a3a;isolation:isolate}
 .quadro .q-o-tutto{color:#1d5e3a}.quadro .q-o-pom{color:#8a4a0e}.quadro .q-o-sera{color:#7a5a08}
 .quadro .q-f .q-riga{color:inherit}
+.quadro .q-cm{padding:8px 10px 9px;isolation:isolate}.quadro .q-cm .q-c{display:block;margin:6px 2px 0;padding:0;background:none!important;border:0;color:#2a3042;font-size:13.5px;font-weight:600;line-height:1.3}
+.quadro .q-cm .q-riga{align-self:flex-start}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -745,12 +747,12 @@ function contornoMano(e, col, sp, r, amp, seme, riempi) { // contorno disegnato 
   pa.setAttribute('d', d + 'Z'); pa.setAttribute('fill', riempi || 'none'); pa.setAttribute('stroke', col); pa.setAttribute('stroke-width', sp); pa.setAttribute('stroke-linecap', 'round'); pa.setAttribute('stroke-linejoin', 'round');
   sv.appendChild(pa); var vecchio = e.querySelector('svg.mano'); if (vecchio && vecchio.parentNode === e) e.removeChild(vecchio); e.style.position = 'relative'; e.insertBefore(sv, e.firstChild);
 }
-function disegnaQuadro(box) { // blocco = forma piena a mano libera senza contorno; ogni persona col colore del suo orario
+function disegnaQuadro(box) { // blocco = forma piena a mano libera senza contorno; ogni persona col colore del suo orario; il commento e' un riquadro bianco che contiene anche chi l'ha scritto
   var fill = { tutto: '#d6efdc', pom: '#fbdcb6', sera: '#f5e8b4' }, z = 0;
   Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { contornoMano(cl, 'none', 0, 24, 5.2, 7 + (z += 3), '#eef7f0'); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-cm'), function (cl) { contornoMano(cl, '#3a4256', 1.1, 16, 1.2, 5 + (z += 7), '#ffffff'); });
   Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { var m = /q-o-(tutto|pom|sera)/.exec(cl.className), c = m ? m[1] : 'tutto'; contornoMano(cl, 'none', 0, 11, 1.4, 11 + (z += 5), fill[c]); });
   Array.prototype.forEach.call(box.querySelectorAll('.q-lg'), function (cl) { var m = /q-o-(tutto|pom|sera)/.exec(cl.className), c = m ? m[1] : 'tutto'; contornoMano(cl, 'none', 0, 10, 1.2, 3 + (z += 4), fill[c]); });
-  Array.prototype.forEach.call(box.querySelectorAll('.q-c'), function (cl) { contornoMano(cl, '#3a4256', 1.2, 10, .8, 5 + (z += 7), '#fde4ec'); });
 }
 function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri: CI SONO / FORSE, ognuno con avatar, nome, orario e (se c'e') il commento in rosa
   var vv = tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso), box = el('div', 'quadro');
@@ -763,7 +765,7 @@ function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri:
     var cl = el('div', 'q-f q-f-tutto'), gg = el('div', 'q-g');
     var ordine = { tutto: 0, pom: 1, sera: 2 };
     l.slice().sort(function (x, y) { return ordine[x.f] - ordine[y.f] || (y.nt ? 1 : 0) - (x.nt ? 1 : 0) || x.v.nome.localeCompare(y.v.nome, 'it'); }).forEach(function (x) {
-      var c = el('div', 'q-p' + (x.nt ? ' q-con' : '')), riga = el('span', 'q-riga q-o-' + x.f); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
+      var c = el('div', 'q-p' + (x.nt ? ' q-con q-cm' : '')), riga = el('span', 'q-riga q-o-' + x.f); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
       c.appendChild(riga); if (x.nt) c.appendChild(el('span', 'q-c', x.nt)); gg.appendChild(c);
     });
     if (!l.length) gg.appendChild(el('span', 'q-v', '—'));
