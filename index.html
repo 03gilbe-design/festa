@@ -406,6 +406,10 @@ body .g .o.uno::before{opacity:.7}
 .quadro .q-cm{padding:8px 10px 9px;isolation:isolate}.quadro .q-cm .q-c{display:block;margin:6px 2px 0;padding:0;background:none!important;border:0;color:#2a3042;font-size:13.5px;font-weight:600;line-height:1.3}
 .quadro .q-cm .q-riga{align-self:flex-start}
 .quadro .q-cm{padding:10px 12px 11px}
+.cal .g[data-g]{isolation:isolate}
+.miei{margin:0 0 12px}.miei-t{margin:0 0 6px;font-size:13px;font-weight:800;color:var(--mut)}
+.miei-g{display:flex;flex-wrap:wrap;gap:5px}.miei-p{padding:3px 9px;border-radius:12px;background:#d6efdc;font-size:12.5px;font-weight:700}
+.miei-p.q-o-pom{background:#fbdcb6}.miei-p.q-o-sera{background:#f5e8b4}
 </style>
 </head>
 <body>
@@ -860,6 +864,10 @@ function sheetOpzioni() {
 // Punto a parte in alto a destra: ritrovare il proprio voto da un altro telefono / cambiare persona.
 function sheetPersona() {
   sheet('Il mio voto', function (s) {
+    var mioV = votoDi(mio()), gm = mioV ? Object.keys(mioV.giorni).filter(function (g) { return g >= OGGI; }).sort() : giorniScelti();
+    if (gm.length) { var bx = el('div', 'miei'); bx.appendChild(el('p', 'miei-t', 'I tuoi giorni')); var gg_ = el('div', 'miei-g');
+      gm.forEach(function (g) { var q = parti(mioV ? mioV.giorni[g] : S.scelte[g]); gg_.appendChild(el('span', 'miei-p q-o-' + q.f, dl(g, { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '') + (q.f === 'pom' ? ' · pom' : q.f === 'sera' ? ' · sera' : '') + (q.si ? '' : ' ?'))); });
+      bx.appendChild(gg_); s.appendChild(bx); }
     function riga(i, t, cls, fn) { var b = el('button', 'riga-a' + (cls ? ' ' + cls : '')); b.type = 'button'; b.appendChild(ico(i)); b.appendChild(document.createTextNode(t)); b.addEventListener('click', fn); s.appendChild(b); }
     riga('chiave', 'Chiave', '', sheetChiave);
     if (mio()) riga('scambia', 'Non sei ' + mio().split(' ')[0] + '?', '', nonSei);
@@ -1027,6 +1035,10 @@ function sugg() {
 }
 
 var SPILL = {};
+function contornoGiorni() { // contorno leggero a mano libera attorno a ogni giorno scegliibile
+  var c = $('cal'); if (!c || CARICO) return;
+  Array.prototype.forEach.call(c.querySelectorAll('.g[data-g]'), function (b, i) { contornoMano(b, 'rgba(42,52,90,.42)', 1.3, 12, .9, 3 + i * 7, 'none'); });
+}
 function renderCal() {
   SPILL = {};
   var c = clear($('cal')), conta = {}, max = 1;
@@ -1080,6 +1092,7 @@ function renderCal() {
     }
     if (tot) { c.appendChild(h); c.appendChild(cal); }
   });
+  setTimeout(contornoGiorni, 0);
 }
 function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito il quadro grande di chi viene; tenendo premuto: solo la scelta, con il tasto piccolo sopra Invia
   var cel = e.currentTarget;
