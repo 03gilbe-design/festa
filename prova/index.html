@@ -472,6 +472,7 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .quadro .q-f{padding-bottom:30px}
 .g.gh .dots{opacity:.38}
 .g.gh .dots{gap:0}.g.gh .dots .av{margin:0 -3px!important}.g.gh .dots .av:first-child{margin-left:0!important}.inv.entrato .pers{opacity:.8}
+.g.gh .dots{transition:opacity .15s}.g.gh.gx .dots{opacity:0}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -611,12 +612,12 @@ for (var d0 = new Date(DAL + 'T00:00:00Z'); d0 <= new Date(AL + 'T00:00:00Z'); d
 var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
-var ENTRATI = [], SRV_ENT = false, MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var VISITE = 0, SRV_VIS = false, MAT_ANIM = false, ENTRATI = [], SRV_ENT = false, MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
 (function () { var m = /[?&]cnt=([abc])/.exec(location.search); document.body.classList.add('cnt-' + (m ? m[1] : 'a')); })();
 var T_AVVIO = Date.now(), CARICO = !/[?&]admin=/.test(location.search); // niente animazione per l'admin; // CARICO: animazione di caricamento a ogni apertura, anche con i dati in cache
 var cachePagina = store.get('cachePagina');
 if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.quando < 43200000 && Array.isArray(cachePagina.voti) && Array.isArray(cachePagina.aperti) && Array.isArray(cachePagina.tutti)) {
-  VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; ENTRATI = cachePagina.entrati || []; SRV_ENT = Array.isArray(cachePagina.entrati); OGGI = cachePagina.oggi || OGGI;
+  VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; ENTRATI = cachePagina.entrati || []; SRV_ENT = Array.isArray(cachePagina.entrati); VISITE = +cachePagina.visite || 0; OGGI = cachePagina.oggi || OGGI;
   DECISA = cachePagina.chiuso ? cachePagina.dataScelta : ''; SCAD = cachePagina.scadenza || ''; aspettoSalvato = cachePagina.aspetto || {};
 }
 var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
@@ -999,6 +1000,7 @@ function sheetInvitati() { // tutti gli invitati: chi ha votato in evidenza (ava
       if (r.v) { var ngv = Object.keys(r.v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length; d.appendChild(el('span', 'q', String(ngv))); d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato ' + ngv + (ngv === 1 ? ' giorno' : ' giorni')); } else if (ENTRATI.some(function (n) { return norm(n) === norm(r.nome); })) { d.appendChild(ico('occhio', 'gia')); li.className += ' entrato'; li.setAttribute('aria-label', r.nome + ', è entrato ma non ha ancora votato'); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
       li.appendChild(d); ul.appendChild(li);
     });
+    if (VISITE > 0) { var lv = el('li', 'inv visite'), dv = el('div', 'pers'); dv.appendChild(ico('occhio', 'gia')); dv.appendChild(el('b', '', 'Hanno solo guardato')); dv.appendChild(el('span', 'q', String(VISITE))); lv.setAttribute('aria-label', VISITE + ' persone hanno aperto la pagina senza scegliere un nome'); lv.appendChild(dv); ul.appendChild(lv); }
     s.appendChild(ul);
   });
 }
@@ -1062,11 +1064,17 @@ function renderName() {
 }
 // Nome scritto a mano: se ha gia' un voto lo si carica per modificarlo (pausa di 0,4 s: ridisegnare mentre il dito tocca un giorno lo farebbe perdere).
 var attesaNome;
+function codiceTelefono() { var d = store.get('dev'); if (!d) { d = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store.set('dev', d); } return String(d); }
+var VISITA_NOME = null; // ultimo nome gia' comunicato per questo telefono
+function segnalaVisita(nome) { // il telefono ha aperto la pagina (codice casuale, niente altro); se poi sceglie/vota il suo nome lo si associa
+  if (ADMIN || !SRV_VIS || VISITA_NOME === nome) return;
+  VISITA_NOME = nome; chiama({ azione: 'visita', dev: codiceTelefono(), nome: nome }).then(null, function () { VISITA_NOME = null; });
+}
 function controllaNome() {
   if (S.adminEdit || (S.voted && !S.edit)) return;
   if (!ADMIN && SRV_ENT) { // chi sceglie il proprio nome da invitato ma non ha votato: si ricorda (nella lista invitati compare l'occhio)
     var kn = norm(S.nome), inv = INVITATI.filter(function (n) { return norm(n) === kn; })[0];
-    if (inv && !votoDi(inv) && !MANDATI[kn] && ENTRATI.indexOf(inv) < 0) { MANDATI[kn] = 1; chiama({ azione: 'entrato', nome: inv }).then(function (r) { if (r && r.ok) ENTRATI.push(inv); else delete MANDATI[kn]; }, function () { delete MANDATI[kn]; }); }
+    if (inv && !votoDi(inv) && !MANDATI[kn] && ENTRATI.indexOf(inv) < 0) { MANDATI[kn] = 1; segnalaVisita(inv); chiama({ azione: 'entrato', nome: inv }).then(function (r) { if (r && r.ok) ENTRATI.push(inv); else delete MANDATI[kn]; }, function () { delete MANDATI[kn]; }); }
   }
   var v = votoDi(S.nome), prima = JSON.stringify([S.scelte, S.vecchio]);
   // Il voto trovato scrivendo il nome vale finche' il nome resta quello (Anna -> Anna B. e' un'altra persona).
@@ -1137,8 +1145,8 @@ function renderCal() {
       if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += ' sk-r'; var hh = ((d * 37 + (mm + 1) * 101 + y) * 2654435761) % 4294967296, dl = hh % 2600, du = 2200 + (hh >> 5) % 1500; b.style.webkitAnimationDelay = b.style.animationDelay = (-dl) + 'ms'; b.style.webkitAnimationDuration = b.style.animationDuration = du + 'ms'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + LIV[nn];
-      var fantasma = editable() && !adminOk && !Object.keys(S.scelte).length; // appena entri: cerchi quasi trasparenti; al primo tocco spariscono; dopo Invia tornano pieni
-      if ((!editable() || adminOk || fantasma) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 3).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd' + (fantasma ? ' gh' : ''); } }
+      var fantasma = editable() && !adminOk, nascosti = fantasma && Object.keys(S.scelte).length > 0; // appena entri: cerchi quasi trasparenti; al primo tocco spariscono; dopo Invia tornano pieni
+      if ((!editable() || adminOk || fantasma) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 3).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd' + (fantasma ? ' gh' : '') + (nascosti ? ' gx' : ''); } }
       if (nn) { var o = el('i', 'o' + (nn === 1 ? ' uno' : ''), String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
@@ -1273,7 +1281,7 @@ function renderBar() {
   }
   var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
   {
-    var nb = el('button', 'ib hint'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) r.appendChild(nb); // la matita compare solo dopo aver scelto un giorno
+    var nb = el('button', 'ib' + (MAT_ANIM ? '' : ' hint')); // l'anello sulla matita pulsa solo la prima volta, non a ogni tocco nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') || MAT_ANIM ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) { r.appendChild(nb); MAT_ANIM = true; } // la matita compare solo dopo aver scelto un giorno
     if (S.edit || S.adminEdit) { var cb = el('button', 'ib'); cb.type = 'button'; cb.id = 'annulla-mod'; cb.setAttribute('aria-label', 'Annulla le modifiche'); cb.appendChild(el('span', '', '×')); cb.firstChild.style.cssText = 'font-size:30px;line-height:1'; cb.addEventListener('click', function () { annullaModifica(); }); r.appendChild(cb); }
     if (S.invio) { b.className += ' lavora'; b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salvo…' : 'Invio…')); b.setAttribute('aria-busy', 'true'); }
     else {
@@ -1367,7 +1375,7 @@ function dopoVoto(dati, riga, prima, eraAdmin, snapS) {
     toast('Salvato', function () { return annullaVoto(prima, nuovo, true, snapS); });
   } else {
     var prec = store.get('nome'); // stesso telefono: nome usato prima
-    store.set('nome', nome);
+    store.set('nome', nome); segnalaVisita(nome);
     S = nuovoS(); applicaVotoMio(); renderAll(); window.scrollTo(0, 0);
     toast(riga ? 'Salvato' : 'Inviato', function () { return annullaVoto(prima, nuovo, false, snapS); });
     if (prec && norm(prec) !== norm(nome) && !(dati.vecchio && norm(dati.vecchio) === norm(prec)) && votoDi(prec)) setTimeout(function () { chiediVecchio(prec); }, 700);
@@ -1647,9 +1655,9 @@ function carica() {
     var nuovaFirmaCalendario = JSON.stringify([res.voti, res.aperti, res.tutti, res.oggi, res.chiuso, res.dataScelta]);
     var calendarioCambiato = nuovaFirmaCalendario !== firmaCalendario;
     firmaCalendario = nuovaFirmaCalendario;
-    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; ENTRATI = res.entrati || []; SRV_ENT = Array.isArray(res.entrati); // server vecchio: niente 'entrati', niente invio OGGI = res.oggi || OGGI;
+    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; ENTRATI = res.entrati || []; SRV_ENT = Array.isArray(res.entrati); VISITE = +res.visite || 0; SRV_VIS = typeof res.visite === 'number'; if (VISITA_NOME === null) segnalaVisita(''); // server vecchio: niente 'entrati'/'visite', niente invio OGGI = res.oggi || OGGI;
     DECISA = res.chiuso ? res.dataScelta : ''; SCAD = res.scadenza || ''; S.letturaKo = false;
-    store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], entrati: res.entrati, oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
+    store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], entrati: res.entrati, visite: res.visite, oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
     aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
     var passo2 = ADMIN ? chiama({ azione: 'verifica' }).then(function (v) {
       if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; } else { ADMIN = ''; adminOk = false; }
