@@ -483,6 +483,7 @@ body .g{padding-bottom:12px}
 .gf{display:flex;align-items:flex-end;gap:4px;overflow-x:auto;padding:6px 0 6px;-webkit-overflow-scrolling:touch}.gf-c{flex:1 0 26px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;background:none;border:0;padding:4px 0 3px;border-radius:10px;font:inherit;color:inherit;min-height:200px}.gf-c.sel{background:#e7eefc;box-shadow:inset 0 0 0 1.5px #9db4ea}.gf-n{font-size:11px;font-weight:800}.gf-b{width:68%;max-width:24px;display:flex;flex-direction:column-reverse;border-radius:6px;overflow:hidden}.gf-b i{display:block;width:100%}.gf-t{background:#6fbf8a}.gf-p{background:#f0a96b}.gf-s{background:#e3c24a}.gf-f{opacity:.38}.gf-d{font-size:10px;line-height:1.15;text-align:center;color:var(--mut);text-transform:uppercase}.gf-d b{display:block;font-size:12px;color:var(--ink)}.gf-leg{display:flex;gap:10px;align-items:center;margin:2px 0 4px}.gf-lg{width:20px;height:20px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center}.gf-lg .ico{width:13px;height:13px;color:#fff}.gf-rw{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:10px 0}.gf-rw>.ico{width:22px;height:22px;margin-right:2px;flex:none}.gf-rw .av{width:28px;height:28px}.gf-fo .av{opacity:.6}.gf-no .av{opacity:.28;filter:grayscale(1)}.gf-si>.ico{color:#2e8a54}.gf-fo>.ico{color:#d98a2b}.gf-no>.ico{color:#9aa3b5}
 .gf-c.base .gf-n::before{content:'°5 ';color:#d9a21c}.gf-dl{font-size:11px;font-weight:800;min-height:13px;color:var(--mut)}.gf-dl.su{color:#2e8a54}.gf-dl.giu{color:#d14a4a}.gf-pin{margin-left:auto;width:34px;height:28px;border:0;border-radius:10px;background:#fdf1cf;color:#c58f10;display:inline-flex;align-items:center;justify-content:center}.gf-pin .ico{width:18px;height:18px}.gf-piu>.ico{color:#2e8a54}.gf-meno>.ico{color:#d14a4a}.gf-ugu>.ico{color:#9aa3b5}.gf-ugu .av{opacity:.45}.gf-meno .av{opacity:.55;filter:grayscale(.6);outline:2px solid #e9a3a3;outline-offset:1px;border-radius:50%}.gf-piu .av{outline:2px solid #8fd1a8;outline-offset:1px;border-radius:50%}
 .gf-chip{flex:none;width:34px;height:40px;border-radius:10px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;margin-right:2px}.gf-chip small{font-size:9px;text-transform:uppercase;opacity:.8}.gf-chip b{font-size:15px}.gf-chip.cur{background:#dbe6fb;color:#1d4ed8;box-shadow:inset 0 0 0 1.5px #7fa0e1}.gf-chip.rif{background:#fdf1cf;color:#8a6208;box-shadow:inset 0 0 0 1.5px #e0b94a}.gf-piu .av{outline:2px solid #7fa0e1!important}.gf-meno .av{opacity:1!important;filter:none!important;outline:2px solid #e0b94a!important}
+.gf-c{min-height:0!important;justify-content:flex-start!important;flex:1 0 30px}.gf-c.base .gf-d::before{content:'°5';display:block;color:#d9a21c;font-size:11px}.gf-m{display:flex;flex-direction:column;gap:2px}.gf-x{width:19px;height:19px;border-radius:50%;background:#f1f3f8;display:block;position:relative}.gf-x .av{width:19px!important;height:19px!important;position:absolute;left:0;top:0;font-size:10px}.gf-x.fo .av{opacity:.4}.gf-x.se .av{box-shadow:0 0 0 2px #e3c24a}.gf-c .gf-d{margin-top:4px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1479,8 +1480,8 @@ function sheetGrafico() { // solo per l'admin: barre per giorno (verde tutto il 
   sheet('Grafico', function (s) {
     var voti = VOTI || [];
     var righe = aperti.map(function (g) {
-      var c = { g: g, si: { tutto: 0, pom: 0, sera: 0 }, fo: { tutto: 0, pom: 0, sera: 0 }, ns: 0, nf: 0, chi: {} };
-      voti.forEach(function (v) { if (!v.giorni[g]) return; var p = parti(v.giorni[g]); c.chi[norm(v.nome)] = p.si ? 'si' : 'fo'; var f = p.f === 'pom' ? 'tutto' : p.f; /* il pomeriggio non lo usa nessuno: conta come tutto il giorno */ if (p.si) { c.si[f]++; c.ns++; } else { c.fo[f]++; c.nf++; } });
+      var c = { g: g, si: { tutto: 0, pom: 0, sera: 0 }, fo: { tutto: 0, pom: 0, sera: 0 }, ns: 0, nf: 0, chi: {}, ora: {} };
+      voti.forEach(function (v) { if (!v.giorni[g]) return; var p = parti(v.giorni[g]); c.chi[norm(v.nome)] = p.si ? 'si' : 'fo'; c.ora[norm(v.nome)] = p.f === 'sera' ? 'sera' : 'tutto'; var f = p.f === 'pom' ? 'tutto' : p.f; /* il pomeriggio non lo usa nessuno: conta come tutto il giorno */ if (p.si) { c.si[f]++; c.ns++; } else { c.fo[f]++; c.nf++; } });
       return c;
     });
     var maxS = Math.max.apply(null, righe.map(function (r) { return r.ns; }).concat([1]));
@@ -1496,20 +1497,19 @@ function sheetGrafico() { // solo per l'admin: barre per giorno (verde tutto il 
     var pin = el('button', 'gf-pin'); pin.type = 'button'; pin.setAttribute('aria-label', 'Usa questo giorno come riferimento'); pin.appendChild(ico('stella'));
     leg.appendChild(pin); s.appendChild(leg);
     var wrap = el('div', 'gf'), sotto = el('div', 'gf-sotto'), cols = {};
-    function barra(r) {
-      var b = el('div', 'gf-b');
-      [['si', 'tutto', 'gf-t'], ['si', 'pom', 'gf-p'], ['si', 'sera', 'gf-s'], ['fo', 'tutto', 'gf-t gf-f'], ['fo', 'pom', 'gf-p gf-f'], ['fo', 'sera', 'gf-s gf-f']].forEach(function (k) {
-        var n = r[k[0]][k[1]]; if (!n) return; var i = el('i', k[2]); i.style.height = Math.max(3, Math.round(n / maxT * H)) + 'px'; b.appendChild(i);
-      });
-      return b;
+    var presenti = voti.filter(function (v) { return scelti.some(function (r) { return r.chi[norm(v.nome)]; }); });
+    presenti.sort(function (a, b) { var ca = scelti.filter(function (r) { return r.chi[norm(a.nome)] === 'si'; }).length, cb = scelti.filter(function (r) { return r.chi[norm(b.nome)] === 'si'; }).length; return cb - ca || a.nome.localeCompare(b.nome, 'it'); });
+    function barra(r) { // una colonna: una riga fissa per persona (cosi' si confrontano i giorni a colpo d'occhio)
+      var m = el('div', 'gf-m');
+      presenti.forEach(function (v) { var st = r.chi[norm(v.nome)], c = el('span', 'gf-x'); if (st) { var a = av(v.nome, v.avatar || ''); a.setAttribute('aria-label', v.nome); c.appendChild(a); c.className += (st === 'fo' ? ' fo' : '') + (r.ora[norm(v.nome)] === 'sera' ? ' se' : ''); } m.appendChild(c); });
+      return m;
     }
     function chipG(r, cls) { var c = el('span', 'gf-chip ' + cls); c.appendChild(el('small', '', dl(r.g, { weekday: 'narrow' }))); c.appendChild(el('b', '', String(+r.g.slice(8)))); return c; }
     function lista(l, cls, icona) { if (!l.length) return; var d = el('div', 'gf-rw ' + cls); d.appendChild(typeof icona === 'string' ? ico(icona) : icona); l.forEach(function (v) { var a = av(v.nome, v.avatar || ''); a.setAttribute('aria-label', v.nome); d.appendChild(a); }); sotto.appendChild(d); }
     function mostra() {
       Object.keys(cols).forEach(function (g) {
-        var c = cols[g], d = g === base.g ? null : righe.filter(function (r) { return r.g === g; })[0].ns - base.ns;
+        var c = cols[g];
         c.className = 'gf-c' + (g === cur.g ? ' sel' : '') + (g === base.g ? ' base' : ''); c.setAttribute('aria-pressed', g === cur.g ? 'true' : 'false');
-        var dd = c.querySelector('.gf-dl'); dd.textContent = d === null ? '' : (d > 0 ? '+' + d : d < 0 ? '\u2212' + (-d) : '='); dd.className = 'gf-dl ' + (d > 0 ? 'su' : d < 0 ? 'giu' : '');
       });
       clear(sotto);
       var ord = voti.slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); });
@@ -1526,7 +1526,6 @@ function sheetGrafico() { // solo per l'admin: barre per giorno (verde tutto il 
     }
     scelti.forEach(function (r) {
       var c = el('button', 'gf-c'); c.type = 'button'; c.setAttribute('aria-label', lungo(r.g) + ': ' + r.ns + (r.nf ? ' + ' + r.nf + ' forse' : ''));
-      c.appendChild(el('span', 'gf-dl')); c.appendChild(el('span', 'gf-n', String(r.ns)));
       c.appendChild(barra(r));
       var d = el('span', 'gf-d'); d.appendChild(document.createTextNode(dl(r.g, { weekday: 'narrow' }))); d.appendChild(el('b', '', String(+r.g.slice(8)))); c.appendChild(d);
       c.addEventListener('click', function () { cur = r; mostra(); });
