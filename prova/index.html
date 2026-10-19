@@ -473,6 +473,7 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .g.gh .dots{opacity:.38}
 .g.gh .dots{gap:0}.g.gh .dots .av{margin:0 -3px!important}.g.gh .dots .av:first-child{margin-left:0!important}.inv.entrato .pers{opacity:.8}
 .g.gh .dots{transition:opacity .15s}.g.gh.gx .dots{opacity:0}
+body .bar .riga{align-items:center}body .bar .ib{margin:0 0 0 8px;width:70px;height:64px;min-height:64px;border-radius:16px}body .bar .ib .ico{width:32px;height:32px}body .bar .ib .pt{top:11px;right:11px}body .bar .ib:first-child{margin-left:0}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1281,7 +1282,7 @@ function renderBar() {
   }
   var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
   {
-    var nb = el('button', 'ib' + (MAT_ANIM ? '' : ' hint')); // l'anello sulla matita pulsa solo la prima volta, non a ogni tocco nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') || MAT_ANIM ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) { r.appendChild(nb); MAT_ANIM = true; } // la matita compare solo dopo aver scelto un giorno
+    var nb = el('button', 'ib' + (MAT_ANIM ? '' : ' hint')); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') || MAT_ANIM ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) { r.appendChild(nb); MAT_ANIM = true; } // la matita compare solo dopo aver scelto un giorno
     if (S.edit || S.adminEdit) { var cb = el('button', 'ib'); cb.type = 'button'; cb.id = 'annulla-mod'; cb.setAttribute('aria-label', 'Annulla le modifiche'); cb.appendChild(el('span', '', '×')); cb.firstChild.style.cssText = 'font-size:30px;line-height:1'; cb.addEventListener('click', function () { annullaModifica(); }); r.appendChild(cb); }
     if (S.invio) { b.className += ' lavora'; b.appendChild(el('span', 'spin')); b.appendChild(document.createTextNode(ex || S.edit || S.adminEdit ? 'Salvo…' : 'Invio…')); b.setAttribute('aria-busy', 'true'); }
     else {
@@ -1292,7 +1293,7 @@ function renderBar() {
     }
     b.addEventListener('click', function (e) { e.preventDefault(); invia(); });
   }
-  r.appendChild(b); bar.appendChild(r);
+  r.insertBefore(b, r.firstChild); bar.appendChild(r); // Invia a sinistra, matita (piu' grande) a destra
 }
 function cambia() {
   S.edit = true; S.vecchio = S.me; S.backup = copia({ scelte: S.scelte, commento: S.commento, pubblico: S.pubblico, avatar: S.avatar }); S.focus = ''; S.keyNew = '';
