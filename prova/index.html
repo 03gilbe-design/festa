@@ -471,6 +471,7 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .quadro .q-f > .q-zl{position:absolute!important;right:16px;left:auto;bottom:8px}
 .quadro .q-f{padding-bottom:30px}
 .quadro .q-zl{width:30px;height:5px;border-radius:3px;font-size:0;bottom:11px!important}.quadro .q-f-tutto .q-zl{background:#4fae75}.quadro .q-f-pom .q-zl{background:#e8933a}.quadro .q-f-sera .q-zl{background:#d9b72c}
+.g.gh .dots{opacity:.38}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1132,7 +1133,8 @@ function renderCal() {
       if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += ' sk-r'; var hh = ((d * 37 + (mm + 1) * 101 + y) * 2654435761) % 4294967296, dl = hh % 2600, du = 2200 + (hh >> 5) % 1500; b.style.webkitAnimationDelay = b.style.animationDelay = (-dl) + 'ms'; b.style.webkitAnimationDuration = b.style.animationDuration = du + 'ms'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + LIV[nn];
-      if ((!editable() || adminOk) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 3).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd'; } }
+      var fantasma = editable() && !adminOk && !Object.keys(S.scelte).length; // appena entri: cerchi quasi trasparenti; al primo tocco spariscono; dopo Invia tornano pieni
+      if ((!editable() || adminOk || fantasma) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 3).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd' + (fantasma ? ' gh' : ''); } }
       if (nn) { var o = el('i', 'o' + (nn === 1 ? ' uno' : ''), String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
