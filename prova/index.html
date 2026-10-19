@@ -339,6 +339,9 @@ body.cnt-b .g.m .o:not(.sk)::before{background-image:url("data:image/svg+xml,%3C
 body.cnt-c .g{padding-top:12px}
 body.cnt-c .g .o{top:2px;right:5px;font-size:12px;font-weight:700;flex-direction:row-reverse}
 body.cnt-c .g .o:not(.sk)::before{width:11px;height:11px;margin:0 0 0 2px}
+#persona{top:calc(env(safe-area-inset-top));right:0;margin:0;width:50px;height:50px;border:2px solid var(--ink);border-top:0;border-right:0;border-radius:0 0 0 18px;background:var(--fill);color:var(--ink)}
+body .g .o.uno{color:#7f9bd6;font-weight:600}
+body .g .o.uno::before{opacity:.7}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -928,7 +931,7 @@ function renderCal() {
       if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += ' sk-r'; var hh = ((d * 37 + (mm + 1) * 101 + y) * 2654435761) % 4294967296, dl = hh % 2600, du = 2200 + (hh >> 5) % 1500; b.style.webkitAnimationDelay = b.style.animationDelay = (-dl) + 'ms'; b.style.webkitAnimationDuration = b.style.animationDuration = du + 'ms'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
       if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
-      if (nn) { var o = el('i', 'o', String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
+      if (nn) { var o = el('i', 'o' + (nn === 1 ? ' uno' : ''), String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
       if (mine && notaGiorno(iso)) { var cn = el('i', 'cn'); cn.setAttribute('aria-hidden', 'true'); b.appendChild(cn); }
       if (mine && (p.f !== 'tutto' || !p.si)) { var fq = el('span', 'fq'); fq.setAttribute('aria-hidden', 'true'); if (p.f === 'pom') fq.appendChild(document.createTextNode('pom')); else if (p.f === 'sera') fq.appendChild(document.createTextNode('sera')); if (!p.si) fq.appendChild(document.createTextNode('?')); b.appendChild(fq); }
