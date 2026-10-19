@@ -450,26 +450,16 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .g .dots .av.ini2{background:#dde3f0;color:#3f4a66;width:13px;height:13px;margin:0 -2px;font-size:7.5px;font-weight:800;line-height:13px;border:1.5px solid #fff;box-sizing:content-box}
 .g .dots{bottom:2px}
 .g.t1,body .g.t1{background:#eaf1fd;color:#1d2740}
-.g.t2,body .g.t2{background:#d6e3f8;color:#1d2740}
-.g.t3,body .g.t3{background:#c0d4f3;color:#1d2740}
-.g.t4,body .g.t4{background:#a9c4ee;color:#1d2740}
-.g.t5,body .g.t5{background:#8fb1e8;color:#1d2740}
-.g.t6,body .g.t6{background:#f6e0b0;color:#1d2740}
-.g.t7,body .g.t7{background:#f2cb90;color:#1d2740}
-@media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1f2c45;color:#eaf1ff}.g.t2,body .g.t2{background:#27395b;color:#eaf1ff}.g.t3,body .g.t3{background:#304771;color:#eaf1ff}.g.t4,body .g.t4{background:#395688;color:#eaf1ff}.g.t5,body .g.t5{background:#43659f;color:#eaf1ff}.g.t6,body .g.t6{background:#4d75b7;color:#eaf1ff}.g.t7,body .g.t7{background:#5885d0;color:#eaf1ff}}
-.quadro .q-f{margin:0 0 8px;padding:8px 10px 10px}.quadro .q-f-tutto,.quadro .q-f-pom,.quadro .q-f-sera{background:none!important}
-.toast .toast-x{margin-left:6px;min-width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:22px;line-height:1}
-.g.t1,body .g.t1{background:#eaf1fd;color:#1d2740}
-.g.t2,body .g.t2{background:#d6e3f8;color:#1d2740}
-.g.t3,body .g.t3{background:#c0d4f3;color:#1d2740}
-.g.t4,body .g.t4{background:#a9c4ee;color:#1d2740}
-.g.t5,body .g.t5{background:#8fb1e8;color:#1d2740}
-.g.t6,body .g.t6{background:#f6e0b0;color:#1d2740}
-.g.t7,body .g.t7{background:#f2cb90;color:#1d2740}
-.g.t8,body .g.t8{background:#eeb676;color:#1d2740}
-.g.t9,body .g.t9{background:#e9a05f;color:#1d2740}
-.g.t10,body .g.t10{background:#e28a4c;color:#1d2740}
-@media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1d2a43;color:#eef2fb}.g.t2,body .g.t2{background:#263a5c;color:#eef2fb}.g.t3,body .g.t3{background:#2f4a75;color:#eef2fb}.g.t4,body .g.t4{background:#385a8f;color:#eef2fb}.g.t5,body .g.t5{background:#416aa8;color:#eef2fb}.g.t6,body .g.t6{background:#5a4a2a;color:#eef2fb}.g.t7,body .g.t7{background:#6e552c;color:#eef2fb}.g.t8,body .g.t8{background:#82602e;color:#eef2fb}.g.t9,body .g.t9{background:#966b30;color:#eef2fb}.g.t10,body .g.t10{background:#aa7632;color:#eef2fb}}
+.g.t2,body .g.t2{background:#d9e5f9;color:#1d2740}
+.g.t3,body .g.t3{background:#c8d8f5;color:#1d2740}
+.g.t4,body .g.t4{background:#b6caf1;color:#1d2740}
+.g.t5,body .g.t5{background:#a4bced;color:#1d2740}
+.g.t6,body .g.t6{background:#92aee8;color:#1d2740}
+.g.t7,body .g.t7{background:#809fe1;color:#1d2740}
+.g.t8,body .g.t8{background:#6f90d8;color:#1d2740}
+.g.t9,body .g.t9{background:#efb775;color:#1d2740}
+.g.t10,body .g.t10{background:#e0833f;color:#1d2740}
+@media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1d2a43;color:#eef2fb}.g.t2,body .g.t2{background:#263a5c;color:#eef2fb}.g.t3,body .g.t3{background:#2f4a75;color:#eef2fb}.g.t4,body .g.t4{background:#385a8f;color:#eef2fb}.g.t5,body .g.t5{background:#416aa8;color:#eef2fb}.g.t6,body .g.t6{background:#4a79c0;color:#eef2fb}.g.t7,body .g.t7{background:#5388d6;color:#eef2fb}.g.t8,body .g.t8{background:#5c97ec;color:#eef2fb}.g.t9,body .g.t9{background:#a8702f;color:#eef2fb}.g.t10,body .g.t10{background:#c0762c;color:#eef2fb}}
 .g .dots{bottom:3px;gap:3px}
 .g .dots .av{width:13px;height:13px;margin:0;border:1.5px solid #fff;box-sizing:content-box;font-size:7px}
 .g.hd{padding-bottom:14px}
@@ -1132,7 +1122,7 @@ function renderCal() {
   c.setAttribute('aria-busy', CARICO ? 'true' : 'false');
   if (CARICO) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
-  var LIV = {}; TUTTI.forEach(function (g) { var n = conta[g]; if (n) LIV[n] = n <= 8 ? n : 8 + Math.min(2, Math.round((n - 8) * 2 / Math.max(1, max - 8))); }); // 1..8 persone = un colore ciascuno, 9+ = ultimi due
+  var LIV = {}, o1 = Math.max(9, Math.round(max * .75)), o2 = Math.max(10, Math.round(max * .9)); TUTTI.forEach(function (g) { var n = conta[g]; if (n) LIV[n] = n >= o2 ? 10 : n >= o1 ? 9 : Math.min(n, 8); }); // 1..8 persone = un blu ciascuno; arancio solo per i pochi giorni piu' pieni
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
     var giorni = mesi[mk], y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, first = new Date(Date.UTC(y, mm, 1)), n = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
@@ -1187,7 +1177,11 @@ function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome;
   var l = vv.map(function (v) { var q = parti(v.giorni[iso]); return { v: v, f: q.f, si: q.si }; });
   l.sort(function (x, y) { return ordine[x.f] - ordine[y.f] || x.v.nome.localeCompare(y.v.nome, 'it'); });
   var gr = [[true, 'Sì'], [false, 'Forse']].map(function (k) { return [k[0], k[1], l.filter(function (x) { return x.si === k[0]; }), true]; }).filter(function (g) { return g[2].length; });
-  if (gr.length === 1 && gr[0][2].length >= 3) { var h2 = Math.ceil(gr[0][2].length / 2); gr = [[gr[0][0], gr[0][1], gr[0][2].slice(0, h2), true], [gr[0][0], gr[0][1], gr[0][2].slice(h2), false]]; } // tutti sullo stesso lato e tanti: due righe
+  if (gr.length === 1) { // tutti sullo stesso lato: una riga per orario (tutto il giorno / pomeriggio / sera); se e' un orario solo e sono tanti, due righe
+    var g0 = gr[0], per = ['tutto', 'pom', 'sera'].map(function (o) { return g0[2].filter(function (x) { return x.f === o; }); }).filter(function (a) { return a.length; });
+    if (per.length > 1) gr = per.map(function (a, i) { return [g0[0], g0[1], a, i === 0]; });
+    else if (g0[2].length >= 3) { var h2 = Math.ceil(g0[2].length / 2); gr = [[g0[0], g0[1], g0[2].slice(0, h2), true], [g0[0], g0[1], g0[2].slice(h2), false]]; }
+  }
   gr.forEach(function (k) {
     var m = k[2];
     var r = el('div', 'qm-r'), vp = el('div', 'qm-vp'), tr = el('div', 'qm-t');
