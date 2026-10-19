@@ -457,9 +457,9 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .g.t6,body .g.t6{background:#9bb7ea;color:#1d2740}
 .g.t7,body .g.t7{background:#8cabe6;color:#1d2740}
 .g.t8,body .g.t8{background:#7fa0e1;color:#1d2740}
-.g.t9,body .g.t9{background:#eebb7c;color:#1d2740}
-.g.t10,body .g.t10{background:#e4894a;color:#1d2740}
-@media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1d2a43;color:#eef2fb}.g.t2,body .g.t2{background:#263a5c;color:#eef2fb}.g.t3,body .g.t3{background:#2f4a75;color:#eef2fb}.g.t4,body .g.t4{background:#385a8f;color:#eef2fb}.g.t5,body .g.t5{background:#416aa8;color:#eef2fb}.g.t6,body .g.t6{background:#4a79c0;color:#eef2fb}.g.t7,body .g.t7{background:#5388d6;color:#eef2fb}.g.t8,body .g.t8{background:#5c97ec;color:#eef2fb}.g.t9,body .g.t9{background:#a8702f;color:#eef2fb}.g.t10,body .g.t10{background:#c0762c;color:#eef2fb}}
+.g.t9,body .g.t9{background:#d9a6d6;color:#1d2740}
+.g.t10,body .g.t10{background:#ee9d6b;color:#1d2740}
+@media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1d2a43;color:#eef2fb}.g.t2,body .g.t2{background:#263a5c;color:#eef2fb}.g.t3,body .g.t3{background:#2f4a75;color:#eef2fb}.g.t4,body .g.t4{background:#385a8f;color:#eef2fb}.g.t5,body .g.t5{background:#416aa8;color:#eef2fb}.g.t6,body .g.t6{background:#4a79c0;color:#eef2fb}.g.t7,body .g.t7{background:#5388d6;color:#eef2fb}.g.t8,body .g.t8{background:#5c97ec;color:#eef2fb}.g.t9,body .g.t9{background:#80608f;color:#eef2fb}.g.t10,body .g.t10{background:#b8743a;color:#eef2fb}}
 .g .dots{bottom:3px;gap:3px}
 .g .dots .av{width:13px;height:13px;margin:0;border:1.5px solid #fff;box-sizing:content-box;font-size:7px}
 .g.hd{padding-bottom:14px}
@@ -1145,7 +1145,7 @@ function renderCal() {
   c.setAttribute('aria-busy', CARICO ? 'true' : 'false');
   if (CARICO) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
-  var LIV = {}, o1 = Math.max(9, Math.round(max * .75)), o2 = Math.max(10, Math.round(max * .9)); TUTTI.forEach(function (g) { var n = conta[g]; if (n) LIV[n] = n >= o2 ? 10 : n >= o1 ? 9 : Math.min(n, 8); }); // 1..8 persone = un blu ciascuno; arancio solo per i pochi giorni piu' pieni
+  var LIV = {}, o1 = Math.max(9, Math.round(max * .6)), o2 = Math.max(11, Math.round(max * .85)); TUTTI.forEach(function (g) { var n = conta[g]; if (n) LIV[n] = n >= o2 ? 10 : n >= o1 ? 9 : Math.min(n, 8); }); // 1..8 persone = un azzurro ciascuno; poi un colore ponte (lilla-rosa) e infine l'arancio solo per i giorni piu' pieni
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
     var giorni = mesi[mk], y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, first = new Date(Date.UTC(y, mm, 1)), n = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
