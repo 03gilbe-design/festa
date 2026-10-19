@@ -348,6 +348,14 @@ body .g .o.uno::before{opacity:.7}
 .riep-n{margin-left:10px;font-size:12px;font-weight:700;color:var(--mut)}
 .riep-f{display:flex;gap:6px;margin-left:auto}.riep-p{padding:2px 8px;border-radius:9px;font-size:12px;font-weight:700;background:#fff;color:#1e3a8a}
 .riep-p.sera{background:#e4defa;color:#4c3a8a}.riep-p.pom{background:#fde7c7;color:#8a4b12}.riep-p.forse{background:#fdd9d4;color:#8a2a22}
+.chi-btn{width:100%;margin:0 0 10px;min-height:46px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);font-weight:700}
+.quadro{padding:2px 0 8px}.q-s{margin:12px 0 16px;padding:12px;border:2px solid var(--line);border-radius:18px;background:var(--fill)}
+.q-h{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;font-size:17px}.q-h b{min-width:30px;padding:2px 10px;border-radius:12px;background:var(--bg);text-align:center;font-size:16px}
+.q-tutto{border-color:#9bb8f0}.q-pom{border-color:#f2c48a}.q-sera{border-color:#c4b4ee}
+.q-g{display:flex;flex-wrap:wrap;gap:10px}.q-p{display:flex;flex-direction:column;align-items:center;width:72px;text-align:center}.q-p .av{width:56px;height:56px;font-size:22px}
+.q-n{margin-top:4px;font-size:14px;font-weight:700;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.q-p.forse .av{opacity:.55}
+.q-c{margin-top:2px;font-size:12px;line-height:1.2;color:var(--mut);max-width:96px;word-break:break-word}
+.g{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -672,8 +680,23 @@ function chipsChiViene(iso, tutti, max) { // chi ha detto di esserci quel giorno
   if (max && ch.childNodes.length > max) { var tot = ch.childNodes.length; while (ch.childNodes.length > max) ch.removeChild(ch.lastChild); var pi = el('span', 'chip'); pi.appendChild(document.createTextNode('+' + (tot - max))); ch.appendChild(pi); }
   return ch;
 }
+function quadroGiorno(iso, tutti) { // scheda grande: gli avatar di chi viene divisi per orario, con nome e commento pubblico
+  var vv = tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso), box = el('div', 'quadro');
+  var gr = { tutto: [], pom: [], sera: [] };
+  vv.forEach(function (v) { var q = parti(v.giorni[iso]); gr[q.f].push({ v: v, si: q.si }); });
+  [['tutto', 'Tutto il giorno'], ['pom', 'Pomeriggio'], ['sera', 'Sera']].forEach(function (k) {
+    var l = gr[k[0]]; if (!l.length) return;
+    var sez = el('section', 'q-s q-' + k[0]), h = el('h3', 'q-h'); h.appendChild(document.createTextNode(k[1])); h.appendChild(el('b', '', String(l.length))); sez.appendChild(h);
+    l.sort(function (x, y) { return (y.si ? 1 : 0) - (x.si ? 1 : 0) || x.v.nome.localeCompare(y.v.nome, 'it'); });
+    var gg = el('div', 'q-g');
+    l.forEach(function (x) { var c = el('div', 'q-p' + (x.si ? '' : ' forse')); c.appendChild(av(x.v.nome)); var t = el('span', 'q-n', x.v.nome.split(' ')[0] + (x.si ? '' : ' ?')); c.appendChild(t); var nt = notaDi(x.v.commento, iso); if (nt) { var n2 = el('span', 'q-c', nt); c.appendChild(n2); } gg.appendChild(c); });
+    sez.appendChild(gg); box.appendChild(sez);
+  });
+  if (!vv.length) box.appendChild(el('p', 'hint', 'Nessuno ancora'));
+  return box;
+}
 function sheetChiViene(iso) {
-  sheet(dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }), function (s) { var ch = chipsChiViene(iso, true); if (!ch.childNodes.length) s.appendChild(el('p', 'hint', 'Nessuno ancora')); else s.appendChild(ch); });
+  sheet(dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }), function (s) { s.appendChild(quadroGiorno(iso, true)); });
 }
 function segnaNota(iso, cella) { var m = cella || document.querySelector('.sheet .mc[data-gc="' + iso + '"]'); if (!m) return; var d = m.querySelector('.cn'); if (notaGiorno(iso)) { if (!d) { d = el('i', 'cn'); d.setAttribute('aria-hidden', 'true'); m.appendChild(d); } } else if (d) m.removeChild(d); }
 function sheetOpzioni() {
@@ -946,6 +969,7 @@ function renderCal() {
       b.setAttribute('aria-label', lungo(iso) + (mine ? ', ci sei' + (p.f === 'pom' ? ', pomeriggio' : p.f === 'sera' ? ', sera' : '') + (p.si ? '' : ', forse') : '') + (iso === OGGI ? ', oggi' : '') + (nn ? ', ' + nn + (nn === 1 ? ' altro' : ' altri') : ''));
       b.setAttribute('aria-pressed', mine ? 'true' : 'false');
       b.addEventListener('click', onDay);
+      tenutoPremuto(b);
       return b;
     }
     for (i = 0; i < lead; i++) celle.push(el('div', 'g vuoto'));
@@ -974,15 +998,27 @@ function renderCal() {
     if (tot) { c.appendChild(h); c.appendChild(cal); }
   });
 }
-function onDay(e) {
+function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito il quadro grande di chi viene; tenendo premuto: solo la scelta, con il tasto piccolo sopra Invia
+  var cel = e.currentTarget;
+  if (!piccolo && Date.now() - (window.ultimoLungo || 0) < 900) return; // il click che segue una pressione lunga non conta
   document.body.classList.remove('kb'); // si sta toccando il calendario: la barra torna fissa
-  var iso = e.currentTarget.getAttribute('data-g');
+  var iso = cel.getAttribute('data-g');
   if (!VOTI || S.invio || DECISA) return;
   if (!editable()) { sheetChiViene(iso); return; }
-  if (!S.scelte[iso]) { S.scelte[iso] = TOCCO; S.focus = iso; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
+  var nuovo = !S.scelte[iso];
+  if (nuovo) { S.scelte[iso] = TOCCO; S.focus = iso; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
   else togliGiorno(iso); // secondo tocco = toglie (i dettagli stanno nel foglio del pulsante accanto a Invia)
   renderCal(); renderBar();
   var q = $('cal').querySelector('[data-g="' + iso + '"]'); if (q) q.focus({ preventScroll: true });
+  if (nuovo && !piccolo && altri(iso).length) sheet(dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }), function (sh) { sh.appendChild(quadroGiorno(iso, false)); });
+}
+function tenutoPremuto(b) { // 0,5 s di pressione: stessa scelta del giorno ma senza il quadro grande
+  var t = null, pos = null;
+  function stop() { if (t) { clearTimeout(t); t = null; } }
+  b.addEventListener('touchstart', function (ev) { var p = ev.touches[0]; pos = [p.clientX, p.clientY]; stop(); t = setTimeout(function () { t = null; window.ultimoLungo = Date.now(); onDay({ currentTarget: b }, true); }, 500); }, { passive: true });
+  b.addEventListener('touchmove', function (ev) { var p = ev.touches[0]; if (pos && (Math.abs(p.clientX - pos[0]) > 8 || Math.abs(p.clientY - pos[1]) > 8)) stop(); }, { passive: true });
+  b.addEventListener('touchend', stop); b.addEventListener('touchcancel', stop);
+  b.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
 }
 function togliGiorno(iso) {
   if (notaGiorno(iso)) setNotaGiorno(iso, '');
@@ -1018,13 +1054,7 @@ function renderBar() {
     ki.addEventListener('focus', function () { kbSeAperta(); setTimeout(function () { try { ki.scrollIntoView({ block: 'center' }); } catch (e) {} }, 300); }); ki.addEventListener('blur', function () { document.body.classList.remove('kb'); });
     cr.appendChild(ki); if (S.keyErr) { ki.setAttribute('aria-invalid', 'true'); var em = el('span', 'em', 'Chiave sbagliata'); em.id = 'serve-e'; em.setAttribute('role', 'alert'); cr.appendChild(em); } bar.appendChild(cr);
   }
-  if (S.focus && S.scelte[S.focus] && editable()) { var gi = S.focus, ch = altri(gi); // quadro d'insieme del giorno toccato: chi viene, e a che ora
-    if (ch.length) { var ri = el('div', 'riep'); ri.setAttribute('aria-label', 'Chi viene ' + lungo(gi));
-      var tt = el('div', 'riep-t', dl(gi, { weekday: 'short', day: 'numeric', month: 'short' })); ri.appendChild(tt);
-      var av_ = el('div', 'riep-av'); ch.slice(0, 7).forEach(function (v) { av_.appendChild(av(v.nome)); }); if (ch.length > 7) av_.appendChild(el('span', 'riep-n', '+' + (ch.length - 7))); ri.appendChild(av_);
-      var ct_ = { tutto: 0, pom: 0, sera: 0, forse: 0 }; ch.forEach(function (v) { var q = parti(v.giorni[gi]); ct_[q.f] = (ct_[q.f] || 0) + 1; if (!q.si) ct_.forse++; });
-      var fr = el('div', 'riep-f'); [['tutto', 'tutto'], ['pom', 'pom'], ['sera', 'sera']].forEach(function (k) { if (ct_[k[0]]) { var pl = el('span', 'riep-p ' + k[0], k[1] + ' ' + ct_[k[0]]); fr.appendChild(pl); } }); if (ct_.forse) fr.appendChild(el('span', 'riep-p forse', '? ' + ct_.forse)); ri.appendChild(fr);
-      bar.appendChild(ri); } }
+  if (S.focus && S.scelte[S.focus] && editable() && altri(S.focus).length) { var gi = S.focus, qb = el('button', 'btn sec chi-btn'); qb.type = 'button'; qb.id = 'chi-viene'; qb.appendChild(ico('gruppo')); qb.appendChild(document.createTextNode('Chi viene ' + dl(gi, { day: 'numeric', month: 'short' }) + ' · ' + altri(gi).length)); qb.addEventListener('click', function () { var g0 = gi; sheet(dl(g0, { weekday: 'long', day: 'numeric', month: 'long' }), function (sh) { sh.appendChild(quadroGiorno(g0, false)); }); }); bar.appendChild(qb); }
   var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
   {
     var nb = el('button', 'ib hint'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) r.appendChild(nb); // la matita compare solo dopo aver scelto un giorno
