@@ -406,6 +406,9 @@ body .g .o.uno::before{opacity:.7}
 .quadro .q-cm{padding:8px 10px 9px;isolation:isolate}.quadro .q-cm .q-c{display:block;margin:6px 2px 0;padding:0;background:none!important;border:0;color:#2a3042;font-size:13.5px;font-weight:600;line-height:1.3}
 .quadro .q-cm .q-riga{align-self:flex-start}
 .quadro .q-cm{padding:10px 12px 11px}
+.topq{position:fixed;top:0;left:0;right:0;z-index:8;max-width:480px;margin:0 auto;max-height:46%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 14px 12px;background:var(--bg);border-radius:0 0 22px 22px;box-shadow:0 8px 24px rgba(20,30,60,.22);-webkit-animation:scendi .18s ease-out;animation:scendi .18s ease-out}
+.topq-t{margin:0 0 2px;font-size:17px;text-transform:capitalize}
+@-webkit-keyframes scendi{from{-webkit-transform:translateY(-14px);opacity:0}to{-webkit-transform:none;opacity:1}}@keyframes scendi{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1081,6 +1084,15 @@ function renderCal() {
     if (tot) { c.appendChild(h); c.appendChild(cal); }
   });
 }
+var topQ = null;
+function chiudiTop() { if (topQ && topQ.parentNode) topQ.parentNode.removeChild(topQ); topQ = null; }
+function mostraTop(iso) { // a ogni tocco su un giorno: quadro di chi viene in ALTO sopra i primi giorni; si chiude con Invia o toccando fuori
+  var vv = altri(iso); if (!vv.length) { chiudiTop(); return; }
+  if (!topQ) { topQ = el('div', 'topq'); topQ.id = 'top-q'; topQ.setAttribute('role', 'region'); var pb = document.querySelector('body > div[style*="position:fixed"]'); if (pb) topQ.style.paddingTop = '30px'; document.body.appendChild(topQ); }
+  clear(topQ); topQ.setAttribute('aria-label', 'Chi viene ' + lungo(iso));
+  topQ.appendChild(el('h3', 'topq-t', dl(iso, { weekday: 'long', day: 'numeric', month: 'long' }))); topQ.appendChild(quadroGiorno(iso, false));
+}
+document.addEventListener('click', function (e) { if (!topQ) return; if (topQ.contains(e.target)) return; if (e.target.closest && e.target.closest('[data-g]')) return; chiudiTop(); }, true);
 function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito il quadro grande di chi viene; tenendo premuto: solo la scelta, con il tasto piccolo sopra Invia
   var cel = e.currentTarget;
   if (!piccolo && Date.now() - (window.ultimoLungo || 0) < 900) return; // il click che segue una pressione lunga non conta
@@ -1095,6 +1107,7 @@ function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito 
   else togliGiorno(iso); // secondo tocco = toglie (i dettagli stanno nel foglio del pulsante accanto a Invia)
   renderCal(); renderBar();
   var q = $('cal').querySelector('[data-g="' + iso + '"]'); if (q) q.focus({ preventScroll: true });
+  if (!piccolo) mostraTop(iso);
 }
 function tenutoPremuto(b) { // 0,5 s di pressione: stessa scelta del giorno ma senza il quadro grande
   var t = null, pos = null;
@@ -1158,6 +1171,7 @@ function cambia() {
   passo('C'); renderName(); renderCal(); renderBar();
 }
 function annullaModifica(daIndietro) {
+  chiudiTop();
   if (S.adminEdit) { S = nuovoS(); store.del('bozza'); if (!daIndietro) togliPassi(); renderAll(); return; }
   var bk = S.backup; if (!bk) { renderAll(); return; }
   S.scelte = bk.scelte; S.commento = bk.commento; S.pubblico = bk.pubblico; S.avatar = bk.avatar; S.edit = false; S.vecchio = ''; S.keyNew = ''; S.focus = ''; S.errore = ''; S.wa = null;
@@ -1167,6 +1181,7 @@ function annullaModifica(daIndietro) {
 // ---------- invio ----------
 function invia(daCoda) {
   if (S.invio) return; // doppio tocco / rete che ripete
+  chiudiTop();
   S.errore = ''; S.wa = null; S.keyErr = false;
   var c = daCoda ? coda() : null, dati, riga;
   if (c) { dati = c.dati; riga = votoDi(dati.vecchio || dati.nome) || votoDi(dati.nome); }
