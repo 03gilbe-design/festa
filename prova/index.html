@@ -629,6 +629,7 @@ var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
 var CESTINO = [];                 // solo admin: [{nome, quando, come}]
 var qs = new URLSearchParams(location.search);
 var ADMIN = qs.get('admin') || '', adminOk = false;
+if (ADMIN || qs.get('nc')) { try { localStorage.setItem('nonconta', '1'); } catch (e) {} } // questo browser e' di Gilberto (link admin o ?nc=1): le sue visite non si contano
 if (ADMIN) history.replaceState(null, '', location.pathname); // il segreto non resta nella barra degli indirizzi
 function nuovoS() {
   return { nome: '', avatar: '', scelte: {}, commento: '', pubblico: false, protetto: false, me: '', voted: false, edit: false, backup: null, focus: '',
@@ -1073,7 +1074,7 @@ var attesaNome;
 function codiceTelefono() { var d = store.get('dev'); if (!d) { d = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store.set('dev', d); } return String(d); }
 var VISITA_NOME = null; // ultimo nome gia' comunicato per questo telefono
 function segnalaVisita(nome) { // il telefono ha aperto la pagina (codice casuale, niente altro); se poi sceglie/vota il suo nome lo si associa
-  if (ADMIN || !SRV_VIS || VISITA_NOME === nome) return;
+  if (ADMIN || !SRV_VIS || VISITA_NOME === nome || store.get('nonconta')) return;
   VISITA_NOME = nome; chiama({ azione: 'visita', dev: codiceTelefono(), nome: nome }).then(null, function () { VISITA_NOME = null; });
 }
 function controllaNome() {
