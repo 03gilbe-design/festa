@@ -470,8 +470,8 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .quadro .q-f-tutto .q-zl{color:#1d5e3a}.quadro .q-f-pom .q-zl{color:#8a4a0e}.quadro .q-f-sera .q-zl{color:#7a5a08}
 .quadro .q-f > .q-zl{position:absolute!important;right:16px;left:auto;bottom:8px}
 .quadro .q-f{padding-bottom:30px}
-.quadro .q-zl{width:30px;height:5px;border-radius:3px;font-size:0;bottom:11px!important}.quadro .q-f-tutto .q-zl{background:#4fae75}.quadro .q-f-pom .q-zl{background:#e8933a}.quadro .q-f-sera .q-zl{background:#d9b72c}
 .g.gh .dots{opacity:.38}
+.g.gh .dots{gap:0}.g.gh .dots .av{margin:0 -3px!important}.g.gh .dots .av:first-child{margin-left:0!important}.inv.entrato .pers{opacity:.8}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -490,7 +490,7 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
   <symbol id="i-puntini" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="19" cy="12" r="1.7" fill="currentColor"/></symbol>
   <symbol id="i-calendario" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
   <symbol id="i-scambia" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.8 3.1-6 7-6 1.3 0 2.5.3 3.5.7"/><path d="M15 15h7M19 12l3 3-3 3"/></symbol>
-  <symbol id="i-orologio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-occhio" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/></symbol><symbol id="i-orologio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 </svg>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
 <!-- 28 avatar mano libera (motore mano.js, seme 11): macchie pastello piene, senza contorno. GROSSA ~26 unita', PICCOLA ~7. Id a-<nome>. -->
@@ -611,12 +611,12 @@ for (var d0 = new Date(DAL + 'T00:00:00Z'); d0 <= new Date(AL + 'T00:00:00Z'); d
 var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
-var INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var ENTRATI = [], MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
 (function () { var m = /[?&]cnt=([abc])/.exec(location.search); document.body.classList.add('cnt-' + (m ? m[1] : 'a')); })();
 var T_AVVIO = Date.now(), CARICO = !/[?&]admin=/.test(location.search); // niente animazione per l'admin; // CARICO: animazione di caricamento a ogni apertura, anche con i dati in cache
 var cachePagina = store.get('cachePagina');
 if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.quando < 43200000 && Array.isArray(cachePagina.voti) && Array.isArray(cachePagina.aperti) && Array.isArray(cachePagina.tutti)) {
-  VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; OGGI = cachePagina.oggi || OGGI;
+  VOTI = cachePagina.voti; aperti = cachePagina.aperti; TUTTI = cachePagina.tutti; INVITATI = cachePagina.invitati || []; ENTRATI = cachePagina.entrati || []; OGGI = cachePagina.oggi || OGGI;
   DECISA = cachePagina.chiuso ? cachePagina.dataScelta : ''; SCAD = cachePagina.scadenza || ''; aspettoSalvato = cachePagina.aspetto || {};
 }
 var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
@@ -849,7 +849,7 @@ function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri:
         var c = el('div', 'q-p' + (x.nt ? ' q-con q-cm' : '')), riga = el('span', 'q-riga q-o-' + x.f); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
         c.appendChild(riga); if (x.nt) c.appendChild(el('span', 'q-c', x.nt)); gg.appendChild(c);
       });
-      cl.appendChild(gg); var zl = el('span', 'q-zl'); zl.setAttribute('aria-label', { tutto: 'Tutto il giorno', pom: 'Pomeriggio', sera: 'Sera' }[k]); cl.appendChild(zl); sez.appendChild(cl);
+      cl.appendChild(gg); cl.appendChild(el('span', 'q-zl', { tutto: 'Tutto il giorno', pom: 'Pomeriggio', sera: 'Sera' }[k])); sez.appendChild(cl);
     });
     if (!l.length) { var gv = el('div', 'q-g'); gv.appendChild(el('span', 'q-v', '—')); sez.appendChild(gv); }
     return sez;
@@ -996,7 +996,7 @@ function sheetInvitati() { // tutti gli invitati: chi ha votato in evidenza (ava
     righe.forEach(function (r) {
       var li = el('li', 'inv' + (r.v ? ' votato' : ' manca')), d = el('div', 'pers'); d.appendChild(av(r.nome, r.v ? r.v.avatar || '' : ''));
       d.appendChild(el('b', '', r.nome));
-      if (r.v) { var ngv = Object.keys(r.v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length; d.appendChild(el('span', 'q', String(ngv))); d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato ' + ngv + (ngv === 1 ? ' giorno' : ' giorni')); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
+      if (r.v) { var ngv = Object.keys(r.v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length; d.appendChild(el('span', 'q', String(ngv))); d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato ' + ngv + (ngv === 1 ? ' giorno' : ' giorni')); } else if (ENTRATI.some(function (n) { return norm(n) === norm(r.nome); })) { d.appendChild(ico('occhio', 'gia')); li.className += ' entrato'; li.setAttribute('aria-label', r.nome + ', è entrato ma non ha ancora votato'); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
       li.appendChild(d); ul.appendChild(li);
     });
     s.appendChild(ul);
@@ -1064,6 +1064,10 @@ function renderName() {
 var attesaNome;
 function controllaNome() {
   if (S.adminEdit || (S.voted && !S.edit)) return;
+  if (!ADMIN) { // chi sceglie il proprio nome da invitato ma non ha votato: si ricorda (nella lista invitati compare l'occhio)
+    var kn = norm(S.nome), inv = INVITATI.filter(function (n) { return norm(n) === kn; })[0];
+    if (inv && !votoDi(inv) && !MANDATI[kn] && ENTRATI.indexOf(inv) < 0) { MANDATI[kn] = 1; chiama({ azione: 'entrato', nome: inv }).then(function (r) { if (r && r.ok) ENTRATI.push(inv); else delete MANDATI[kn]; }, function () { delete MANDATI[kn]; }); }
+  }
   var v = votoDi(S.nome), prima = JSON.stringify([S.scelte, S.vecchio]);
   // Il voto trovato scrivendo il nome vale finche' il nome resta quello (Anna -> Anna B. e' un'altra persona).
   if (S.autoV && !(v && norm(v.nome) === norm(S.vecchio))) {
@@ -1362,9 +1366,11 @@ function dopoVoto(dati, riga, prima, eraAdmin, snapS) {
     S = nuovoS(); applicaVotoMio(); renderAll();
     toast('Salvato', function () { return annullaVoto(prima, nuovo, true, snapS); });
   } else {
+    var prec = store.get('nome'); // stesso telefono: nome usato prima
     store.set('nome', nome);
     S = nuovoS(); applicaVotoMio(); renderAll(); window.scrollTo(0, 0);
     toast(riga ? 'Salvato' : 'Inviato', function () { return annullaVoto(prima, nuovo, false, snapS); });
+    if (prec && norm(prec) !== norm(nome) && !(dati.vecchio && norm(dati.vecchio) === norm(prec)) && votoDi(prec)) setTimeout(function () { chiediVecchio(prec); }, 700);
   }
   carica();
 }
@@ -1391,6 +1397,21 @@ function nonSei() {
   closeSheet(); var chi = mio(), prima = copia(S);
   store.del('nome'); store.del('bozza'); togliPassi(); S = nuovoS(); renderAll();
   toast('Voto di ' + chi.split(' ')[0] + ' salvato', function () { store.set('nome', chi); S = prima; renderAll(); });
+}
+function chiediVecchio(nome) { // stesso telefono, nuovo nome: si chiede se togliere i voti dell'account di prima
+  sheet('Altro account', function (s) {
+    s.style.paddingBottom = '96px'; // sotto il toast "Inviato"
+    s.appendChild(el('p', 'hint', 'Da questo telefono avevi già votato come ' + nome + '. Togliere quei voti?'));
+    var si = el('button', 'btn', 'Sì, togli i voti di ' + nome.split(' ')[0]), no = el('button', 'btn sec', 'No, tienili'); si.type = no.type = 'button'; si.id = 'vecchio-si'; no.id = 'vecchio-no';
+    no.addEventListener('click', function () { closeSheet(); });
+    si.addEventListener('click', function () {
+      si.disabled = true;
+      deveOk({ azione: 'ritira', nome: nome, chiave: ricordo.get('chiavi', nome) }).then(function () {
+        VOTI = VOTI.filter(function (x) { return norm(x.nome) !== norm(nome); }); closeSheet(); renderAll(); toast('Voti di ' + nome.split(' ')[0] + ' tolti');
+      }, function (e) { si.disabled = false; s.appendChild(el('p', 'hint', e.codice === 'chiave' ? 'Serve la chiave di ' + nome : 'Non tolti: riprova')); });
+    });
+    s.appendChild(si); s.appendChild(no);
+  });
 }
 function ritira() {
   var eraInModifica = S.edit;
@@ -1626,9 +1647,9 @@ function carica() {
     var nuovaFirmaCalendario = JSON.stringify([res.voti, res.aperti, res.tutti, res.oggi, res.chiuso, res.dataScelta]);
     var calendarioCambiato = nuovaFirmaCalendario !== firmaCalendario;
     firmaCalendario = nuovaFirmaCalendario;
-    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; OGGI = res.oggi || OGGI;
+    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; ENTRATI = res.entrati || []; OGGI = res.oggi || OGGI;
     DECISA = res.chiuso ? res.dataScelta : ''; SCAD = res.scadenza || ''; S.letturaKo = false;
-    store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
+    store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], entrati: res.entrati || [], oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
     aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
     var passo2 = ADMIN ? chiama({ azione: 'verifica' }).then(function (v) {
       if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; } else { ADMIN = ''; adminOk = false; }
