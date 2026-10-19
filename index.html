@@ -758,7 +758,7 @@ function disegnaQuadro(box) { // blocco = forma piena a mano libera senza contor
 function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri: CI SONO / FORSE, ognuno con avatar, nome, orario e (se c'e') il commento in rosa
   var vv = tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso), box = el('div', 'quadro');
   var si = [], fo = [];
-  vv.forEach(function (v) { var q = parti(v.giorni[iso]), x = { v: v, f: q.f, si: q.si, nt: notaDi(v.commento, iso) }; (q.si ? si : fo).push(x); });
+  vv.forEach(function (v) { var q = parti(v.giorni[iso]), pr = adminOk && !v.commento ? notaDi(privati[norm(v.nome)], iso) : '', x = { v: v, f: q.f, si: q.si, nt: notaDi(v.commento, iso) || (pr ? pr + ' (solo admin)' : '') }; (q.si ? si : fo).push(x); });
   function ord(l) { l.sort(function (x, y) { return (y.nt ? 1 : 0) - (x.nt ? 1 : 0) || x.v.nome.localeCompare(y.v.nome, 'it'); }); }
   ord(si); ord(fo);
   function gruppo(cls, titolo, l) { // un solo blocco per gruppo: tutti insieme, ognuno col colore del suo orario (verde tutto il giorno, arancione pomeriggio, giallo sera)
@@ -1087,7 +1087,9 @@ function onDay(e, piccolo) { // tocco: sceglie/toglie e (se scegli) apre subito 
   if (!piccolo && Date.now() - (window.ultimoLungo || 0) < 900) return; // il click che segue una pressione lunga non conta
   document.body.classList.remove('kb'); // si sta toccando il calendario: la barra torna fissa
   var iso = cel.getAttribute('data-g');
-  if (!VOTI || S.invio || DECISA) return;
+  if (!VOTI || S.invio) return;
+  if (adminOk && !S.adminEdit) { sheetChiViene(iso); return; } // admin: il tocco su un giorno mostra subito chi c'e' (anche i commenti privati), niente scelta e niente Invia
+  if (DECISA) return;
   if (!editable()) { sheetChiViene(iso); return; }
   var nuovo = !S.scelte[iso];
   if (nuovo) { S.scelte[iso] = TOCCO; S.focus = iso; S.auto = false; S.dirty = true; S.errore = ''; S.wa = null; salvaBozza(); }
@@ -1122,7 +1124,7 @@ function renderBar() {
   if (document.activeElement && document.activeElement.id === 'serve' && !S.invio && !S.errore) return;
   var bar = $('bar'), tz = bar.querySelector('.toast');
   Array.prototype.slice.call(bar.children).forEach(function (c) { if (c !== tz) bar.removeChild(c); });
-  bar.hidden = !!(S.voted && !S.edit);
+  bar.hidden = !!(S.voted && !S.edit) || (adminOk && !S.adminEdit);
   if (bar.hidden) return;
   var ex = esiste(), needKey = ex && ex.protetto && !S.adminEdit && !ricordo.get('chiavi', ex.nome);
   if (S.errore) { // messaggio umano + (se la rete e' giu') il bottone WhatsApp
