@@ -367,6 +367,16 @@ body .g .o.uno::before{opacity:.7}
 .q-g .q-o{display:inline-block}
 .q-g .q-p{width:auto;max-width:none;text-align:left}
 .q-g .q-p .av{width:26px;height:26px;margin-right:6px}
+.quadro .q-s{margin:14px 0 6px;padding:0;border:0;background:none;border-radius:0}
+.quadro .q-h{margin:0 0 8px;padding:0 0 6px;border-bottom:1px solid var(--line)}.quadro .q-h b{background:none;min-width:0;padding:0;font-size:16px;color:var(--mut)}
+.quadro .q-si .q-h{color:#1d6b43}.quadro .q-fo .q-h{color:#9a5a12}
+.quadro .q-g{display:flex;flex-wrap:wrap;gap:8px 6px;align-items:flex-start}
+.quadro .q-p{display:flex;flex-direction:column;align-items:flex-start;padding:0;background:none;border-radius:0;width:auto;max-width:100%}
+.quadro .q-riga{display:inline-flex;align-items:center;white-space:nowrap;padding:3px 10px 3px 3px;border-radius:20px;background:var(--fill);font-size:13.5px;font-weight:700;color:var(--ink)}
+.quadro .q-riga .av{width:26px;height:26px;margin-right:6px;font-size:13px}
+.quadro .q-con{flex:1 1 100%}.quadro .q-c{display:block;margin:3px 0 2px 18px;padding:5px 10px;border-radius:12px;background:#fde4ec;color:#7a2a45;font-size:13px;line-height:1.25;font-weight:600;word-break:break-word}
+.quadro .q-con{width:100%}.quadro .q-con .q-c{align-self:stretch;margin-right:2px}
+.quadro .q-con .q-c{max-width:none;width:auto;box-sizing:border-box}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -691,26 +701,25 @@ function chipsChiViene(iso, tutti, max) { // chi ha detto di esserci quel giorno
   if (max && ch.childNodes.length > max) { var tot = ch.childNodes.length; while (ch.childNodes.length > max) ch.removeChild(ch.lastChild); var pi = el('span', 'chip'); pi.appendChild(document.createTextNode('+' + (tot - max))); ch.appendChild(pi); }
   return ch;
 }
-function quadroGiorno(iso, tutti) { // a colpo d'occhio: CI SONO / FORSE (avatar piccoli con nome e orario) e sotto i COMMENTI del giorno
+function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri: CI SONO / FORSE, ognuno con avatar, nome, orario e (se c'e') il commento in rosa
   var vv = tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso), box = el('div', 'quadro');
-  var si = [], fo = [], com = [];
-  vv.forEach(function (v) { var q = parti(v.giorni[iso]), x = { v: v, f: q.f, si: q.si, nt: notaDi(v.commento, iso) }; (q.si ? si : fo).push(x); if (x.nt) com.push(x); });
-  function ord(l) { l.sort(function (x, y) { return x.v.nome.localeCompare(y.v.nome, 'it'); }); }
+  var si = [], fo = [];
+  vv.forEach(function (v) { var q = parti(v.giorni[iso]), x = { v: v, f: q.f, si: q.si, nt: notaDi(v.commento, iso) }; (q.si ? si : fo).push(x); });
+  function ord(l) { l.sort(function (x, y) { return (y.nt ? 1 : 0) - (x.nt ? 1 : 0) || x.v.nome.localeCompare(y.v.nome, 'it'); }); }
   ord(si); ord(fo);
-  function blocco(cls, titolo, l) {
+  function gruppo(cls, titolo, l) {
     var sez = el('section', 'q-s ' + cls), h = el('h3', 'q-h'); h.appendChild(document.createTextNode(titolo)); h.appendChild(el('b', '', String(l.length))); sez.appendChild(h);
     var gg = el('div', 'q-g');
-    l.forEach(function (x) { var c = el('span', 'q-p'); c.appendChild(av(x.v.nome)); c.appendChild(document.createTextNode(x.v.nome.split(' ')[0])); if (x.f !== 'tutto') c.appendChild(el('small', 'q-o', x.f === 'pom' ? 'pom' : 'sera')); gg.appendChild(c); });
+    l.forEach(function (x) {
+      var c = el('div', 'q-p' + (x.nt ? ' q-con' : '')), riga = el('span', 'q-riga'); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
+      if (x.f !== 'tutto') riga.appendChild(el('small', 'q-o', x.f === 'pom' ? 'pom' : 'sera'));
+      c.appendChild(riga); if (x.nt) c.appendChild(el('span', 'q-c', x.nt)); gg.appendChild(c);
+    });
     if (!l.length) gg.appendChild(el('span', 'q-v', '—'));
     sez.appendChild(gg); return sez;
   }
-  box.appendChild(blocco('q-si', 'Ci sono', si));
-  box.appendChild(blocco('q-fo', 'Forse', fo));
-  if (com.length) {
-    var sc = el('section', 'q-s q-co'), hc = el('h3', 'q-h'); hc.appendChild(document.createTextNode('Commenti')); hc.appendChild(el('b', '', String(com.length))); sc.appendChild(hc);
-    com.forEach(function (x) { var r = el('div', 'q-r'); r.appendChild(av(x.v.nome)); var t = el('div', 'q-rt'); t.appendChild(el('b', '', x.v.nome.split(' ')[0] + (x.si ? '' : ' (forse)'))); t.appendChild(el('span', '', x.nt)); r.appendChild(t); sc.appendChild(r); });
-    box.appendChild(sc);
-  }
+  box.appendChild(gruppo('q-si', 'Ci sono', si));
+  box.appendChild(gruppo('q-fo', 'Forse', fo));
   if (!vv.length) box.appendChild(el('p', 'hint', 'Nessuno ancora'));
   return box;
 }
