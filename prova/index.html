@@ -475,6 +475,7 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .g.gh .dots{transition:opacity .15s}.g.gh.gx .dots{opacity:0}
 body .bar .riga{align-items:center}body .bar .ib{margin:0 0 0 8px;width:116px;height:56px;min-height:56px;border-radius:14px}body .bar .invia{height:56px;min-height:56px}body .bar .ib .ico{width:32px;height:32px}body .bar .ib .pt{top:11px;right:11px}body .bar .ib:first-child{margin-left:0}
 .g.foc{box-shadow:none}.g:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--ink)}body .g{padding-top:10px}body.cnt-a .g .o{top:3px;font-size:11.5px}
+.inv.visite .pers{justify-content:flex-start;padding-left:10px}.inv.visite .pers .gia{margin:0 10px 0 0;width:26px;height:26px}.inv.visite .pers .q{margin:0}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1003,7 +1004,7 @@ function sheetInvitati() { // tutti gli invitati: chi ha votato in evidenza (ava
       if (r.v) { var ngv = Object.keys(r.v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length; d.appendChild(el('span', 'q', String(ngv))); d.appendChild(ico('spunta', 'gia')); li.setAttribute('aria-label', r.nome + ', ha votato ' + ngv + (ngv === 1 ? ' giorno' : ' giorni')); } else if (ENTRATI.some(function (n) { return norm(n) === norm(r.nome); })) { d.appendChild(ico('occhio', 'gia')); li.className += ' entrato'; li.setAttribute('aria-label', r.nome + ', è entrato ma non ha ancora votato'); } else li.setAttribute('aria-label', r.nome + ', non ha ancora votato');
       li.appendChild(d); ul.appendChild(li);
     });
-    if (VISITE > 0) { var lv = el('li', 'inv visite'), dv = el('div', 'pers'); dv.appendChild(ico('occhio', 'gia')); dv.appendChild(el('b', '', 'Hanno solo guardato')); dv.appendChild(el('span', 'q', String(VISITE))); lv.setAttribute('aria-label', VISITE + ' persone hanno aperto la pagina senza scegliere un nome'); lv.appendChild(dv); ul.appendChild(lv); }
+    if (VISITE > 0) { var lv = el('li', 'inv visite'), dv = el('div', 'pers'); dv.appendChild(ico('occhio', 'gia')); dv.appendChild(el('span', 'q', String(VISITE))); lv.setAttribute('aria-label', VISITE + ' persone hanno aperto la pagina senza scegliere un nome'); lv.appendChild(dv); ul.appendChild(lv); }
     s.appendChild(ul);
   });
 }
@@ -1193,6 +1194,7 @@ function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome;
   var vv = altri(iso), box = el('div', 'quadro qmini'), ordine = { tutto: 0, pom: 1, sera: 2 };
   var l = vv.map(function (v) { var q = parti(v.giorni[iso]); return { v: v, f: q.f, si: q.si }; });
   l.sort(function (x, y) { return ordine[x.f] - ordine[y.f] || x.v.nome.localeCompare(y.v.nome, 'it'); });
+  var unico = l.every(function (x) { return x.f === l[0].f; }); // un solo orario per tutti: niente scritta pom/sera sui nomi
   var gr = [[true, 'Sì'], [false, 'Forse']].map(function (k) { return [k[0], k[1], l.filter(function (x) { return x.si === k[0]; }), true]; }).filter(function (g) { return g[2].length; });
   if (gr.length === 1) { // tutti sullo stesso lato: una riga per orario (tutto il giorno / pomeriggio / sera); se e' un orario solo e sono tanti, due righe
     var g0 = gr[0], per = ['tutto', 'pom', 'sera'].map(function (o) { return g0[2].filter(function (x) { return x.f === o; }); }).filter(function (a) { return a.length; });
@@ -1203,7 +1205,7 @@ function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome;
     var m = k[2];
     var r = el('div', 'qm-r'), vp = el('div', 'qm-vp'), tr = el('div', 'qm-t');
     r.appendChild(el('span', 'qm-lab ' + (k[0] ? 'si' : 'fo'), k[3] ? k[1] : ''));
-    function pillole(dove) { m.forEach(function (x) { var p = el('span', 'q-riga q-o-' + x.f); p.appendChild(av(x.v.nome)); p.appendChild(document.createTextNode(x.v.nome.split(' ')[0] + (x.f === 'pom' ? ' · pom' : x.f === 'sera' ? ' · sera' : ''))); dove.appendChild(p); }); }
+    function pillole(dove) { m.forEach(function (x) { var p = el('span', 'q-riga q-o-' + x.f); p.appendChild(av(x.v.nome)); p.appendChild(document.createTextNode(x.v.nome.split(' ')[0] + (unico ? '' : x.f === 'pom' ? ' · pom' : x.f === 'sera' ? ' · sera' : ''))); dove.appendChild(p); }); }
     pillole(tr); vp.appendChild(tr); r.appendChild(vp); box.appendChild(r);
     setTimeout(function () { // misura: se non ci sta, si duplica la fila e la si fa scorrere in loop
       if (tr.scrollWidth > vp.clientWidth + 2) { var w = tr.scrollWidth + 5; var d2 = el('div', 'qm-t'); pillole(d2); while (d2.firstChild) tr.appendChild(d2.firstChild); tr.style.setProperty('--w', w + 'px'); var sec = Math.max(8, Math.round(w / 26)); tr.style.webkitAnimationDuration = tr.style.animationDuration = sec + 's'; tr.className += ' scorre'; }

@@ -466,6 +466,7 @@ body .g .o.uno::before{opacity:.7}
 .g.gh .dots{opacity:.38}
 .g.gh .dots{gap:0}.g.gh .dots .av{margin:0 -3px!important}.g.gh .dots .av:first-child{margin-left:0!important}.inv.entrato .pers{opacity:.8}
 .g.foc{box-shadow:none}.g:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--ink)}body .g{padding-top:10px}body.cnt-a .g .o{top:3px;font-size:11.5px}
+body .bar .riga{align-items:center}body .bar .ib{margin:0 0 0 8px;width:116px;height:56px;min-height:56px;border-radius:14px}body .bar .invia{height:56px;min-height:56px}body .bar .ib .ico{width:32px;height:32px}body .bar .ib .pt{top:11px;right:11px}body .bar .ib:first-child{margin-left:0}
 </style>
 </head>
 <body>
@@ -1278,7 +1279,7 @@ function renderBar() {
     }
     b.addEventListener('click', function (e) { e.preventDefault(); invia(); });
   }
-  r.appendChild(b); bar.appendChild(r);
+  r.insertBefore(b, r.firstChild); bar.appendChild(r); // Invia a sinistra, matita (piu' grande) a destra
 }
 function cambia() {
   S.edit = true; S.vecchio = S.me; S.backup = copia({ scelte: S.scelte, commento: S.commento, pubblico: S.pubblico, avatar: S.avatar }); S.focus = ''; S.keyNew = '';
