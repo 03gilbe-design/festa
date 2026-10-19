@@ -449,6 +449,14 @@ body .g.m .o:not(.sk){background:#e8eefb;color:#3a5594;border:0}
 .g .dots .av.nb{background:none;border:0;width:15px;height:15px;margin:0 -3px;box-sizing:border-box}.g .dots .av.nb svg{width:100%;height:100%;display:block}
 .g .dots .av.ini2{background:#dde3f0;color:#3f4a66;width:13px;height:13px;margin:0 -2px;font-size:7.5px;font-weight:800;line-height:13px;border:1.5px solid #fff;box-sizing:content-box}
 .g .dots{bottom:2px}
+.g.t1,body .g.t1{background:#e9f0fc;color:#0f1f4d}
+.g.t2,body .g.t2{background:#d9e5fa;color:#0f1f4d}
+.g.t3,body .g.t3{background:#c7d8f7;color:#0f1f4d}
+.g.t4,body .g.t4{background:#b3c9f3;color:#0f1f4d}
+.g.t5,body .g.t5{background:#9db9ee;color:#0f1f4d}
+.g.t6,body .g.t6{background:#86a6e8;color:#0f1f4d}
+.g.t7,body .g.t7{background:#6c91e0;color:#0f1f4d}
+@media (prefers-color-scheme:dark){.g.t1,body .g.t1{background:#1f2c45;color:#eaf1ff}.g.t2,body .g.t2{background:#27395b;color:#eaf1ff}.g.t3,body .g.t3{background:#304771;color:#eaf1ff}.g.t4,body .g.t4{background:#395688;color:#eaf1ff}.g.t5,body .g.t5{background:#43659f;color:#eaf1ff}.g.t6,body .g.t6{background:#4d75b7;color:#eaf1ff}.g.t7,body .g.t7{background:#5885d0;color:#eaf1ff}}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1095,6 +1103,8 @@ function renderCal() {
   c.setAttribute('aria-busy', CARICO ? 'true' : 'false');
   if (CARICO) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
   TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
+  var LIV = {}, vals = []; TUTTI.forEach(function (g) { if (conta[g] && vals.indexOf(conta[g]) < 0) vals.push(conta[g]); }); vals.sort(function (a, b) { return a - b; });
+  vals.forEach(function (v, i) { LIV[v] = vals.length < 2 ? 4 : 1 + Math.round(i * 6 / (vals.length - 1)); });
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
     var giorni = mesi[mk], y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, first = new Date(Date.UTC(y, mm, 1)), n = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
@@ -1103,7 +1113,7 @@ function renderCal() {
       var b = el('button', 'g'); b.type = 'button'; b.setAttribute('data-g', iso); b.appendChild(document.createTextNode(String(d)));
       if (CARICO && !S.scelte[iso]) { b.disabled = true; b.className += ' sk-r'; var hh = ((d * 37 + (mm + 1) * 101 + y) * 2654435761) % 4294967296, dl = hh % 2600, du = 2200 + (hh >> 5) % 1500; b.style.webkitAnimationDelay = b.style.animationDelay = (-dl) + 'ms'; b.style.webkitAnimationDuration = b.style.animationDuration = du + 'ms'; }
       var mine = !!S.scelte[iso], p = parti(S.scelte[iso]), nn = conta[iso];
-      if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + Math.max(1, Math.ceil(3 * nn / max));
+      if (mine) { b.className += ' m'; if (!p.si) b.className += ' f'; } else if (nn) b.className += ' t' + LIV[nn];
       if ((!editable() || adminOk) && VOTI) { var pv = VOTI.filter(function (v) { return v.giorni[iso] && (!filtroAttivo() || FILTRO[norm(v.nome)]); }); if (pv.length) { var ds = el('span', 'dots'); ds.setAttribute('aria-hidden', 'true'); pv.slice(0, 5).forEach(function (v) { ds.appendChild(avMini(v)); }); b.appendChild(ds); b.className += ' hd'; } }
       if (nn) { var o = el('i', 'o' + (nn === 1 ? ' uno' : ''), String(nn)); o.setAttribute('aria-hidden', 'true'); b.appendChild(o); }
       else if (CARICO && !S.scelte[iso]) { var sk = el('i', 'o sk'); sk.setAttribute('aria-hidden', 'true'); b.appendChild(sk); }
@@ -1148,10 +1158,12 @@ function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome;
   var vv = altri(iso), box = el('div', 'quadro qmini'), ordine = { tutto: 0, pom: 1, sera: 2 };
   var l = vv.map(function (v) { var q = parti(v.giorni[iso]); return { v: v, f: q.f, si: q.si }; });
   l.sort(function (x, y) { return ordine[x.f] - ordine[y.f] || x.v.nome.localeCompare(y.v.nome, 'it'); });
-  [[true, 'Sì'], [false, 'Forse']].forEach(function (k) {
-    var m = l.filter(function (x) { return x.si === k[0]; }); if (!m.length) return;
+  var gr = [[true, 'Sì'], [false, 'Forse']].map(function (k) { return [k[0], k[1], l.filter(function (x) { return x.si === k[0]; }), true]; }).filter(function (g) { return g[2].length; });
+  if (gr.length === 1 && gr[0][2].length > 6) { var h2 = Math.ceil(gr[0][2].length / 2); gr = [[gr[0][0], gr[0][1], gr[0][2].slice(0, h2), true], [gr[0][0], gr[0][1], gr[0][2].slice(h2), false]]; } // tutti sullo stesso lato e tanti: due righe
+  gr.forEach(function (k) {
+    var m = k[2];
     var r = el('div', 'qm-r'), vp = el('div', 'qm-vp'), tr = el('div', 'qm-t');
-    r.appendChild(el('span', 'qm-lab ' + (k[0] ? 'si' : 'fo'), k[1]));
+    r.appendChild(el('span', 'qm-lab ' + (k[0] ? 'si' : 'fo'), k[3] ? k[1] : ''));
     function pillole(dove) { m.forEach(function (x) { var p = el('span', 'q-riga q-o-' + x.f); p.appendChild(av(x.v.nome)); p.appendChild(document.createTextNode(x.v.nome.split(' ')[0] + (x.f === 'pom' ? ' · pom' : x.f === 'sera' ? ' · sera' : ''))); dove.appendChild(p); }); }
     pillole(tr); vp.appendChild(tr); r.appendChild(vp); box.appendChild(r);
     setTimeout(function () { // misura: se non ci sta, si duplica la fila e la si fa scorrere in loop
