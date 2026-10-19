@@ -377,6 +377,16 @@ body .g .o.uno::before{opacity:.7}
 .quadro .q-con{flex:1 1 100%}.quadro .q-c{display:block;margin:3px 0 2px 18px;padding:5px 10px;border-radius:12px;background:#fde4ec;color:#7a2a45;font-size:13px;line-height:1.25;font-weight:600;word-break:break-word}
 .quadro .q-con{width:100%}.quadro .q-con .q-c{align-self:stretch;margin-right:2px}
 .quadro .q-con .q-c{max-width:none;width:auto;box-sizing:border-box}
+.quadro .q-f{margin:0 0 8px;padding:6px 8px 8px;border-radius:14px}.quadro .q-fl{display:block;margin:0 0 5px 2px;font-size:12px;font-weight:700;letter-spacing:.02em}
+.quadro .q-f-tutto{background:#e8f0ff}.quadro .q-f-tutto .q-fl{color:#1e3a8a}.quadro .q-f-tutto .q-riga{background:#fff;color:#1e3a8a}
+.quadro .q-f-pom{background:#fdf0dc}.quadro .q-f-pom .q-fl{color:#8a4b12}.quadro .q-f-pom .q-riga{background:#fff;color:#8a4b12}
+.quadro .q-f-sera{background:#ece7fb}.quadro .q-f-sera .q-fl{color:#4c3a8a}.quadro .q-f-sera .q-riga{background:#fff;color:#4c3a8a}
+.quadro .q-f{border:2.5px solid #9bb8f0;padding:8px 10px 10px;border-radius:22px 17px 25px 15px / 16px 24px 17px 23px}
+.quadro .q-f-tutto{border-color:#7f9fe0;border-radius:23px 16px 26px 15px / 15px 25px 17px 24px}
+.quadro .q-f-pom{border-color:#eab36b;border-radius:16px 25px 15px 24px / 24px 15px 25px 17px}
+.quadro .q-f-sera{border-color:#a897e0;border-radius:24px 15px 22px 18px / 17px 23px 16px 25px}
+.quadro .q-riga{border-radius:20px 16px 21px 15px / 15px 21px 16px 20px}
+.quadro .q-c{border-radius:14px 10px 15px 9px / 10px 15px 9px 14px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -709,14 +719,18 @@ function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri:
   ord(si); ord(fo);
   function gruppo(cls, titolo, l) {
     var sez = el('section', 'q-s ' + cls), h = el('h3', 'q-h'); h.appendChild(document.createTextNode(titolo)); h.appendChild(el('b', '', String(l.length))); sez.appendChild(h);
-    var gg = el('div', 'q-g');
-    l.forEach(function (x) {
-      var c = el('div', 'q-p' + (x.nt ? ' q-con' : '')), riga = el('span', 'q-riga'); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
-      if (x.f !== 'tutto') riga.appendChild(el('small', 'q-o', x.f === 'pom' ? 'pom' : 'sera'));
-      c.appendChild(riga); if (x.nt) c.appendChild(el('span', 'q-c', x.nt)); gg.appendChild(c);
+    [['tutto', 'Tutto il giorno'], ['pom', 'Pomeriggio'], ['sera', 'Sera']].forEach(function (k) { // chi ha scelto lo stesso orario sta insieme, dello stesso colore
+      var m = l.filter(function (x) { return x.f === k[0]; }); if (!m.length) return;
+      var cl = el('div', 'q-f q-f-' + k[0]); cl.appendChild(el('small', 'q-fl', k[1]));
+      var gg = el('div', 'q-g');
+      m.forEach(function (x) {
+        var c = el('div', 'q-p' + (x.nt ? ' q-con' : '')), riga = el('span', 'q-riga'); riga.appendChild(av(x.v.nome)); riga.appendChild(document.createTextNode(x.v.nome.split(' ')[0]));
+        c.appendChild(riga); if (x.nt) c.appendChild(el('span', 'q-c', x.nt)); gg.appendChild(c);
+      });
+      cl.appendChild(gg); sez.appendChild(cl);
     });
-    if (!l.length) gg.appendChild(el('span', 'q-v', '—'));
-    sez.appendChild(gg); return sez;
+    if (!l.length) { var gv = el('div', 'q-g'); gv.appendChild(el('span', 'q-v', '—')); sez.appendChild(gv); }
+    return sez;
   }
   box.appendChild(gruppo('q-si', 'Ci sono', si));
   box.appendChild(gruppo('q-fo', 'Forse', fo));
