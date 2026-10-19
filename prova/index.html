@@ -387,6 +387,15 @@ body .g .o.uno::before{opacity:.7}
 .quadro .q-f-sera{border-color:#a897e0;border-radius:24px 15px 22px 18px / 17px 23px 16px 25px}
 .quadro .q-riga{border-radius:20px 16px 21px 15px / 15px 21px 16px 20px}
 .quadro .q-c{border-radius:14px 10px 15px 9px / 10px 15px 9px 14px}
+.quadro .q-f{border:0;background:var(--bg)}.quadro .q-f-tutto{background:#eaf0fd}.quadro .q-f-pom{background:#fdf1de}.quadro .q-f-sera{background:#eeeafb}
+.quadro .q-riga{border:0}.quadro .q-c{border:0}
+.quadro .q-f > *,.quadro .q-riga > *{position:relative}
+.quadro .q-f,.quadro .q-f-tutto,.quadro .q-f-pom,.quadro .q-f-sera{background:none!important;border:0!important}
+.quadro .q-riga{background:none!important;border:0}
+.quadro .q-c{background:none!important;border:0}
+.quadro .q-f > *:not(svg),.quadro .q-riga > *:not(svg),.quadro .q-c{position:relative;z-index:1}
+.quadro .q-riga,.quadro .q-c{isolation:isolate}
+.quadro .q-f,.quadro .q-riga,.quadro .q-c{isolation:isolate}.quadro svg.mano{z-index:-1}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -711,6 +720,30 @@ function chipsChiViene(iso, tutti, max) { // chi ha detto di esserci quel giorno
   if (max && ch.childNodes.length > max) { var tot = ch.childNodes.length; while (ch.childNodes.length > max) ch.removeChild(ch.lastChild); var pi = el('span', 'chip'); pi.appendChild(document.createTextNode('+' + (tot - max))); ch.appendChild(pi); }
   return ch;
 }
+function contornoMano(e, col, sp, r, amp, seme, riempi) { // contorno disegnato a mano (SVG): linea morbida e un po' storta lungo il vero perimetro arrotondato
+  var w = e.offsetWidth, h = e.offsetHeight; if (w < 8 || h < 8) return;
+  var k = seme || 1; function rnd() { k = (k * 16807) % 2147483647; return (k / 2147483647 - .5) * 2 * amp; }
+  r = Math.min(r, h / 2 - 1, w / 2 - 1); var P = [], i, j, t = sp / 2 + 1;
+  var cx = [w - r - t + 1, w - r - t + 1, r + t - 1, r + t - 1], cy = [r + t - 1, h - r - t + 1, h - r - t + 1, r + t - 1], a0 = [-90, 0, 90, 180];
+  function lato(x1, y1, x2, y2) { var L = Math.hypot(x2 - x1, y2 - y1), q = Math.max(1, Math.round(L / 34)); for (var z = 1; z < q; z++) P.push([x1 + (x2 - x1) * z / q, y1 + (y2 - y1) * z / q]); }
+  for (i = 0; i < 4; i++) {
+    for (j = 0; j <= 4; j++) { var an = (a0[i] + 90 * j / 4) * Math.PI / 180; P.push([cx[i] + (r - 0) * Math.cos(an), cy[i] + (r - 0) * Math.sin(an)]); }
+    var n2 = (i + 1) % 4; lato(cx[i] + r * Math.cos((a0[i] + 90) * Math.PI / 180), cy[i] + r * Math.sin((a0[i] + 90) * Math.PI / 180), cx[n2] + r * Math.cos(a0[n2] * Math.PI / 180), cy[n2] + r * Math.sin(a0[n2] * Math.PI / 180));
+  }
+  P = P.map(function (p) { return [Math.max(t, Math.min(w - t, p[0] + rnd())), Math.max(t, Math.min(h - t, p[1] + rnd()))]; });
+  var L2 = P.length, d = 'M' + P[0][0].toFixed(1) + ',' + P[0][1].toFixed(1);
+  for (i = 0; i < L2; i++) { var p0 = P[(i - 1 + L2) % L2], p1 = P[i], p2 = P[(i + 1) % L2], p3 = P[(i + 2) % L2]; d += 'C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ',' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ' ' + (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ',' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ' ' + p2[0].toFixed(1) + ',' + p2[1].toFixed(1); }
+  var ns = 'http://www.w3.org/2000/svg', sv = document.createElementNS(ns, 'svg'), pa = document.createElementNS(ns, 'path');
+  sv.setAttribute('width', w); sv.setAttribute('height', h); sv.setAttribute('class', 'mano'); sv.setAttribute('aria-hidden', 'true'); sv.style.cssText = 'position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:-1';
+  pa.setAttribute('d', d + 'Z'); pa.setAttribute('fill', riempi || 'none'); pa.setAttribute('stroke', col); pa.setAttribute('stroke-width', sp); pa.setAttribute('stroke-linecap', 'round'); pa.setAttribute('stroke-linejoin', 'round');
+  sv.appendChild(pa); var vecchio = e.querySelector('svg.mano'); if (vecchio && vecchio.parentNode === e) e.removeChild(vecchio); e.style.position = 'relative'; e.insertBefore(sv, e.firstChild);
+}
+function disegnaQuadro(box) {
+  var cols = { tutto: '#6f93de', pom: '#e3a24f', sera: '#9a86dc' }, fill = { tutto: '#eaf0fd', pom: '#fdf1de', sera: '#eeeafb' }, z = 0;
+  Array.prototype.forEach.call(box.querySelectorAll('.q-f'), function (cl) { var t = /q-f-(tutto|pom|sera)/.exec(cl.className), c = t ? t[1] : 'tutto'; contornoMano(cl, cols[c], 3, 22, 2.2, 7 + (z += 3), fill[c]); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-riga'), function (cl) { var t = cl.closest ? cl.closest('.q-f') : null, m = t && /q-f-(tutto|pom|sera)/.exec(t.className), c = m ? m[1] : 'tutto'; contornoMano(cl, cols[c], 1.8, 15, .9, 11 + (z += 5), '#ffffff'); });
+  Array.prototype.forEach.call(box.querySelectorAll('.q-c'), function (cl) { contornoMano(cl, '#e48aa8', 1.8, 13, 1, 5 + (z += 7), '#fde4ec'); });
+}
 function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri: CI SONO / FORSE, ognuno con avatar, nome, orario e (se c'e') il commento in rosa
   var vv = tutti ? (VOTI || []).filter(function (v) { return v.giorni[iso]; }) : altri(iso), box = el('div', 'quadro');
   var si = [], fo = [];
@@ -735,6 +768,7 @@ function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri:
   box.appendChild(gruppo('q-si', 'Ci sono', si));
   box.appendChild(gruppo('q-fo', 'Forse', fo));
   if (!vv.length) box.appendChild(el('p', 'hint', 'Nessuno ancora'));
+  setTimeout(function () { disegnaQuadro(box); }, 60); setTimeout(function () { disegnaQuadro(box); }, 450); // dopo il disegno (e dopo il caricamento delle immagini)
   return box;
 }
 function sheetChiViene(iso) {
