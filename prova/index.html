@@ -342,6 +342,12 @@ body.cnt-c .g .o:not(.sk)::before{width:11px;height:11px;margin:0 0 0 2px}
 #persona{top:calc(env(safe-area-inset-top));right:0;margin:0;width:50px;height:50px;border:2px solid var(--ink);border-top:0;border-right:0;border-radius:0 0 0 18px;background:var(--fill);color:var(--ink)}
 body .g .o.uno{color:#7f9bd6;font-weight:600}
 body .g .o.uno::before{opacity:.7}
+.riep{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:0 0 10px;padding:8px 10px;border-radius:14px;background:var(--fill);border:1.5px solid var(--line)}
+.riep-t{font-weight:700;font-size:14px;text-transform:capitalize;color:var(--ink)}
+.riep-av{display:flex;align-items:center}.riep-av .av{width:26px;height:26px;margin-right:-6px;border:2px solid var(--fill);box-sizing:content-box;font-size:12px}
+.riep-n{margin-left:10px;font-size:12px;font-weight:700;color:var(--mut)}
+.riep-f{display:flex;gap:6px;margin-left:auto}.riep-p{padding:2px 8px;border-radius:9px;font-size:12px;font-weight:700;background:#fff;color:#1e3a8a}
+.riep-p.sera{background:#e4defa;color:#4c3a8a}.riep-p.pom{background:#fde7c7;color:#8a4b12}.riep-p.forse{background:#fdd9d4;color:#8a2a22}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1012,6 +1018,13 @@ function renderBar() {
     ki.addEventListener('focus', function () { kbSeAperta(); setTimeout(function () { try { ki.scrollIntoView({ block: 'center' }); } catch (e) {} }, 300); }); ki.addEventListener('blur', function () { document.body.classList.remove('kb'); });
     cr.appendChild(ki); if (S.keyErr) { ki.setAttribute('aria-invalid', 'true'); var em = el('span', 'em', 'Chiave sbagliata'); em.id = 'serve-e'; em.setAttribute('role', 'alert'); cr.appendChild(em); } bar.appendChild(cr);
   }
+  if (S.focus && S.scelte[S.focus] && editable()) { var gi = S.focus, ch = altri(gi); // quadro d'insieme del giorno toccato: chi viene, e a che ora
+    if (ch.length) { var ri = el('div', 'riep'); ri.setAttribute('aria-label', 'Chi viene ' + lungo(gi));
+      var tt = el('div', 'riep-t', dl(gi, { weekday: 'short', day: 'numeric', month: 'short' })); ri.appendChild(tt);
+      var av_ = el('div', 'riep-av'); ch.slice(0, 7).forEach(function (v) { av_.appendChild(av(v.nome)); }); if (ch.length > 7) av_.appendChild(el('span', 'riep-n', '+' + (ch.length - 7))); ri.appendChild(av_);
+      var ct_ = { tutto: 0, pom: 0, sera: 0, forse: 0 }; ch.forEach(function (v) { var q = parti(v.giorni[gi]); ct_[q.f] = (ct_[q.f] || 0) + 1; if (!q.si) ct_.forse++; });
+      var fr = el('div', 'riep-f'); [['tutto', 'tutto'], ['pom', 'pom'], ['sera', 'sera']].forEach(function (k) { if (ct_[k[0]]) { var pl = el('span', 'riep-p ' + k[0], k[1] + ' ' + ct_[k[0]]); fr.appendChild(pl); } }); if (ct_.forse) fr.appendChild(el('span', 'riep-p forse', '? ' + ct_.forse)); ri.appendChild(fr);
+      bar.appendChild(ri); } }
   var r = el('div', 'riga'), b = el('button', 'invia'); b.type = 'submit'; b.id = 'b';
   {
     var nb = el('button', 'ib hint'); nb.type = 'button'; nb.id = 'opzioni'; nb.setAttribute('aria-label', 'Più opzioni' + (S.commento ? ' (commento scritto)' : '')); nb.appendChild(ico('matita')); if (S.commento || (ngiorni() && !store.get('dettagli_visti'))) nb.appendChild(el('span', 'pt' + (S.commento || store.get('dettagli_visti') ? '' : ' nuovo'))); nb.addEventListener('click', sheetOpzioni); if (ngiorni()) r.appendChild(nb); // la matita compare solo dopo aver scelto un giorno
