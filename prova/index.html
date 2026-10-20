@@ -485,6 +485,7 @@ body .g{padding-bottom:12px}
 .gf-chip{flex:none;width:34px;height:40px;border-radius:10px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;margin-right:2px}.gf-chip small{font-size:9px;text-transform:uppercase;opacity:.8}.gf-chip b{font-size:15px}.gf-chip.cur{background:#dbe6fb;color:#1d4ed8;box-shadow:inset 0 0 0 1.5px #7fa0e1}.gf-chip.rif{background:#fdf1cf;color:#8a6208;box-shadow:inset 0 0 0 1.5px #e0b94a}.gf-piu .av{outline:2px solid #7fa0e1!important}.gf-meno .av{opacity:1!important;filter:none!important;outline:2px solid #e0b94a!important}
 .gf-c{min-height:0!important;justify-content:flex-start!important;flex:1 0 30px}.gf-c.base .gf-d::before{content:'°5';display:block;color:#d9a21c;font-size:11px}.gf-m{display:flex;flex-direction:column;gap:2px}.gf-x{width:19px;height:19px;border-radius:50%;background:#f1f3f8;display:block;position:relative}.gf-x .av{width:19px!important;height:19px!important;position:absolute;left:0;top:0;font-size:10px}.gf-x.fo .av{opacity:.4}.gf-x.se .av{box-shadow:0 0 0 2px #e3c24a}.gf-c .gf-d{margin-top:4px}
 @media (prefers-color-scheme:dark){.quadro .q-p,.quadro .q-riga,.quadro .q-c{color:#1d2740}.quadro .q-si .q-h{color:#7fd6a0}.quadro .q-fo .q-h{color:#f0b46a}.qmini .qm-lab.si{color:#7fd6a0}.qmini .qm-lab.fo{color:#f0b46a}.gf-x{background:#2a3350}.gf-c.sel{background:#23305a;box-shadow:inset 0 0 0 1.5px #5b78c8}.gf-d{color:#9aa6c4}.gf-d b{color:#eef2fb}.gf-pin{background:#4a3d1a;color:#f0c14b}.gf-chip.cur{background:#26365f;color:#a9c0ff}.gf-chip.rif{background:#4a3d1a;color:#f0c14b}.gf-lg.gf-f{background:#3b6b4f}}
+.adm #adm-grafico{flex:0 0 58px;min-height:38px;margin:4px 8px;border-radius:12px;background:#2563eb;color:#fff}.adm #adm-grafico .ico{width:26px;height:26px;margin:0;stroke-width:2.4}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1199,7 +1200,7 @@ function renderCal() {
     }
     if (tot) { c.appendChild(h); c.appendChild(cal); }
   });
-  setTimeout(contornoGiorni, 0);
+  contornoGiorni(); // subito, nello stesso passaggio del ridisegno: niente fotogramma con i giorni lisci (era il tremolio)
 }
 function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome; se sono tante scorrono lentamente di lato (come la fila dei votanti in alto) invece di andare a capo
   var vv = altri(iso), box = el('div', 'quadro qmini'), ordine = { tutto: 0, pom: 1, sera: 2 };
