@@ -488,6 +488,9 @@ body .topq{background:var(--bg)!important;-webkit-backdrop-filter:none;backdrop-
 @media (prefers-color-scheme:dark){body .g .o,body .g .o.uno{color:#eaf1ff}body .g .o:not(.sk)::before{-webkit-filter:brightness(3.2);filter:brightness(3.2)}}
 .cz-bar{display:flex;align-items:center;gap:6px;margin:0 0 8px}.cz-tog{flex:none;width:44px;height:44px;border:0;border-radius:12px;background:#eef1f8;color:#33415f;display:flex;align-items:center;justify-content:center}.cz-tog.on{background:#2563eb;color:#fff}.cz-tog .ico{width:24px;height:24px}.cz-pp{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px 2px}.cz-p{flex:none;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:none;position:relative;opacity:.55}.cz-p .av{width:30px!important;height:30px!important;margin:2px}.cz-p.on{opacity:1;box-shadow:0 0 0 3px var(--c)}.cz-p.sel{box-shadow:0 0 0 4px var(--c),0 0 0 6px #fff}.cz-pers .chz .cz-av{display:none}@media (prefers-color-scheme:dark){.cz-tog{background:#26314d;color:#cdd8f2}}
 .cit.tel{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.cit.tel .av{width:26px;height:26px}.cit.tel>.ico{width:20px;height:20px}
+.ac-top{display:flex;align-items:center;gap:6px;margin:4px 0 10px}.ac-top .ico{width:22px;height:22px;color:#64708a}.ac-top b{margin-right:12px;font-size:18px}.ac{list-style:none;margin:0;padding:0}.ac-r{padding:9px 0;border-bottom:1px solid var(--line)}.ac-n{display:flex;align-items:center;gap:6px}.ac-n .av{width:28px;height:28px;margin-left:-8px}.ac-n .av:first-child{margin-left:0}.ac-n b{font-size:16px}.ac-n .ac-an{width:28px;height:28px;color:#9aa3b5}.ac-n .ac-sc{width:20px;height:20px;color:#d98a2b}.ac-t{margin-left:auto;font-weight:800;color:#33415f;font-size:15px}.ac-tr{position:relative;height:10px;border-radius:6px;background:#eef1f8;margin:7px 0 3px}.ac-tr i{position:absolute;top:0;bottom:0;border-radius:6px;background:#2563eb}.ac-q{font-size:12.5px;color:var(--mut)}.ac-r.anon .ac-tr i{background:#9aa3b5}@media (prefers-color-scheme:dark){.ac-tr{background:#26314d}.ac-t{color:#cdd8f2}.ac-tr i{background:#5b8cf0}.ac-r.anon .ac-tr i{background:#6b7694}}
+.ac,.ac-r,.ac-n,.ac-tr,.ac-q,.ac-top{box-sizing:border-box;max-width:100%;min-width:0}.ac-n{flex-wrap:nowrap}.ac-n b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.ac-t{flex:none}.ac-tr{overflow:hidden}
+.adm button{min-width:0;padding:0 2px}.adm #adm-giorni,.adm #adm-altro{font-size:0}.adm #adm-giorni .ico,.adm #adm-altro .ico{margin:0}.adm .in{overflow:hidden}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1488,9 +1491,31 @@ function renderAdmin() {
   bt('', 'gruppo', String(VOTI ? VOTI.length : 0), function () { sheetPersone(''); }, 'Persone', 'adm-persone');
   bt('', 'grafico', '', sheetGrafico, 'Grafico dei giorni', 'adm-grafico');
   bt('', 'gruppo', '', sheetChiazze, 'Chiazze: chi e quando', 'adm-chiazze');
+  bt('', 'occhio', '', sheetAccessi, 'Accessi e durata', 'adm-accessi');
   bt('', 'calendario', 'Giorni', sheetGiorni, null, 'adm-giorni');
   bt('', 'puntini', 'Altro', sheetAdminAltro, 'Altro', 'adm-altro');
   bt('ee', null, 'Esci', function () { location.href = location.pathname; }, null, 'esci');
+}
+function sheetAccessi() { // solo admin: un telefono per riga, barra dal primo all'ultimo accesso, tempo sulla pagina, nomi usati (i tuoi browser non sono contati)
+  sheet('Accessi', function (s) {
+    var L = DISP.slice().sort(function (a, b) { return (b.ultimo || 0) - (a.ultimo || 0); });
+    if (!L.length) { s.appendChild(el('p', 'hint', 'Nessun accesso registrato ancora')); return; }
+    var t0 = Math.min.apply(null, L.map(function (x) { return x.primo || Date.now(); })), t1 = Math.max.apply(null, L.map(function (x) { return x.ultimo || 0; }).concat([t0 + 1])), maxS = Math.max.apply(null, L.map(function (x) { return x.sec || 0; }).concat([1]));
+    var nA = L.filter(function (x) { return !x.nomi.length; }).length;
+    var rs = el('div', 'ac-top'); rs.appendChild(ico('occhio')); rs.appendChild(el('b', '', String(L.length))); rs.appendChild(ico('persona')); rs.appendChild(el('b', '', String(L.length - nA))); rs.appendChild(ico('orologio')); rs.appendChild(el('b', '', durata(L.reduce(function (a, x) { return a + (x.sec || 0); }, 0)))); s.appendChild(rs);
+    var ul = el('ul', 'ac');
+    L.forEach(function (x) {
+      var li = el('li', 'ac-r' + (x.nomi.length ? '' : ' anon')), top = el('div', 'ac-n');
+      if (x.nomi.length) x.nomi.forEach(function (n) { var w = votoDi(n); var a = av(w ? w.nome : n, w ? w.avatar || '' : ''); a.setAttribute('aria-label', w ? w.nome : n); top.appendChild(a); if (x.nomi.length === 1) top.appendChild(el('b', '', w ? w.nome : n)); });
+      else { top.appendChild(ico('persona', 'ac-an')); top.appendChild(el('b', '', 'Senza nome')); }
+      if (x.nomi.length > 1) top.appendChild(ico('scambia', 'ac-sc'));
+      top.appendChild(el('span', 'ac-t', durata(x.sec))); li.appendChild(top);
+      var tr = el('div', 'ac-tr'), a0 = (x.primo - t0) / (t1 - t0) * 100, w0 = Math.max(2, (x.ultimo - x.primo) / (t1 - t0) * 100), b = el('i'); b.style.left = a0 + '%'; b.style.width = Math.min(100 - a0, w0) + '%'; b.style.opacity = String(.35 + .65 * (x.sec || 0) / maxS); tr.appendChild(b); li.appendChild(tr);
+      li.appendChild(el('div', 'ac-q', 'primo accesso ' + faTempo(x.primo) + ' · ultimo ' + faTempo(x.ultimo)));
+      ul.appendChild(li);
+    });
+    s.appendChild(ul);
+  });
 }
 function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati (anche in diagonale) = una zona; piu' persone = piu' livelli semitrasparenti; dentro ogni giorno un cerchietto per persona
   sheet('Chi e quando', function (s) {
