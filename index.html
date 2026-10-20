@@ -492,6 +492,8 @@ body .topq{background:var(--bg)!important;-webkit-backdrop-filter:none;backdrop-
 .ac,.ac-r,.ac-n,.ac-tr,.ac-q,.ac-top{box-sizing:border-box;max-width:100%;min-width:0}.ac-n{flex-wrap:nowrap}.ac-n b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.ac-t{flex:none}.ac-tr{overflow:hidden}
 .adm button{min-width:0;padding:0 2px}.adm #adm-giorni,.adm #adm-altro{font-size:0}.adm #adm-giorni .ico,.adm #adm-altro .ico{margin:0}.adm .in{overflow:hidden}
 .adm .in{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}.adm .in::-webkit-scrollbar{display:none}.adm button{flex:1 0 auto;min-width:42px}.adm .ee{flex:0 0 58px}
+.cz-pan,.cz-soli{margin:6px 0 10px;padding:8px 10px;border-radius:14px;background:#f1f4fb}.cz-pt{display:block;font-size:13px;color:#4b5775;text-transform:capitalize;margin-bottom:5px}.cz-pr{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:3px 0}.cz-pr>.ico{width:18px;height:18px;color:#64708a;margin-right:2px}.cz-pl{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 3px;border-radius:14px;background:#fff;font-size:12.5px;font-weight:700}.cz-pl .av{width:18px!important;height:18px!important;margin:0!important}.cz-dd{font-style:normal;font-size:11px;color:#2563eb;margin-left:2px}.cz-uno .cz-pl{background:#e9eefb}.cz-fo .cz-pl{opacity:.65}.chz .g.cz.sel{outline:2px solid #2563eb;outline-offset:1px;border-radius:12px}@media (prefers-color-scheme:dark){.cz-pan,.cz-soli{background:#1d2740}.cz-pt{color:#9fb0d6}.cz-pl{background:#26314d;color:#eef2fb}.cz-uno .cz-pl{background:#2d3a5c}}
+.cz-pp{flex:1;min-width:0}.cz-p{width:40px!important;height:40px!important}.cz-p .av{width:34px!important;height:34px!important;margin:3px!important}.cz-p.ex{opacity:.3}.cz-p.ex::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:3px;border-radius:2px;background:#d33;transform:rotate(-45deg)}.cz-all .ico{width:20px;height:20px}.cz-all b{font-size:13px;margin-left:2px}.cz-tog.cz-all{width:auto;min-width:44px;padding:0 8px}.cz-tog.cz-all:disabled{opacity:.45}.cz-top{display:flex;align-items:center;justify-content:space-between}.cz-az{min-height:40px;padding:0 14px;border:0;border-radius:20px;background:#2563eb;color:#fff;font:inherit;font-size:13px;font-weight:700}.cz-tt,.cz-gg{margin-top:6px;padding-top:6px;border-top:1px solid rgba(100,112,138,.25)}.cz-mn>.ico{color:#d33}.cz-pi>.ico{color:#1f9d55}.cz-nil{font-size:12px;color:#64708a}.chz .g.cz .cz-star{position:absolute;right:1px;top:1px;width:13px;height:13px;color:#f2a900}.cz-star .ico{width:13px;height:13px}@media (prefers-color-scheme:dark){.cz-mn>.ico{color:#ff7b7b}.cz-pi>.ico{color:#4fd18b}.cz-nil{color:#9fb0d6}.cz-tt,.cz-gg{border-color:rgba(159,176,214,.25)}}
 </style>
 </head>
 <body>
@@ -1520,23 +1522,70 @@ function sheetAccessi() { // solo admin: un telefono per riga, barra dal primo a
 function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati (anche in diagonale) = una zona; piu' persone = piu' livelli semitrasparenti; dentro ogni giorno un cerchietto per persona
   sheet('Chi e quando', function (s) {
     var voti = VOTI || [], NS = 'http://www.w3.org/2000/svg', cnt = {}, chi = {};
-    voti.forEach(function (v) { Object.keys(v.giorni).forEach(function (g) { if (aperti.indexOf(g) < 0 || !parti(v.giorni[g]).si) return; cnt[g] = (cnt[g] || 0) + 1; (chi[g] = chi[g] || []).push(v); }); });
-    var max = Math.max.apply(null, Object.keys(cnt).map(function (k) { return cnt[k]; }).concat([1]));
-    var sg = [1, Math.ceil(max * .25), Math.ceil(max * .45), Math.ceil(max * .65), Math.ceil(max * .85)].filter(function (v, i, a) { return a.indexOf(v) === i; });
+    function nG(v) { return Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0 && parti(v.giorni[g]).si; }).length; }
+    function pill(v, extra) { var c = el('span', 'cz-pl'); c.appendChild(av(v.nome, v.avatar || '')); c.appendChild(el('span', '', v.nome.split(' ')[0])); if (extra) c.appendChild(extra); return c; }
+    var esc = {}; try { esc = JSON.parse(localStorage.getItem('chiazze_escl') || '{}') || {}; } catch (e) { esc = {}; }
+    function salvaEsc() { try { localStorage.setItem('chiazze_escl', JSON.stringify(esc)); } catch (e) {} }
+    function att() { return voti.filter(function (v) { return !esc[norm(v.nome)]; }); }
+    var max = 1, sg = [1];
+    function ricalcola() {
+      cnt = {}; chi = {};
+      att().forEach(function (v) { Object.keys(v.giorni).forEach(function (g) { if (aperti.indexOf(g) < 0 || !parti(v.giorni[g]).si) return; cnt[g] = (cnt[g] || 0) + 1; if (nG(v) > 1) (chi[g] = chi[g] || []).push(v); }); });
+      max = Math.max.apply(null, Object.keys(cnt).map(function (k) { return cnt[k]; }).concat([1]));
+      sg = [1, Math.ceil(max * .25), Math.ceil(max * .45), Math.ceil(max * .65), Math.ceil(max * .85)].filter(function (v, i, a) { return a.indexOf(v) === i; });
+    }
+    ricalcola();
     var OP = [.26, .26, .26, .26, .82], COL = ['#7fa0e1', '#7fa0e1', '#7fa0e1', '#7fa0e1', '#e4894a'];
     var mesi = {}; aperti.slice().sort().forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
-    var cals = [], modo = 'conteggio', scelte = {};
+    var cals = [], modo = 'conteggio', scelte = {}, selG = {};
     var ordV = voti.slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); });
     var colV = {}; ordV.forEach(function (v, i) { colV[norm(v.nome)] = 'hsl(' + Math.round(360 * i / Math.max(1, ordV.length)) + ',72%,52%)'; });
     var barra = el('div', 'cz-bar'), tog = el('button', 'cz-tog'); tog.type = 'button'; tog.setAttribute('aria-label', 'Un colore per persona'); tog.appendChild(ico('colori')); barra.appendChild(tog);
-    var riga = el('div', 'cz-pp'); barra.appendChild(riga); s.appendChild(barra);
+    var tutti = el('button', 'cz-tog cz-all'); tutti.type = 'button'; tutti.setAttribute('aria-label', 'Rimetti tutti'); barra.appendChild(tutti);
+    var riga = el('div', 'cz-pp'); barra.appendChild(riga); riga.setAttribute('aria-label', 'Tocca per togliere una persona'); s.appendChild(barra);
+    var pan = el('div', 'cz-pan'); pan.hidden = true; s.appendChild(pan);
+    function sicuro(v, g) { return !!(v.giorni[g] && parti(v.giorni[g]).si); }
+    function pillsRow(L, icn, cls, nota) { var r = el('div', 'cz-pr' + (cls ? ' ' + cls : '')); if (icn) r.appendChild(ico(icn)); L.forEach(function (v) { r.appendChild(pill(v)); }); if (!L.length && nota) r.appendChild(el('small', 'cz-nil', nota)); return r; }
+    function mostraSel() {
+      var G = Object.keys(selG).sort(); clear(pan); pan.hidden = !G.length; if (!G.length) return;
+      var A = att().sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); });
+      if (G.length === 1) {
+        var g = G[0]; pan.appendChild(el('b', 'cz-pt', lungo(g)));
+        var tutti1 = A.filter(function (v) { return sicuro(v, g); });
+        pan.appendChild(pillsRow(tutti1.filter(function (v) { return nG(v) > 1; }), null, ''));
+        var uno = tutti1.filter(function (v) { return nG(v) <= 1; }); if (uno.length) pan.appendChild(pillsRow(uno, 'calendario', 'cz-uno'));
+        var forse = A.filter(function (v) { return v.giorni[g] && !parti(v.giorni[g]).si; }); if (forse.length) pan.appendChild(pillsRow(forse, 'orologio', 'cz-fo'));
+        return;
+      }
+      var top = el('div', 'cz-top'); top.appendChild(el('b', 'cz-pt', G.length + ' giorni')); var az = el('button', 'cz-az', 'Azzera'); az.type = 'button'; az.addEventListener('click', function () { selG = {}; aggiorna(); }); top.appendChild(az); pan.appendChild(top);
+      var tt = A.filter(function (v) { return G.every(function (g) { return sicuro(v, g); }); });
+      var bx = el('div', 'cz-tt'); var bt = el('b', 'cz-pt', 'In tutti i giorni (' + tt.length + ')'); bt.style.textTransform = 'none'; bx.appendChild(bt); bx.appendChild(pillsRow(tt, 'spunta', '', 'nessuno')); pan.appendChild(bx);
+      G.forEach(function (g) {
+        var qui = A.filter(function (v) { return sicuro(v, g); }), altri = A.filter(function (v) { return G.some(function (h) { return h !== g && sicuro(v, h); }); });
+        var manca = altri.filter(function (v) { return !sicuro(v, g); }), solo = qui.filter(function (v) { return !G.some(function (h) { return h !== g && sicuro(v, h); }); });
+        var bg = el('div', 'cz-gg'); bg.appendChild(el('b', 'cz-pt', lungo(g) + ' \u00b7 ' + qui.length));
+        if (manca.length) bg.appendChild(pillsRow(manca, 'meno', 'cz-mn')); if (solo.length) bg.appendChild(pillsRow(solo, 'piu', 'cz-pi'));
+        if (!manca.length && !solo.length) bg.appendChild(el('small', 'cz-nil', 'nessuna differenza'));
+        pan.appendChild(bg);
+      });
+    }
+
     ordV.forEach(function (v) {
       var b = el('button', 'cz-p'); b.type = 'button'; b.setAttribute('aria-label', v.nome); b.style.setProperty('--c', colV[norm(v.nome)]); b.appendChild(av(v.nome, v.avatar || ''));
-      b.addEventListener('click', function () { var k = norm(v.nome); if (scelte[k]) delete scelte[k]; else scelte[k] = 1; modo = 'persone'; aggiorna(); });
+      b.addEventListener('click', function () { var k = norm(v.nome); if (modo === 'persone') { if (esc[k]) return; if (scelte[k]) delete scelte[k]; else scelte[k] = 1; } else { if (esc[k]) delete esc[k]; else esc[k] = 1; salvaEsc(); } aggiorna(); });
       riga.appendChild(b); v._b = b;
     });
+    tutti.addEventListener('click', function () { esc = {}; salvaEsc(); aggiorna(); });
     tog.addEventListener('click', function () { modo = modo === 'conteggio' ? 'persone' : 'conteggio'; scelte = {}; aggiorna(); });
-    function aggiorna() { s.className = s.className.replace(/\bcz-pers\b/g, '').trim() + (modo === 'persone' ? ' cz-pers' : ''); tog.className = 'cz-tog' + (modo === 'persone' ? ' on' : ''); var q = Object.keys(scelte).length; ordV.forEach(function (v) { v._b.className = 'cz-p' + (modo === 'persone' && (!q || scelte[norm(v.nome)]) ? ' on' : '') + (q && scelte[norm(v.nome)] ? ' sel' : ''); }); disegna(); }
+    function aggiorna() {
+      ricalcola(); s.className = s.className.replace(/\bcz-pers\b/g, '').trim() + (modo === 'persone' ? ' cz-pers' : ''); tog.className = 'cz-tog' + (modo === 'persone' ? ' on' : '');
+      var ne = voti.filter(function (v) { return esc[norm(v.nome)]; }).length; clear(tutti); tutti.appendChild(ico('gruppo')); tutti.appendChild(el('b', '', String(ne))); tutti.className = 'cz-tog cz-all' + (ne ? ' on' : ''); tutti.disabled = !ne;
+      var q = Object.keys(scelte).length;
+      ordV.forEach(function (v) { var k = norm(v.nome); v._b.className = 'cz-p' + (esc[k] ? ' ex' : '') + (modo === 'persone' && !esc[k] && (!q || scelte[k]) ? ' on' : '') + (q && scelte[k] && !esc[k] ? ' sel' : ''); v._b.setAttribute('aria-pressed', esc[k] ? 'true' : 'false'); });
+      var mx = 0, G = Object.keys(selG); G.forEach(function (g) { mx = Math.max(mx, cnt[g] || 0); });
+      cals.forEach(function (o) { Object.keys(o.cells).forEach(function (g) { var c = o.cells[g].el, on = !!selG[g]; c.classList.toggle('sel', on); var st = c.querySelector('.cz-star'); if (st) c.removeChild(st); if (on && G.length > 1 && mx > 0 && cnt[g] === mx) { st = el('span', 'cz-star'); st.appendChild(ico('stella')); c.appendChild(st); } }); });
+      pallini(); soliUI(); mostraSel(); disegna();
+    }
     Object.keys(mesi).sort().forEach(function (mk) {
       var y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize'; s.appendChild(h);
       var cal = el('div', 'cal chz'), lead = (new Date(mesi[mk][0] + 'T12:00:00Z').getUTCDay() + 6) % 7, i, cells = {}, nm = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate();
@@ -1544,23 +1593,35 @@ function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati 
       var pos = 0;
       for (var d = +mesi[mk][0].slice(8); d <= nm; d++) {
         var g = mk + '-' + (d < 10 ? '0' : '') + d, ap = mesi[mk].indexOf(g) >= 0, c = el('div', 'g cz' + (ap ? '' : ' off'), String(d));
-        cal.appendChild(c); cells[g] = { el: c, n: cnt[g] || 0, open: ap, idx: lead + pos }; pos++;
+        if (ap) { c.setAttribute('data-gz', g); c.addEventListener('click', function (e) { var gz = e.currentTarget.getAttribute('data-gz'); if (selG[gz]) delete selG[gz]; else selG[gz] = 1; aggiorna(); }); }
+        cal.appendChild(c); cells[g] = { el: c, open: ap, idx: lead + pos }; pos++;
       }
-      // pallini solo per la DIFFERENZA: chi c'e' in questo giorno ma non in tutti i giorni attaccati (anche in diagonale); chi c'e' in tutti si capisce dalla zona
-      (function () {
-        var byIdx = {}; Object.keys(cells).forEach(function (g) { byIdx[cells[g].idx] = g; });
+      s.appendChild(cal); cals.push({ cal: cal, cells: cells });
+    });
+    var gs = el('div', 'cz-soli'); s.appendChild(gs);
+    function soliUI() {
+      clear(gs); var soli = att().filter(function (v) { return nG(v) === 1; }); gs.hidden = !soli.length; if (!soli.length) return;
+      gs.appendChild(el('b', 'cz-pt', 'Un solo giorno'));
+      function g1(v) { return Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0 && parti(v.giorni[g]).si; })[0] || ''; }
+      soli.sort(function (a, b) { return g1(a) < g1(b) ? -1 : g1(a) > g1(b) ? 1 : 0; });
+      var rs = el('div', 'cz-pr'); soli.forEach(function (v) { var x = g1(v), ch = el('i', 'cz-dd', x ? String(+x.slice(8)) + '/' + x.slice(5, 7) : ''); rs.appendChild(pill(v, ch)); }); gs.appendChild(rs);
+    }
+    // pallini solo per la DIFFERENZA: chi c'e' in questo giorno ma non in tutti i giorni attaccati (anche in diagonale)
+    function pallini() {
+      cals.forEach(function (o) {
+        var cells = o.cells, byIdx = {}; Object.keys(cells).forEach(function (g) { byIdx[cells[g].idx] = g; });
         function ha(g, v) { return (chi[g] || []).some(function (x) { return norm(x.nome) === norm(v.nome); }); }
         Object.keys(cells).forEach(function (g) {
-          var o = cells[g]; if (!o.open || !cnt[g]) return;
-          var r0 = Math.floor(o.idx / 7), c0 = o.idx % 7, N = [];
+          var oc = cells[g], old = oc.el.querySelector('.cz-av'); if (old) oc.el.removeChild(old);
+          if (!oc.open || !cnt[g]) return;
+          var r0 = Math.floor(oc.idx / 7), c0 = oc.idx % 7, N = [];
           for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) { if (!dr && !dc) continue; var cc = c0 + dc; if (cc < 0 || cc > 6) continue; var ng = byIdx[(r0 + dr) * 7 + cc]; if (ng && cells[ng].open && cnt[ng]) N.push(ng); }
           var mostra = (chi[g] || []).filter(function (v) { return !N.length || !N.every(function (ng) { return ha(ng, v); }); });
           if (!mostra.length) return;
-          var av0 = el('div', 'cz-av'); mostra.forEach(function (v) { var a = av(v.nome, v.avatar || ''); a.setAttribute('aria-label', v.nome); av0.appendChild(a); }); o.el.appendChild(av0);
+          var av0 = el('div', 'cz-av'); mostra.forEach(function (v) { var a = av(v.nome, v.avatar || ''); a.setAttribute('aria-label', v.nome); av0.appendChild(a); }); oc.el.appendChild(av0);
         });
-      })();
-      s.appendChild(cal); cals.push({ cal: cal, cells: cells });
-    });
+      });
+    }
     function disegna() {
       cals.forEach(function (o) {
         var cal = o.cal, cells = o.cells, old = cal.querySelector('svg.cz-z'); if (old) cal.removeChild(old);
@@ -1583,15 +1644,15 @@ function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati 
           });
         }
         if (modo === 'persone') {
-          var q = Object.keys(scelte).length, n = q || ordV.length;
+          var q = Object.keys(scelte).length, n = q || att().length || 1;
           ordV.forEach(function (v) {
-            var k = norm(v.nome); if (q && !scelte[k]) return;
+            var k = norm(v.nome); if (esc[k] || (q && !scelte[k])) return;
             var S = keys.filter(function (g) { return cells[g].open && v.giorni[g] && parti(v.giorni[g]).si; }); if (S.length) zona(S, colV[k], q ? .5 : Math.max(.16, Math.min(.42, 2.2 / n)));
           });
           cal.appendChild(svg); return;
         }
         sg.forEach(function (t, li) {
-          var S = keys.filter(function (g) { return cells[g].open && cells[g].n >= t; }), idx = {}; S.forEach(function (g) { idx[cells[g].idx] = g; });
+          var S = keys.filter(function (g) { return cells[g].open && (cnt[g] || 0) >= t; }), idx = {}; S.forEach(function (g) { idx[cells[g].idx] = g; });
           var col = COL[Math.min(li, COL.length - 1)], P = 3; cur = document.createElementNS(NS, 'g'); cur.setAttribute('opacity', OP[Math.min(li, OP.length - 1)]); gg.appendChild(cur);
           S.forEach(function (g) {
             var b = box(g), i0 = cells[g].idx; rc(b.x - P, b.y - P, b.w + 2 * P, b.h + 2 * P, 16, col);
@@ -1606,7 +1667,7 @@ function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati 
         cal.appendChild(svg);
       });
     }
-    setTimeout(disegna, 30); setTimeout(disegna, 400);
+    setTimeout(aggiorna, 30); setTimeout(disegna, 400);
   }, true);
 }
 function sheetGrafico() { // solo per l'admin: barre per giorno (verde tutto il giorno, arancio pomeriggio, giallo sera; tenue = forse). Si confronta con un giorno di riferimento (la stella): chi si aggiunge (+) e chi si perde (-)
