@@ -482,6 +482,7 @@ body .g{padding-bottom:12px}
 body .ed-b{background:#2563eb;color:#fff}@-webkit-keyframes anelloB{0%{box-shadow:0 0 0 0 rgba(37,99,235,.6)}70%{box-shadow:0 0 0 12px rgba(37,99,235,0)}100%{box-shadow:0 0 0 0 rgba(37,99,235,0)}}@keyframes anelloB{0%{box-shadow:0 0 0 0 rgba(37,99,235,.6)}70%{box-shadow:0 0 0 12px rgba(37,99,235,0)}100%{box-shadow:0 0 0 0 rgba(37,99,235,0)}}.avb.hint{-webkit-animation:anelloB 1.5s ease-out 3;animation:anelloB 1.5s ease-out 3}@media (prefers-reduced-motion:reduce){.avb.hint{-webkit-animation:none;animation:none;box-shadow:0 0 0 3px rgba(37,99,235,.5)}}
 body #modifica-voto,body #modifica-voto:hover{background:#2563eb;color:#fff;border-color:#2563eb}body #modifica-voto .ico{color:#fff}
 body .bar #annulla-mod{background:#2563eb;color:#fff}body .bar #annulla-mod span{color:#fff}
+.mg .mo{color:#6b7fa8}.gf-pin{width:46px;height:36px}.gf-pin .ico{width:22px;height:22px}@media (prefers-color-scheme:dark){.pers .q,.lista .pers .q{background:#27403a;color:#bfe8cf}.mg .mo{color:#8da2cf}}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -866,9 +867,7 @@ function quadroGiorno(iso, tutti) { // a colpo d'occhio, a righe senza riquadri:
     if (!l.length) { var gv = el('div', 'q-g'); gv.appendChild(el('span', 'q-v', '—')); sez.appendChild(gv); }
     return sez;
   }
-  box.appendChild(gruppo('q-si', 'Ci sono', si));
-  box.appendChild(gruppo('q-fo', 'Forse', fo));
-  if (!vv.length) box.appendChild(el('p', 'hint', 'Nessuno ancora'));
+  if (vv.length) { box.appendChild(gruppo('q-si', 'Ci sono', si)); box.appendChild(gruppo('q-fo', 'Forse', fo)); } else box.appendChild(el('p', 'hint', 'Nessuno ancora'));
   setTimeout(function () { disegnaQuadro(box); }, 60); setTimeout(function () { disegnaQuadro(box); }, 450); // dopo il disegno (e dopo il caricamento delle immagini)
   return box;
 }
@@ -1602,7 +1601,7 @@ function sheetGiorni() {
     function ridisegna() {
       clear(wrap); var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
       Object.keys(mesi).sort().forEach(function (mk) {
-        var y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, lead = (new Date(Date.UTC(y, mm, 1)).getUTCDay() + 6) % 7, h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize';
+        var y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, lead = (new Date(mesi[mk][0] + 'T12:00:00Z').getUTCDay() + 6) % 7, h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize';
         var cal = el('div', 'cal'), i; for (i = 0; i < lead; i++) cal.appendChild(el('div', 'g vuoto'));
         mesi[mk].forEach(function (g) {
           var ap = tmp.indexOf(g) >= 0, b = el('button', 'g ' + (ap ? 'aperto-adm' : 'chiuso-adm'), String(+g.slice(8))); b.type = 'button'; b.setAttribute('data-g', g);
