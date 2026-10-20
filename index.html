@@ -631,7 +631,7 @@ for (var d0 = new Date(DAL + 'T00:00:00Z'); d0 <= new Date(AL + 'T00:00:00Z'); d
 var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
-var DISP = [], VISITE = 0, SRV_VIS = false, MAT_ANIM = false, ENTRATI = [], SRV_ENT = false, MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var ORA_CORR = 25200000, DISP = [], VISITE = 0, SRV_VIS = false, MAT_ANIM = false, ENTRATI = [], SRV_ENT = false, MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
 (function () { var m = /[?&]cnt=([abc])/.exec(location.search); document.body.classList.add('cnt-' + (m ? m[1] : 'a')); })();
 var T_AVVIO = Date.now(), CARICO = !/[?&]admin=/.test(location.search); // niente animazione per l'admin; // CARICO: animazione di caricamento a ogni apertura, anche con i dati in cache
 var cachePagina = store.get('cachePagina');
@@ -1680,7 +1680,7 @@ function persona(v, aperta, vai) {
       if (p.f !== 'tutto') m.appendChild(ico(p.f === 'pom' ? 'sole' : 'luna'));
       d.appendChild(m);
     });
-    if (v.agg) { var ro = el('p', 'cit'); ro.appendChild(ico('orologio')); ro.appendChild(document.createTextNode(' voto salvato ' + new Date(v.agg).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))); d.appendChild(ro); } // orario dell'ultimo salvataggio (lo vede solo l'admin)
+    if (v.agg) { var ro = el('p', 'cit'); ro.appendChild(ico('orologio')); ro.appendChild(document.createTextNode(' voto salvato ' + new Date(v.agg + ORA_CORR).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))); d.appendChild(ro); } // orario dell'ultimo salvataggio (lo vede solo l'admin)
     var tel = telefonoDi(v.nome);
     if (tel) {
       var rt = el('p', 'cit'); rt.appendChild(ico('orologio')); rt.appendChild(document.createTextNode(' ' + faTempo(tel.ultimo) + ' · ' + durata(tel.sec) + ' sulla pagina')); d.appendChild(rt);
@@ -1870,7 +1870,7 @@ function carica() {
     var nuovaFirmaCalendario = JSON.stringify([res.voti, res.aperti, res.tutti, res.oggi, res.chiuso, res.dataScelta]);
     var calendarioCambiato = nuovaFirmaCalendario !== firmaCalendario;
     firmaCalendario = nuovaFirmaCalendario;
-    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; ENTRATI = res.entrati || []; SRV_ENT = Array.isArray(res.entrati); VISITE = +res.visite || 0; SRV_VIS = typeof res.visite === 'number'; if (VISITA_NOME === null) segnalaVisita(''); // server vecchio: niente 'entrati'/'visite', niente invio OGGI = res.oggi || OGGI;
+    VOTI = res.voti; aperti = res.aperti; TUTTI = res.tutti; INVITATI = res.invitati || []; ENTRATI = res.entrati || []; ORA_CORR = res.orarioOk ? 0 : 25200000; SRV_ENT = Array.isArray(res.entrati); VISITE = +res.visite || 0; SRV_VIS = typeof res.visite === 'number'; if (VISITA_NOME === null) segnalaVisita(''); // server vecchio: niente 'entrati'/'visite', niente invio OGGI = res.oggi || OGGI;
     DECISA = res.chiuso ? res.dataScelta : ''; SCAD = res.scadenza || ''; S.letturaKo = false;
     store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], entrati: res.entrati, visite: res.visite, oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
     aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
