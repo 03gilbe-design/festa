@@ -1209,6 +1209,12 @@ function mostraTop(iso) { // a ogni tocco su un giorno: quadro di chi viene in A
   if (!topQ) { topQ = el('div', 'topq'); topQ.id = 'top-q'; topQ.setAttribute('role', 'region'); var pb = document.querySelector('body > div[style*="position:fixed"]'); if (pb) topQ.style.top = '30px'; document.body.appendChild(topQ); }
   clear(topQ); topQ.setAttribute('aria-label', 'Chi viene ' + lungo(iso));
   topQ.appendChild(quadroMini(iso));
+  (function () { // si toglie facendola scorrere (verso l'alto o di lato)
+    var q = topQ, x0 = 0, y0 = 0, dx = 0, dy = 0, on = false;
+    q.addEventListener('touchstart', function (e) { var t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; dx = dy = 0; on = true; q.style.transition = 'none'; clearTimeout(topT); }, { passive: true });
+    q.addEventListener('touchmove', function (e) { if (!on) return; var t = e.touches[0]; dx = t.clientX - x0; dy = t.clientY - y0; if (Math.abs(dx) > Math.abs(dy)) { q.style.transform = 'translateX(' + dx + 'px)'; q.style.opacity = String(Math.max(.2, 1 - Math.abs(dx) / 220)); } else if (dy < 0) { q.style.transform = 'translateY(' + dy + 'px)'; q.style.opacity = String(Math.max(.2, 1 + dy / 120)); } }, { passive: true });
+    q.addEventListener('touchend', function () { if (!on) return; on = false; if (Math.abs(dx) > 70 || dy < -35) chiudiTop(); else { q.style.transition = 'transform .15s,opacity .15s'; q.style.transform = ''; q.style.opacity = ''; topT = setTimeout(function () { chiudiTop(false); }, 2500); } });
+  })();
   topQ.className = 'topq'; clearTimeout(topT); topT = setTimeout(function () { chiudiTop(false); }, 3000); // notifica volante: dopo qualche secondo sparisce da sola
 }
 document.addEventListener('click', function (e) { if (!topQ) return; if (topQ.contains(e.target)) return; if (e.target.closest && e.target.closest('[data-g]')) return; chiudiTop(); }, true);
