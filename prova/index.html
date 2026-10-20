@@ -487,6 +487,7 @@ body .bar #annulla-mod{background:#2563eb;color:#fff}body .bar #annulla-mod span
 body .topq{background:var(--bg)!important;-webkit-backdrop-filter:none;backdrop-filter:none}body .bar .invia{flex:1;justify-content:center;text-align:center}body .bar .invia .n{margin-left:6px}
 @media (prefers-color-scheme:dark){body .g .o,body .g .o.uno{color:#eaf1ff}body .g .o:not(.sk)::before{-webkit-filter:brightness(3.2);filter:brightness(3.2)}}
 .cz-bar{display:flex;align-items:center;gap:6px;margin:0 0 8px}.cz-tog{flex:none;width:44px;height:44px;border:0;border-radius:12px;background:#eef1f8;color:#33415f;display:flex;align-items:center;justify-content:center}.cz-tog.on{background:#2563eb;color:#fff}.cz-tog .ico{width:24px;height:24px}.cz-pp{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px 2px}.cz-p{flex:none;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:none;position:relative;opacity:.55}.cz-p .av{width:30px!important;height:30px!important;margin:2px}.cz-p.on{opacity:1;box-shadow:0 0 0 3px var(--c)}.cz-p.sel{box-shadow:0 0 0 4px var(--c),0 0 0 6px #fff}.cz-pers .chz .cz-av{display:none}@media (prefers-color-scheme:dark){.cz-tog{background:#26314d;color:#cdd8f2}}
+.cit.tel{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.cit.tel .av{width:26px;height:26px}.cit.tel>.ico{width:20px;height:20px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -627,7 +628,7 @@ for (var d0 = new Date(DAL + 'T00:00:00Z'); d0 <= new Date(AL + 'T00:00:00Z'); d
 var aperti = TUTTI.filter(function (g) { return CHIUSI0.indexOf(g) < 0; });
 var OGGI = oggiItalia();
 var VOTI = null;                  // [{nome, giorni:{iso:'fascia|prob'}, commento (solo pubblici), protetto, avatar, agg}]
-var VISITE = 0, SRV_VIS = false, MAT_ANIM = false, ENTRATI = [], SRV_ENT = false, MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
+var DISP = [], VISITE = 0, SRV_VIS = false, MAT_ANIM = false, ENTRATI = [], SRV_ENT = false, MANDATI = {}, INVITATI = [], DECISA = '', SCAD = '', aspettoSalvato = {}, anteprima = null;
 (function () { var m = /[?&]cnt=([abc])/.exec(location.search); document.body.classList.add('cnt-' + (m ? m[1] : 'a')); })();
 var T_AVVIO = Date.now(), CARICO = !/[?&]admin=/.test(location.search); // niente animazione per l'admin; // CARICO: animazione di caricamento a ogni apertura, anche con i dati in cache
 var cachePagina = store.get('cachePagina');
@@ -1085,6 +1086,10 @@ function segnalaVisita(nome) { // il telefono ha aperto la pagina (codice casual
   if (ADMIN || !SRV_VIS || VISITA_NOME === nome || store.get('nonconta')) return;
   VISITA_NOME = nome; chiama({ azione: 'visita', dev: codiceTelefono(), nome: nome }).then(null, function () { VISITA_NOME = null; });
 }
+setInterval(function () { if (ADMIN || !SRV_VIS || store.get('nonconta') || document.hidden) return; chiama({ azione: 'visita', dev: codiceTelefono(), nome: VISITA_NOME || '', sec: 30 }).then(null, function () {}); }, 30000);
+function faTempo(ts) { if (!ts) return ''; var m = Math.round((Date.now() - ts) / 60000); if (m < 2) return 'adesso'; if (m < 60) return m + ' min fa'; var h = Math.round(m / 60); if (h < 24) return h + ' h fa'; var g = Math.round(h / 24); return g === 1 ? 'ieri' : g + ' giorni fa'; }
+function durata(sec) { var m = Math.round((sec || 0) / 60); if (m < 1) return (sec || 0) + ' s'; if (m < 60) return m + ' min'; return Math.floor(m / 60) + ' h ' + (m % 60) + ' min'; }
+function telefonoDi(nome) { return DISP.filter(function (x) { return x.nomi.indexOf(norm(nome)) >= 0; })[0] || null; }
 function controllaNome() {
   if (S.adminEdit || (S.voted && !S.edit)) return;
   if (!ADMIN && SRV_ENT) { // chi sceglie il proprio nome da invitato ma non ha votato: si ricorda (nella lista invitati compare l'occhio)
@@ -1641,7 +1646,7 @@ function sheetGrafico() { // solo per l'admin: barre per giorno (verde tutto il 
 }
 function persona(v, aperta, vai) {
   var li = el('li'), b = el('button', 'pers'); b.type = 'button'; b.setAttribute('aria-expanded', aperta ? 'true' : 'false'); b.setAttribute('aria-label', v.nome);
-  b.appendChild(av(v.nome)); b.appendChild(el('b', '', v.nome)); if (v.protetto) b.appendChild(ico('lucchetto', 's'));
+  b.appendChild(av(v.nome)); b.appendChild(el('b', '', v.nome)); if (v.protetto) b.appendChild(ico('lucchetto', 's')); var tl = telefonoDi(v.nome); if (tl && tl.nomi.length > 1) b.appendChild(ico('scambia', 's'));
   var ng_ = Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; }).length; b.appendChild(el('span', 'q', String(ng_))); b.addEventListener('click', vai); li.appendChild(b);
   if (aperta) {
     var d = el('div', 'dett');
@@ -1651,6 +1656,12 @@ function persona(v, aperta, vai) {
       if (p.f !== 'tutto') m.appendChild(ico(p.f === 'pom' ? 'sole' : 'luna'));
       d.appendChild(m);
     });
+    var tel = telefonoDi(v.nome);
+    if (tel) {
+      var rt = el('p', 'cit'); rt.appendChild(ico('orologio')); rt.appendChild(document.createTextNode(' ' + faTempo(tel.ultimo) + ' · ' + durata(tel.sec) + ' sulla pagina')); d.appendChild(rt);
+      var altri = tel.nomi.filter(function (n) { return n !== norm(v.nome); });
+      if (altri.length) { var rs = el('p', 'cit tel'); rs.appendChild(ico('scambia')); altri.forEach(function (n) { var w = votoDi(n); var a = av(w ? w.nome : n, w ? w.avatar || '' : ''); a.setAttribute('aria-label', 'Stesso telefono: ' + (w ? w.nome : n)); rs.appendChild(a); }); d.appendChild(rs); }
+    }
     var priv = privati[norm(v.nome)];
     if (v.commento || priv) { var q = el('p', 'cit'); q.appendChild(ico(v.commento ? 'nuvola' : 'lucchetto', null, v.commento ? 'Commento per tutti' : 'Commento solo per Gilberto')); q.appendChild(document.createTextNode(v.commento || priv)); d.appendChild(q); }
     var du = el('div', 'duo');
@@ -1839,7 +1850,7 @@ function carica() {
     store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], entrati: res.entrati, visite: res.visite, oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
     aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
     var passo2 = ADMIN ? chiama({ azione: 'verifica' }).then(function (v) {
-      if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; } else { ADMIN = ''; adminOk = false; }
+      if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; DISP = v.dispositivi || []; } else { ADMIN = ''; adminOk = false; }
     }, function () { /* rete: si riprova al prossimo caricamento */ }) : Promise.resolve();
     return passo2.then(function () {
       if (io !== giro) return;
