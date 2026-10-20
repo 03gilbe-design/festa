@@ -1680,6 +1680,7 @@ function persona(v, aperta, vai) {
       if (p.f !== 'tutto') m.appendChild(ico(p.f === 'pom' ? 'sole' : 'luna'));
       d.appendChild(m);
     });
+    if (v.agg) { var ro = el('p', 'cit'); ro.appendChild(ico('orologio')); ro.appendChild(document.createTextNode(' voto salvato ' + new Date(v.agg).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))); d.appendChild(ro); } // orario dell'ultimo salvataggio (lo vede solo l'admin)
     var tel = telefonoDi(v.nome);
     if (tel) {
       var rt = el('p', 'cit'); rt.appendChild(ico('orologio')); rt.appendChild(document.createTextNode(' ' + faTempo(tel.ultimo) + ' · ' + durata(tel.sec) + ' sulla pagina')); d.appendChild(rt);
