@@ -1477,7 +1477,7 @@ function applicaVotoMio() {
 function bindPersona() { var b = $('persona'); if (b) b.addEventListener('click', sheetPersona); }
 bindPersona();
 function renderAdmin() {
-  var a = $('adm'); a.hidden = !adminOk; if (!adminOk) return;
+  var a = $('adm'); a.hidden = !(adminOk || ADMIN); if (!(adminOk || ADMIN)) return; // la barra admin compare subito; il server verifica in sottofondo
   var i = clear($('admin-in'));
   function bt(cls, icon, txt, fn, label, id) { var b = el('button', cls || ''); b.type = 'button'; if (id) b.id = id; if (icon) b.appendChild(ico(icon)); b.appendChild(document.createTextNode(txt)); if (label) b.setAttribute('aria-label', label); b.addEventListener('click', fn); i.appendChild(b); }
   bt('', 'gruppo', String(VOTI ? VOTI.length : 0), function () { sheetPersone(''); }, 'Persone', 'adm-persone');
@@ -1514,9 +1514,21 @@ function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati 
       var pos = 0;
       for (var d = +mesi[mk][0].slice(8); d <= nm; d++) {
         var g = mk + '-' + (d < 10 ? '0' : '') + d, ap = mesi[mk].indexOf(g) >= 0, c = el('div', 'g cz' + (ap ? '' : ' off'), String(d));
-        if (ap && cnt[g]) { var av0 = el('div', 'cz-av'); (chi[g] || []).forEach(function (v) { var a = av(v.nome, v.avatar || ''); a.setAttribute('aria-label', v.nome); av0.appendChild(a); }); c.appendChild(av0); }
         cal.appendChild(c); cells[g] = { el: c, n: cnt[g] || 0, open: ap, idx: lead + pos }; pos++;
       }
+      // pallini solo per la DIFFERENZA: chi c'e' in questo giorno ma non in tutti i giorni attaccati (anche in diagonale); chi c'e' in tutti si capisce dalla zona
+      (function () {
+        var byIdx = {}; Object.keys(cells).forEach(function (g) { byIdx[cells[g].idx] = g; });
+        function ha(g, v) { return (chi[g] || []).some(function (x) { return norm(x.nome) === norm(v.nome); }); }
+        Object.keys(cells).forEach(function (g) {
+          var o = cells[g]; if (!o.open || !cnt[g]) return;
+          var r0 = Math.floor(o.idx / 7), c0 = o.idx % 7, N = [];
+          for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) { if (!dr && !dc) continue; var cc = c0 + dc; if (cc < 0 || cc > 6) continue; var ng = byIdx[(r0 + dr) * 7 + cc]; if (ng && cells[ng].open && cnt[ng]) N.push(ng); }
+          var mostra = (chi[g] || []).filter(function (v) { return !N.length || !N.every(function (ng) { return ha(ng, v); }); });
+          if (!mostra.length) return;
+          var av0 = el('div', 'cz-av'); mostra.forEach(function (v) { var a = av(v.nome, v.avatar || ''); a.setAttribute('aria-label', v.nome); av0.appendChild(a); }); o.el.appendChild(av0);
+        });
+      })();
       s.appendChild(cal); cals.push({ cal: cal, cells: cells });
     });
     function disegna() {
@@ -1580,7 +1592,7 @@ function sheetGrafico() { // solo per l'admin: barre per giorno (verde tutto il 
     var scelti = righe.filter(function (r) { return r.ns >= Math.max(2, Math.round(maxS * 0.5)); });
     if (scelti.length < 6) scelti = righe.slice().sort(function (a, b) { return peso(b) - peso(a); }).slice(0, 6);
     scelti = scelti.sort(function (a, b) { return peso(b) - peso(a); }).slice(0, 16).sort(function (a, b) { return a.g < b.g ? -1 : 1; });
-    var base = scelti.slice().sort(function (a, b) { return peso(b) - peso(a); })[0], cur = base;
+    var ordP = scelti.slice().sort(function (a, b) { return peso(b) - peso(a); }), base = ordP[0], cur = ordP[1] || ordP[0]; // confronto subito: il giorno piu' pieno contro il secondo
     var H = 150, maxT = Math.max.apply(null, scelti.map(function (r) { return r.ns + r.nf; }).concat([1]));
     var leg = el('div', 'gf-leg'); leg.setAttribute('aria-hidden', 'true');
     [['gf-t', 'persona'], ['gf-s', 'luna']].forEach(function (x) { var d = el('span', 'gf-lg ' + x[0]); d.appendChild(ico(x[1])); leg.appendChild(d); });
