@@ -1229,7 +1229,10 @@ function quadroMini(iso) { // sempre due righe "Si" / "Forse" con avatar e nome;
 var topQ = null;
 var topT = null;
 function chiudiTop(subito) { clearTimeout(topT); var q = topQ; topQ = null; if (!q || !q.parentNode) return; if (subito === false) { q.className += ' fuori'; setTimeout(function () { if (q.parentNode) q.parentNode.removeChild(q); }, 260); } else q.parentNode.removeChild(q); }
-function mostraTop(iso) { // a ogni tocco su un giorno: quadro di chi viene in ALTO sopra i primi giorni; si chiude con Invia o toccando fuori
+var SENZA_MINI = /[?&]nomini=1/.test(location.search); // prova: ?nomini=1 spegne la mini notifica; ?nofx=1 spegne animazioni e trasformazioni (per capire cosa fa tremare)
+if (/[?&]nofx=1/.test(location.search)) { var stFx = document.createElement('style'); stFx.textContent = '*,*::before,*::after{-webkit-animation:none!important;animation:none!important;-webkit-transition:none!important;transition:none!important}.g:active{-webkit-transform:none!important;transform:none!important}'; document.head.appendChild(stFx); }
+function mostraTop(iso) {
+  if (SENZA_MINI) return; // a ogni tocco su un giorno: quadro di chi viene in ALTO sopra i primi giorni; si chiude con Invia o toccando fuori
   var vv = altri(iso); if (!vv.length) { chiudiTop(); return; }
   if (!topQ) { topQ = el('div', 'topq'); topQ.id = 'top-q'; topQ.setAttribute('role', 'region'); var pb = document.querySelector('body > div[style*="position:fixed"]'); if (pb) topQ.style.top = '30px'; document.body.appendChild(topQ); }
   clear(topQ); topQ.setAttribute('aria-label', 'Chi viene ' + lungo(iso));
