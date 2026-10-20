@@ -483,6 +483,7 @@ body .ed-b{background:#2563eb;color:#fff}@-webkit-keyframes anelloB{0%{box-shado
 body #modifica-voto,body #modifica-voto:hover{background:#2563eb;color:#fff;border-color:#2563eb}body #modifica-voto .ico{color:#fff}
 body .bar #annulla-mod{background:#2563eb;color:#fff}body .bar #annulla-mod span{color:#fff}
 .mg .mo{color:#6b7fa8}.gf-pin{width:46px;height:36px}.gf-pin .ico{width:22px;height:22px}@media (prefers-color-scheme:dark){.pers .q,.lista .pers .q{background:#27403a;color:#bfe8cf}.mg .mo{color:#8da2cf}}
+.cal.chz{position:relative;gap:6px}.chz .g.cz{position:relative;z-index:2;min-height:50px;height:auto;padding:6px 0 3px;flex-direction:column;justify-content:flex-start;background:transparent!important;box-sizing:border-box;font-size:17px}.chz .g.cz.off{text-decoration:line-through;opacity:.35}.chz .cz-av{display:flex;flex-wrap:wrap;justify-content:center;margin-top:2px;padding:0 3px;max-width:100%}.chz .cz-av .av{width:13px!important;height:13px!important;margin:-1px -2px!important;border-width:.6px;font-size:7px}.chz .cz-av .av svg{width:100%;height:100%}svg.cz-z{position:absolute;left:0;top:0;z-index:1;pointer-events:none;overflow:visible}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1478,9 +1479,59 @@ function renderAdmin() {
   function bt(cls, icon, txt, fn, label, id) { var b = el('button', cls || ''); b.type = 'button'; if (id) b.id = id; if (icon) b.appendChild(ico(icon)); b.appendChild(document.createTextNode(txt)); if (label) b.setAttribute('aria-label', label); b.addEventListener('click', fn); i.appendChild(b); }
   bt('', 'gruppo', String(VOTI ? VOTI.length : 0), function () { sheetPersone(''); }, 'Persone', 'adm-persone');
   bt('', 'grafico', '', sheetGrafico, 'Grafico dei giorni', 'adm-grafico');
+  bt('', 'gruppo', '', sheetChiazze, 'Chiazze: chi e quando', 'adm-chiazze');
   bt('', 'calendario', 'Giorni', sheetGiorni, null, 'adm-giorni');
   bt('', 'puntini', 'Altro', sheetAdminAltro, 'Altro', 'adm-altro');
   bt('ee', null, 'Esci', function () { location.href = location.pathname; }, null, 'esci');
+}
+function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati (anche in diagonale) = una zona; piu' persone = piu' livelli semitrasparenti; dentro ogni giorno un cerchietto per persona
+  sheet('Chi e quando', function (s) {
+    var voti = VOTI || [], NS = 'http://www.w3.org/2000/svg', cnt = {}, chi = {};
+    voti.forEach(function (v) { Object.keys(v.giorni).forEach(function (g) { if (aperti.indexOf(g) < 0 || !parti(v.giorni[g]).si) return; cnt[g] = (cnt[g] || 0) + 1; (chi[g] = chi[g] || []).push(v); }); });
+    var max = Math.max.apply(null, Object.keys(cnt).map(function (k) { return cnt[k]; }).concat([1]));
+    var sg = [1, Math.ceil(max * .25), Math.ceil(max * .45), Math.ceil(max * .65), Math.ceil(max * .85)].filter(function (v, i, a) { return a.indexOf(v) === i; });
+    var OP = [.26, .26, .26, .26, .82], COL = ['#7fa0e1', '#7fa0e1', '#7fa0e1', '#7fa0e1', '#e4894a'];
+    var mesi = {}; aperti.slice().sort().forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
+    var cals = [];
+    Object.keys(mesi).sort().forEach(function (mk) {
+      var y = +mk.slice(0, 4), mm = +mk.slice(5) - 1, h = el('h2', 'mese', new Date(Date.UTC(y, mm, 1)).toLocaleDateString('it-IT', { timeZone: 'UTC', month: 'long' })); h.style.textTransform = 'capitalize'; s.appendChild(h);
+      var cal = el('div', 'cal chz'), lead = (new Date(mesi[mk][0] + 'T12:00:00Z').getUTCDay() + 6) % 7, i, cells = {}, nm = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate();
+      for (i = 0; i < lead; i++) cal.appendChild(el('div', 'g vuoto'));
+      var pos = 0;
+      for (var d = +mesi[mk][0].slice(8); d <= nm; d++) {
+        var g = mk + '-' + (d < 10 ? '0' : '') + d, ap = mesi[mk].indexOf(g) >= 0, c = el('div', 'g cz' + (ap ? '' : ' off'), String(d));
+        if (ap && cnt[g]) { var av0 = el('div', 'cz-av'); (chi[g] || []).forEach(function (v) { var a = av(v.nome, v.avatar || ''); a.setAttribute('aria-label', v.nome); av0.appendChild(a); }); c.appendChild(av0); }
+        cal.appendChild(c); cells[g] = { el: c, n: cnt[g] || 0, open: ap, idx: lead + pos }; pos++;
+      }
+      s.appendChild(cal); cals.push({ cal: cal, cells: cells });
+    });
+    function disegna() {
+      cals.forEach(function (o) {
+        var cal = o.cal, cells = o.cells, old = cal.querySelector('svg.cz-z'); if (old) cal.removeChild(old);
+        var R = cal.getBoundingClientRect(); if (!R.width) return;
+        var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'cz-z'); svg.setAttribute('width', R.width); svg.setAttribute('height', R.height);
+        var gg = document.createElementNS(NS, 'g'); gg.setAttribute('filter', 'url(#mano)'); svg.appendChild(gg);
+        function box(g) { var r = cells[g].el.getBoundingClientRect(); return { x: r.left - R.left, y: r.top - R.top, w: r.width, h: r.height }; }
+        var cur = gg; function rc(x, y, w, h, rx, c) { var e = document.createElementNS(NS, 'rect'); e.setAttribute('x', x); e.setAttribute('y', y); e.setAttribute('width', w); e.setAttribute('height', h); e.setAttribute('rx', rx); e.setAttribute('fill', c); cur.appendChild(e); }
+        var keys = Object.keys(cells);
+        sg.forEach(function (t, li) {
+          var S = keys.filter(function (g) { return cells[g].open && cells[g].n >= t; }), idx = {}; S.forEach(function (g) { idx[cells[g].idx] = g; });
+          var col = COL[Math.min(li, COL.length - 1)], P = 3; cur = document.createElementNS(NS, 'g'); cur.setAttribute('opacity', OP[Math.min(li, OP.length - 1)]); gg.appendChild(cur);
+          S.forEach(function (g) {
+            var b = box(g), i0 = cells[g].idx; rc(b.x - P, b.y - P, b.w + 2 * P, b.h + 2 * P, 16, col);
+            [[1, 0], [0, 1], [1, 1], [-1, 1]].forEach(function (dd) {
+              var j = i0 + dd[1] * 7 + dd[0]; if (dd[0] !== 0 && Math.floor(j / 7) !== Math.floor(i0 / 7) + dd[1]) return; if (!idx[j]) return; var b2 = box(idx[j]);
+              if (dd[1] === 0) rc(b.x + b.w - 6, b.y - P, b2.x - (b.x + b.w) + 12, b.h + 2 * P, 6, col);
+              else if (dd[0] === 0) rc(b.x - P, b.y + b.h - 6, b.w + 2 * P, b2.y - (b.y + b.h) + 12, 6, col);
+              else { var lx = dd[0] === -1 ? b2.x + b2.w : b.x + b.w, rx = dd[0] === -1 ? b.x : b2.x, ty = b.y + b.h, by = b2.y; rc(Math.min(lx, rx) - 6, ty - 6, Math.abs(rx - lx) + 12, by - ty + 12, 6, col); }
+            });
+          });
+        });
+        cal.appendChild(svg);
+      });
+    }
+    setTimeout(disegna, 30); setTimeout(disegna, 400);
+  }, true);
 }
 function sheetGrafico() { // solo per l'admin: barre per giorno (verde tutto il giorno, arancio pomeriggio, giallo sera; tenue = forse). Si confronta con un giorno di riferimento (la stella): chi si aggiunge (+) e chi si perde (-)
   sheet('Grafico', function (s) {
