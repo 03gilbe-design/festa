@@ -491,6 +491,7 @@ body .topq{background:var(--bg)!important;-webkit-backdrop-filter:none;backdrop-
 .ac-top{display:flex;align-items:center;gap:6px;margin:4px 0 10px}.ac-top .ico{width:22px;height:22px;color:#64708a}.ac-top b{margin-right:12px;font-size:18px}.ac{list-style:none;margin:0;padding:0}.ac-r{padding:9px 0;border-bottom:1px solid var(--line)}.ac-n{display:flex;align-items:center;gap:6px}.ac-n .av{width:28px;height:28px;margin-left:-8px}.ac-n .av:first-child{margin-left:0}.ac-n b{font-size:16px}.ac-n .ac-an{width:28px;height:28px;color:#9aa3b5}.ac-n .ac-sc{width:20px;height:20px;color:#d98a2b}.ac-t{margin-left:auto;font-weight:800;color:#33415f;font-size:15px}.ac-tr{position:relative;height:10px;border-radius:6px;background:#eef1f8;margin:7px 0 3px}.ac-tr i{position:absolute;top:0;bottom:0;border-radius:6px;background:#2563eb}.ac-q{font-size:12.5px;color:var(--mut)}.ac-r.anon .ac-tr i{background:#9aa3b5}@media (prefers-color-scheme:dark){.ac-tr{background:#26314d}.ac-t{color:#cdd8f2}.ac-tr i{background:#5b8cf0}.ac-r.anon .ac-tr i{background:#6b7694}}
 .ac,.ac-r,.ac-n,.ac-tr,.ac-q,.ac-top{box-sizing:border-box;max-width:100%;min-width:0}.ac-n{flex-wrap:nowrap}.ac-n b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.ac-t{flex:none}.ac-tr{overflow:hidden}
 .adm button{min-width:0;padding:0 2px}.adm #adm-giorni,.adm #adm-altro{font-size:0}.adm #adm-giorni .ico,.adm #adm-altro .ico{margin:0}.adm .in{overflow:hidden}
+.cz-pan,.cz-soli{margin:6px 0 10px;padding:8px 10px;border-radius:14px;background:#f1f4fb}.cz-pt{display:block;font-size:13px;color:#4b5775;text-transform:capitalize;margin-bottom:5px}.cz-pr{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:3px 0}.cz-pr>.ico{width:18px;height:18px;color:#64708a;margin-right:2px}.cz-pl{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 3px;border-radius:14px;background:#fff;font-size:12.5px;font-weight:700}.cz-pl .av{width:18px!important;height:18px!important;margin:0!important}.cz-dd{font-style:normal;font-size:11px;color:#2563eb;margin-left:2px}.cz-uno .cz-pl{background:#e9eefb}.cz-fo .cz-pl{opacity:.65}.chz .g.cz.sel{outline:2px solid #2563eb;outline-offset:1px;border-radius:12px}@media (prefers-color-scheme:dark){.cz-pan,.cz-soli{background:#1d2740}.cz-pt{color:#9fb0d6}.cz-pl{background:#26314d;color:#eef2fb}.cz-uno .cz-pl{background:#2d3a5c}}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1520,7 +1521,9 @@ function sheetAccessi() { // solo admin: un telefono per riga, barra dal primo a
 function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati (anche in diagonale) = una zona; piu' persone = piu' livelli semitrasparenti; dentro ogni giorno un cerchietto per persona
   sheet('Chi e quando', function (s) {
     var voti = VOTI || [], NS = 'http://www.w3.org/2000/svg', cnt = {}, chi = {};
-    voti.forEach(function (v) { Object.keys(v.giorni).forEach(function (g) { if (aperti.indexOf(g) < 0 || !parti(v.giorni[g]).si) return; cnt[g] = (cnt[g] || 0) + 1; (chi[g] = chi[g] || []).push(v); }); });
+    function nG(v) { return Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0 && parti(v.giorni[g]).si; }).length; }
+    function pill(v, extra) { var c = el('span', 'cz-pl'); c.appendChild(av(v.nome, v.avatar || '')); c.appendChild(el('span', '', v.nome.split(' ')[0])); if (extra) c.appendChild(extra); return c; }
+    voti.forEach(function (v) { Object.keys(v.giorni).forEach(function (g) { if (aperti.indexOf(g) < 0 || !parti(v.giorni[g]).si) return; cnt[g] = (cnt[g] || 0) + 1; if (nG(v) > 1) (chi[g] = chi[g] || []).push(v); }); });
     var max = Math.max.apply(null, Object.keys(cnt).map(function (k) { return cnt[k]; }).concat([1]));
     var sg = [1, Math.ceil(max * .25), Math.ceil(max * .45), Math.ceil(max * .65), Math.ceil(max * .85)].filter(function (v, i, a) { return a.indexOf(v) === i; });
     var OP = [.26, .26, .26, .26, .82], COL = ['#7fa0e1', '#7fa0e1', '#7fa0e1', '#7fa0e1', '#e4894a'];
@@ -1530,6 +1533,16 @@ function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati 
     var colV = {}; ordV.forEach(function (v, i) { colV[norm(v.nome)] = 'hsl(' + Math.round(360 * i / Math.max(1, ordV.length)) + ',72%,52%)'; });
     var barra = el('div', 'cz-bar'), tog = el('button', 'cz-tog'); tog.type = 'button'; tog.setAttribute('aria-label', 'Un colore per persona'); tog.appendChild(ico('colori')); barra.appendChild(tog);
     var riga = el('div', 'cz-pp'); barra.appendChild(riga); s.appendChild(barra);
+    var pan = el('div', 'cz-pan'); pan.hidden = true; s.appendChild(pan);
+    function mostraGiorno(g) {
+      clear(pan); pan.hidden = false; pan.appendChild(el('b', 'cz-pt', lungo(g)));
+      var tutti = voti.filter(function (v) { return v.giorni[g] && parti(v.giorni[g]).si; }).sort(function (a, b) { return a.nome.localeCompare(b.nome, 'it'); });
+      var molti = tutti.filter(function (v) { return nG(v) > 1; }), uno = tutti.filter(function (v) { return nG(v) <= 1; });
+      var r1 = el('div', 'cz-pr'); molti.forEach(function (v) { r1.appendChild(pill(v)); }); pan.appendChild(r1);
+      if (uno.length) { var r2 = el('div', 'cz-pr cz-uno'); r2.appendChild(ico('calendario')); uno.forEach(function (v) { r2.appendChild(pill(v)); }); pan.appendChild(r2); }
+      var forse = voti.filter(function (v) { return v.giorni[g] && !parti(v.giorni[g]).si; }); if (forse.length) { var r3 = el('div', 'cz-pr cz-fo'); r3.appendChild(ico('orologio')); forse.forEach(function (v) { r3.appendChild(pill(v)); }); pan.appendChild(r3); }
+    }
+
     ordV.forEach(function (v) {
       var b = el('button', 'cz-p'); b.type = 'button'; b.setAttribute('aria-label', v.nome); b.style.setProperty('--c', colV[norm(v.nome)]); b.appendChild(av(v.nome, v.avatar || ''));
       b.addEventListener('click', function () { var k = norm(v.nome); if (scelte[k]) delete scelte[k]; else scelte[k] = 1; modo = 'persone'; aggiorna(); });
@@ -1544,6 +1557,7 @@ function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati 
       var pos = 0;
       for (var d = +mesi[mk][0].slice(8); d <= nm; d++) {
         var g = mk + '-' + (d < 10 ? '0' : '') + d, ap = mesi[mk].indexOf(g) >= 0, c = el('div', 'g cz' + (ap ? '' : ' off'), String(d));
+        if (ap) { c.setAttribute('data-gz', g); c.addEventListener('click', function (e) { var gz = e.currentTarget.getAttribute('data-gz'); Array.prototype.forEach.call(s.querySelectorAll('.cz.sel'), function (x) { x.classList.remove('sel'); }); e.currentTarget.classList.add('sel'); mostraGiorno(gz); }); }
         cal.appendChild(c); cells[g] = { el: c, n: cnt[g] || 0, open: ap, idx: lead + pos }; pos++;
       }
       // pallini solo per la DIFFERENZA: chi c'e' in questo giorno ma non in tutti i giorni attaccati (anche in diagonale); chi c'e' in tutti si capisce dalla zona
@@ -1561,6 +1575,12 @@ function sheetChiazze() { // solo admin: calendario a chiazze. Giorni attaccati 
       })();
       s.appendChild(cal); cals.push({ cal: cal, cells: cells });
     });
+    var soli = voti.filter(function (v) { return nG(v) === 1; });
+    if (soli.length) {
+      var gs = el('div', 'cz-soli'); gs.appendChild(el('b', 'cz-pt', 'Un solo giorno'));
+      soli.sort(function (a, b) { var ga = Object.keys(a.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; })[0] || '', gb = Object.keys(b.giorni).filter(function (g) { return aperti.indexOf(g) >= 0; })[0] || ''; return ga < gb ? -1 : ga > gb ? 1 : 0; });
+      var rs = el('div', 'cz-pr'); soli.forEach(function (v) { var g1 = Object.keys(v.giorni).filter(function (g) { return aperti.indexOf(g) >= 0 && parti(v.giorni[g]).si; })[0]; var ch = el('i', 'cz-dd', g1 ? String(+g1.slice(8)) + '/' + g1.slice(5, 7) : ''); rs.appendChild(pill(v, ch)); }); gs.appendChild(rs); s.appendChild(gs);
+    }
     function disegna() {
       cals.forEach(function (o) {
         var cal = o.cal, cells = o.cells, old = cal.querySelector('svg.cz-z'); if (old) cal.removeChild(old);
