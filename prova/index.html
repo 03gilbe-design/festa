@@ -676,6 +676,9 @@ var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
 var CESTINO = [];                 // solo admin: [{nome, quando, come}]
 var qs = new URLSearchParams(location.search);
 var ADMIN = qs.get('admin') || '', adminOk = !!qs.get('admin'); // col link admin la pagina e' admin SUBITO (tocco su un giorno = chi c'e'); se il server poi dice che il segreto e' sbagliato torna normale
+if (qs.get('admin') && qs.get('gruppi')) { // import dei gruppi dal link admin (restano solo nel tuo browser): &gruppi=Verona:Manuel,Leo,Geg;Estate:Lambo,Liukks
+  try { var gl = []; String(qs.get('gruppi')).split(';').forEach(function (g) { var q = g.split(':'); var nm = (q[0] || '').replace(/[<>]/g, '').trim().slice(0, 12); var mb = (q[1] || '').split(',').map(function (x) { return norm(x); }).filter(Boolean); if (nm && mb.length) gl.push({ nome: nm, membri: mb }); }); if (gl.length) localStorage.setItem('chiazze_gruppi', JSON.stringify(gl)); } catch (e) {}
+}
 if (ADMIN || qs.get('nc')) { try { localStorage.setItem('nonconta', '1'); } catch (e) {} } // questo browser e' di Gilberto (link admin o ?nc=1): le sue visite non si contano
 if (ADMIN) history.replaceState(null, '', location.pathname); // il segreto non resta nella barra degli indirizzi
 function nuovoS() {
