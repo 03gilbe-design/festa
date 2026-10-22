@@ -671,7 +671,7 @@ if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.q
 var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
 var CESTINO = [];                 // solo admin: [{nome, quando, come}]
 var qs = new URLSearchParams(location.search);
-var ADMIN = qs.get('admin') || '', adminOk = false;
+var ADMIN = qs.get('admin') || '', adminOk = !!qs.get('admin'); // col link admin la pagina e' admin SUBITO (tocco su un giorno = chi c'e'); se il server poi dice che il segreto e' sbagliato torna normale
 if (ADMIN || qs.get('nc')) { try { localStorage.setItem('nonconta', '1'); } catch (e) {} } // questo browser e' di Gilberto (link admin o ?nc=1): le sue visite non si contano
 if (ADMIN) history.replaceState(null, '', location.pathname); // il segreto non resta nella barra degli indirizzi
 function nuovoS() {
