@@ -524,6 +524,7 @@ body .topq{background:var(--bg)!important;-webkit-backdrop-filter:none;backdrop-
 .cz-p.gx{opacity:.18}.cz-p.gm:not(.ex){opacity:1;box-shadow:0 0 0 3px var(--gc)}.cz-grp{margin:4px 0 6px;padding:6px 8px;border-radius:12px;border-left:4px solid var(--gc);background:rgba(255,255,255,.55)}.cz-grp .cz-pt{margin-bottom:3px}.cz-mc .cz-pl{background:#fde0e0;color:#7a1d1d}.cz-vl{display:block;font-size:12px;color:#4b5775;margin-top:4px}.cz-gcov .cz-av{display:none}.chz .g.cz .cz-gn{margin-top:3px;padding:0 5px;border-radius:8px;background:var(--gc);color:#fff;font-size:10px;font-weight:700;line-height:15px}
 @media (prefers-color-scheme:dark){.cz-ed{background:#1d2740}.cz-in{background:#26314d;color:#eef2fb}.cz-grp{background:rgba(255,255,255,.07)}.cz-mc .cz-pl{background:#4a2630;color:#ffd1d1}.cz-vl{color:#9fb0d6}.cz-del{color:#ff8a8a;--gc:#ff8a8a}.cz-ge{background:rgba(159,176,214,.22)}}
 .adm .in{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}.adm .in::-webkit-scrollbar{display:none}.adm button{flex:1 0 auto;min-width:42px}.adm .ee{flex:0 0 58px}
+#adm-pw{width:100%;box-sizing:border-box;height:52px;padding:0 14px;margin:6px 0 10px;border:2px solid var(--line,#cfd6e6);border-radius:14px;font-size:18px;background:var(--bg);color:var(--ink)}#adm-entra{width:100%}#adm-msg{min-height:22px;text-align:center}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -675,7 +676,8 @@ if (cachePagina && typeof cachePagina === 'object' && Date.now() - cachePagina.q
 var privati = Object.create(null); // solo admin: norm(nome) -> commento privato
 var CESTINO = [];                 // solo admin: [{nome, quando, come}]
 var qs = new URLSearchParams(location.search);
-var ADMIN = qs.get('admin') || '', adminOk = !!qs.get('admin'); // col link admin la pagina e' admin SUBITO (tocco su un giorno = chi c'e'); se il server poi dice che il segreto e' sbagliato torna normale
+function chiaveSalvata() { try { var o = JSON.parse(localStorage.getItem('adminkey') || 'null'); if (o && o.k && Date.now() - o.t < 14 * 86400000) return String(o.k); localStorage.removeItem('adminkey'); } catch (e) {} return ''; }
+var ADMIN = qs.get('admin') || chiaveSalvata(), adminOk = !!ADMIN; // col link admin o con la chiave salvata (dal popup) la pagina e' admin SUBITO; se il server dice che il segreto e' sbagliato torna normale
 if (qs.get('admin') && qs.get('gruppi')) { // import dei gruppi dal link admin (restano solo nel tuo browser): &gruppi=Nome1:a,b,c;Nome2:d,e
   try { var gl = []; String(qs.get('gruppi')).split(';').forEach(function (g) { var q = g.split(':'); var nm = (q[0] || '').replace(/[<>]/g, '').trim().slice(0, 12); var mb = (q[1] || '').split(',').map(function (x) { return norm(x); }).filter(Boolean); if (nm && mb.length) gl.push({ nome: nm, membri: mb }); }); if (gl.length) localStorage.setItem('chiazze_gruppi', JSON.stringify(gl)); } catch (e) {}
 }
@@ -1531,7 +1533,7 @@ function renderAdmin() {
   bt('', 'occhio', '', sheetAccessi, 'Accessi e durata', 'adm-accessi');
   bt('', 'calendario', 'Giorni', sheetGiorni, null, 'adm-giorni');
   bt('', 'puntini', 'Altro', sheetAdminAltro, 'Altro', 'adm-altro');
-  bt('ee', null, 'Esci', function () { location.href = location.pathname; }, null, 'esci');
+  bt('ee', null, 'Esci', function () { try { localStorage.removeItem('adminkey'); } catch (e) {} location.href = location.pathname; }, null, 'esci');
 }
 function sheetAccessi() { // solo admin: un telefono per riga, barra dal primo all'ultimo accesso, tempo sulla pagina, nomi usati (i tuoi browser non sono contati)
   sheet('Accessi', function (s) {
@@ -1903,6 +1905,33 @@ function sheetPianifica() { // solo admin: scegli i giorni candidati, escludi pe
     disegna();
   });
 }
+function sheetAccessoAdmin() { // popup: la password va al server ('verifica'); la pagina diventa admin SOLO se il server risponde ok
+  if (adminOk) return;
+  sheet('Admin', function (s) {
+    var inp = el('input'); inp.type = 'password'; inp.id = 'adm-pw'; inp.autocomplete = 'off'; inp.setAttribute('autocapitalize', 'off'); inp.setAttribute('autocorrect', 'off'); inp.setAttribute('spellcheck', 'false'); inp.maxLength = 80; inp.setAttribute('aria-label', 'Password admin');
+    var msg = el('p', 'hint', ''); msg.id = 'adm-msg'; msg.setAttribute('role', 'status');
+    var ok = el('button', 'btn', 'Entra'); ok.type = 'button'; ok.id = 'adm-entra';
+    var falliti = 0, bloccoFino = 0;
+    function prova() {
+      var k = inp.value.trim(); if (!k || ok.disabled) return;
+      if (Date.now() < bloccoFino) { msg.textContent = 'Aspetta un attimo'; return; }
+      ok.disabled = true; msg.textContent = '';
+      var body = new URLSearchParams(); body.append('azione', 'verifica'); body.append('admin', k);
+      fetch(SERVER, { method: 'POST', body: body, signal: timeout(30000) }).then(function (r) { return r.json(); }).then(function (v) {
+        if (v && v.ok) { try { localStorage.setItem('adminkey', JSON.stringify({ k: k, t: Date.now() })); localStorage.setItem('nonconta', '1'); } catch (e) {} location.href = location.pathname; return; }
+        falliti++; inp.value = ''; msg.textContent = 'Non valida'; if (falliti >= 3) { bloccoFino = Date.now() + 30000; msg.textContent = 'Non valida. Riprova tra 30 secondi'; }
+        ok.disabled = false;
+      }, function () { msg.textContent = 'Nessuna connessione'; ok.disabled = false; });
+    }
+    ok.addEventListener('click', prova); inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); prova(); } });
+    s.appendChild(inp); s.appendChild(ok); s.appendChild(msg);
+    setTimeout(function () { try { inp.focus(); } catch (e) {} }, 60);
+  });
+}
+(function () { // 5 tocchi veloci sul titolo aprono il popup (il tocco da solo non da' nessun potere)
+  var n = 0, t0 = 0, h = document.querySelector('h1'); if (!h) return;
+  h.addEventListener('click', function () { var ora = Date.now(); if (ora - t0 > 2500) n = 0; t0 = ora; n++; if (n >= 5) { n = 0; sheetAccessoAdmin(); } });
+})();
 function persona(v, aperta, vai) {
   var li = el('li'), b = el('button', 'pers'); b.type = 'button'; b.setAttribute('aria-expanded', aperta ? 'true' : 'false'); b.setAttribute('aria-label', v.nome);
   b.appendChild(av(v.nome)); b.appendChild(el('b', '', v.nome)); if (v.protetto) b.appendChild(ico('lucchetto', 's')); var tl = telefonoDi(v.nome); if (tl && tl.nomi.length > 1) b.appendChild(ico('scambia', 's'));
@@ -2110,7 +2139,7 @@ function carica() {
     store.set('cachePagina', { quando: Date.now(), voti: res.voti, aperti: res.aperti, tutti: res.tutti, invitati: res.invitati || [], entrati: res.entrati, visite: res.visite, oggi: res.oggi || OGGI, chiuso: !!res.chiuso, dataScelta: res.dataScelta || '', scadenza: res.scadenza || '', aspetto: res.aspetto || {} });
     aspettoSalvato = res.aspetto || {}; store.set('aspetto', aspettoSalvato); if (!anteprima) applicaAspetto(aspettoSalvato);
     var passo2 = ADMIN ? chiama({ azione: 'verifica' }).then(function (v) {
-      if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; DISP = v.dispositivi || []; } else { ADMIN = ''; adminOk = false; }
+      if (v.ok) { adminOk = true; privati = Object.create(null); Object.keys(v.privati || {}).forEach(function (n) { privati[norm(n)] = v.privati[n]; }); CESTINO = v.cestino || []; DISP = v.dispositivi || []; } else { ADMIN = ''; adminOk = false; try { localStorage.removeItem('adminkey'); } catch (e) {} }
     }, function () { /* rete: si riprova al prossimo caricamento */ }) : Promise.resolve();
     return passo2.then(function () {
       if (io !== giro) return;
