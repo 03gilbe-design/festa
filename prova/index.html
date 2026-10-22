@@ -529,6 +529,7 @@ body .topq{background:var(--bg)!important;-webkit-backdrop-filter:none;backdrop-
 body .g.m{outline:3px solid #1d4ed8;outline-offset:-3px;font-weight:800}body .g.m.f{outline-style:dashed}body .g.m::after{content:'';position:absolute;top:-5px;left:-5px;width:17px;height:17px;box-shadow:0 0 0 2px var(--bg,#fff);border-radius:50%;background:#1d4ed8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat;z-index:3}body .g.m.f::after{background-color:#6b7fb0}body .g.m .o{color:inherit;opacity:1}body .g.m .o:not(.sk)::before{-webkit-filter:invert(1);filter:invert(1)}@media (prefers-color-scheme:dark){body .g.m{outline-color:#8fb3ff;color:#eef2fb}body .g.m::after{background-color:#8fb3ff}body .g.m .o:not(.sk)::before{-webkit-filter:none;filter:none}}
 .quadro .q-no .q-h{color:#6b7385}.quadro .q-no .q-riga{background:#eceff5;color:#59627a}.quadro .q-no .av{opacity:.55;filter:grayscale(.7)}.quadro .q-nv{margin:8px 2px 2px;font-size:12.5px;color:#6b7385;display:flex;align-items:center;gap:4px}.quadro .q-nv .ico{width:15px;height:15px}.quadro .q-no .q-g{display:flex;flex-wrap:wrap;gap:4px}@media (prefers-color-scheme:dark){.quadro .q-no .q-h,.quadro .q-nv{color:#9aa6c4}.quadro .q-no .q-riga{background:#26314d;color:#b7c2de}}
 body .quadro .q-no .q-riga,body .quadro .q-no .q-riga.q-o-no{background:#e7eaf1!important;color:#59627a!important}body .quadro .q-no .q-riga::before,body .quadro .q-no .q-riga::after{display:none!important}@media (prefers-color-scheme:dark){body .quadro .q-no .q-riga,body .quadro .q-no .q-riga.q-o-no{background:#2a3350!important;color:#c3cde6!important}}
+.agg-cal{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:0 14px;min-height:40px;border-radius:20px;border:1.5px solid var(--line,#cfd6e6);color:var(--ink);font-size:14px;font-weight:600;text-decoration:none}.agg-cal .ico{width:17px;height:17px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -1090,6 +1091,10 @@ function renderAll(senzaCalendario) {
     var d = el('div', 'decisa'), g = el('div', 'grande'); g.id = 'data-scelta'; g.setAttribute('aria-label', lungo(DECISA)); g.setAttribute('role', 'img');
     g.appendChild(el('span', '', dl(DECISA, { weekday: 'short' }))); g.appendChild(el('b', '', String(+DECISA.slice(8)))); g.appendChild(el('span', '', dl(DECISA, { month: 'short' }))); d.appendChild(g);
     var lk = el('div', 'lk'); lk.appendChild(ico('lucchetto', null, 'Voti chiusi')); d.appendChild(lk);
+    var ag = el('a', 'agg-cal'); ag.target = '_blank'; ag.rel = 'noopener'; // evento di tutto il giorno con luogo, apre Google Calendar (anche da telefono)
+    var fine = new Date(Date.UTC(+DECISA.slice(0, 4), +DECISA.slice(5, 7) - 1, +DECISA.slice(8) + 1)).toISOString().slice(0, 10).replace(/-/g, '');
+    ag.href = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('Festa di laurea di Gilberto') + '&dates=' + DECISA.replace(/-/g, '') + '/' + fine + '&location=' + encodeURIComponent('San Bonifacio (VR)');
+    ag.appendChild(ico('calendario')); ag.appendChild(document.createTextNode(' Aggiungi al calendario')); d.appendChild(ag);
     if (adminOk) {
       var r = el('button', 'btn sec'); r.type = 'button'; r.id = 'riapri'; r.appendChild(document.createTextNode('Riapri i voti'));
       r.addEventListener('click', riapri); d.appendChild(r);
