@@ -525,6 +525,7 @@ body .topq{background:var(--bg)!important;-webkit-backdrop-filter:none;backdrop-
 @media (prefers-color-scheme:dark){.cz-ed{background:#1d2740}.cz-in{background:#26314d;color:#eef2fb}.cz-grp{background:rgba(255,255,255,.07)}.cz-mc .cz-pl{background:#4a2630;color:#ffd1d1}.cz-vl{color:#9fb0d6}.cz-del{color:#ff8a8a;--gc:#ff8a8a}.cz-ge{background:rgba(159,176,214,.22)}}
 .adm .in{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}.adm .in::-webkit-scrollbar{display:none}.adm button{flex:1 0 auto;min-width:42px}.adm .ee{flex:0 0 58px}
 #adm-pw{width:100%;box-sizing:border-box;height:52px;padding:0 14px;margin:6px 0 10px;border:2px solid var(--line,#cfd6e6);border-radius:14px;font-size:18px;background:var(--bg);color:var(--ink)}#adm-entra{width:100%}#adm-msg{min-height:22px;text-align:center}
+.adm-apri{display:flex;justify-content:center;margin:-6px 0 2px}.adm-apri button{width:44px;height:30px;border:0;border-radius:50%;background:transparent;color:#9aa3b5;opacity:.7;display:flex;align-items:center;justify-content:center}.adm-apri .ico{width:20px;height:20px}
 </style>
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:99;background:#b91c1c;color:#fff;font:700 12px system-ui,sans-serif;text-align:center;padding:2px 0;pointer-events:none">PROVA</div>
@@ -590,6 +591,7 @@ body .topq{background:var(--bg)!important;-webkit-backdrop-filter:none;backdrop-
   <div id="nomeblk"></div>
   <div id="cal"></div>
   <div id="stato"></div>
+  <div class="adm-apri" id="adm-apri-w"><button type="button" id="adm-apri" aria-label="Accesso admin"><svg class="ico" aria-hidden="true"><use href="#i-lucchetto"/></svg></button></div>
   <div class="bar" id="bar"></div>
 </main>
 <div id="over"></div>
@@ -1523,6 +1525,7 @@ function applicaVotoMio() {
 function bindPersona() { var b = $('persona'); if (b) b.addEventListener('click', sheetPersona); }
 bindPersona();
 function renderAdmin() {
+  var aw = $('adm-apri-w'); if (aw) aw.hidden = !!(adminOk || ADMIN);
   var a = $('adm'); a.hidden = !(adminOk || ADMIN); if (!(adminOk || ADMIN)) return; // la barra admin compare subito; il server verifica in sottofondo
   var i = clear($('admin-in'));
   function bt(cls, icon, txt, fn, label, id) { var b = el('button', cls || ''); b.type = 'button'; if (id) b.id = id; if (icon) b.appendChild(ico(icon)); b.appendChild(document.createTextNode(txt)); if (label) b.setAttribute('aria-label', label); b.addEventListener('click', fn); i.appendChild(b); }
@@ -1928,6 +1931,7 @@ function sheetAccessoAdmin() { // popup: la password va al server ('verifica'); 
     setTimeout(function () { try { inp.focus(); } catch (e) {} }, 60);
   });
 }
+(function () { var b = document.getElementById('adm-apri'); if (b) b.addEventListener('click', sheetAccessoAdmin); })();
 (function () { // 5 tocchi veloci sul titolo aprono il popup (il tocco da solo non da' nessun potere)
   var n = 0, t0 = 0, h = document.querySelector('h1'); if (!h) return;
   h.addEventListener('click', function () { var ora = Date.now(); if (ora - t0 > 2500) n = 0; t0 = ora; n++; if (n >= 5) { n = 0; sheetAccessoAdmin(); } });
