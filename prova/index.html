@@ -721,6 +721,10 @@ function altri(iso) { // gli ALTRI che ci sono: il voto che sto toccando non con
   var io = norm(S.vecchio || S.me);
   return VOTI ? VOTI.filter(function (v) { return v.giorni[iso] && norm(v.nome) !== io && (!filtroAttivo() || FILTRO[norm(v.nome)]); }) : [];
 }
+function contaSi(iso, conMio) { // UNICA regola del 'quante persone ci sono': solo chi ha scelto SI (il forse si mostra a parte). conMio=true conta anche il mio voto
+  var io = conMio ? '' : norm(S.vecchio || S.me);
+  return VOTI ? VOTI.filter(function (v) { return v.giorni[iso] && parti(v.giorni[iso]).si && norm(v.nome) !== io && (!filtroAttivo() || FILTRO[norm(v.nome)]); }).length : 0;
+}
 function giorniVotabili(giorni) { return oggetto(Object.keys(giorni).filter(votabile).map(function (g) { return [g, giorni[g]]; })); }
 function link() { return location.origin + location.pathname; }
 
@@ -1210,7 +1214,7 @@ function renderCal() {
   if (c.classList) c.classList[CARICO ? 'add' : 'remove']('carico'); // finche' i voti non arrivano: tessere con la luce che scorre (come YouTube)
   c.setAttribute('aria-busy', CARICO ? 'true' : 'false');
   if (CARICO) { var att = el('div', 'caricamento'); att.id = 'caricamento'; att.setAttribute('role', 'status'); att.setAttribute('aria-live', 'polite'); att.appendChild(el('span', 'spin')); att.appendChild(document.createTextNode('Caricamento disponibilità…')); c.appendChild(att); }
-  TUTTI.forEach(function (g) { conta[g] = altri(g).length; if (conta[g] > max) max = conta[g]; });
+  TUTTI.forEach(function (g) { conta[g] = contaSi(g, !editable()); if (conta[g] > max) max = conta[g]; }); // chi ha votato (sola lettura): il numero include anche il suo voto, uguale alla tendina
   var LIV = {}, o1 = Math.max(9, Math.round(max * .75)), o2 = Math.max(10, Math.round(max * .9)); TUTTI.forEach(function (g) { var n = conta[g]; if (n) LIV[n] = n >= o2 ? 10 : n >= o1 ? 9 : Math.min(n, 8); }); // 1..8 persone = un blu ciascuno; arancio solo per i pochi giorni piu' pieni
   var mesi = {}; TUTTI.forEach(function (g) { (mesi[g.slice(0, 7)] = mesi[g.slice(0, 7)] || []).push(g); });
   Object.keys(mesi).sort().forEach(function (mk) {
